@@ -1,0 +1,8 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "cd backend && npm ci --production"
+
+[deploy]
+startCommand = "cd backend && npm start"
+watchPatterns = ["backend/**"]
+
