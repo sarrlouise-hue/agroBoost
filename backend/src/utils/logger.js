@@ -2,6 +2,9 @@ const winston = require('winston');
 const DailyRotateFile = require('winston-daily-rotate-file');
 const { NODE_ENV } = require('../config/env');
 
+// Détecter si on est sur Vercel (serverless)
+const isVercel = process.env.VERCEL === '1';
+
 // Définir le format des logs
 const logFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -33,8 +36,9 @@ transports.push(
   })
 );
 
-// Transports fichiers (uniquement en production)
-if (NODE_ENV === 'production') {
+// Transports fichiers (uniquement en production et pas sur Vercel)
+// Sur Vercel, le système de fichiers est en lecture seule, on utilise uniquement la console
+if (NODE_ENV === 'production' && !isVercel) {
   // Fichier de log des erreurs
   transports.push(
     new DailyRotateFile({
