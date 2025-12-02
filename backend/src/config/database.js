@@ -26,7 +26,8 @@ const sequelize = new Sequelize(databaseUrl, {
     idle: 10000,
   },
   dialectOptions: {
-    ssl: process.env.NODE_ENV === 'production' ? {
+    // NeonDB nécessite SSL en production
+    ssl: process.env.NODE_ENV === 'production' || process.env.DATABASE_URL?.includes('neon.tech') ? {
       require: true,
       rejectUnauthorized: false,
     } : false,
@@ -38,7 +39,7 @@ const connectDB = async () => {
   try {
     if (!databaseUrl || databaseUrl === 'postgresql://postgres:@127.0.0.1:5432/agroboost') {
       console.error('❌ DATABASE_URL non configurée ou utilise les valeurs par défaut.');
-      console.error('💡 Sur Railway, assurez-vous que la variable DATABASE_URL est définie et liée à votre service PostgreSQL.');
+      console.error('💡 Sur Vercel avec NeonDB, assurez-vous que la variable DATABASE_URL est définie dans les variables d\'environnement Vercel.');
       throw new Error('DATABASE_URL non configurée');
     }
 
@@ -53,7 +54,7 @@ const connectDB = async () => {
   } catch (error) {
     console.error('❌ Erreur de connexion à PostgreSQL:', error.message);
     if (error.message.includes('ENOTFOUND')) {
-      console.error('💡 Vérifiez que la base de données PostgreSQL est provisionnée et que DATABASE_URL est correctement configurée sur Railway.');
+      console.error('💡 Vérifiez que la base de données NeonDB est provisionnée et que DATABASE_URL est correctement configurée sur Vercel.');
     }
     throw error;
   }

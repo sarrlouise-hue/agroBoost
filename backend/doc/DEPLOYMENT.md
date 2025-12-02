@@ -151,32 +151,25 @@ heroku config:set JWT_REFRESH_SECRET=your-refresh-secret
 git push heroku main
 ```
 
-### Option 3: Railway + PostgreSQL
+### Option 3: Vercel + NeonDB
 
-#### 1. Créer un projet sur Railway
-- Aller sur [Railway](https://railway.app)
-- Créer un nouveau projet
-- Connecter votre repository GitHub
-
-#### 2. Créer une base de données PostgreSQL
-- Dans votre projet Railway, cliquer sur "New" → "Database" → "Add PostgreSQL"
-- Railway créera automatiquement une base de données PostgreSQL
-- Notez que Railway créera automatiquement une variable `DATABASE_URL` avec l'URL de connexion
-
-#### 3. Créer un service pour le backend
-- Dans votre projet Railway, cliquer sur "New" → "GitHub Repo"
+#### 1. Créer un projet sur Vercel
+- Aller sur [Vercel](https://vercel.com)
+- Se connecter avec votre compte GitHub
+- Cliquer sur "Add New Project"
 - Sélectionner votre repository `agroBoost`
-- Railway détectera automatiquement le fichier `railway.toml` à la racine
 
-#### 4. Lier la base de données au service backend
-- Dans le service backend, aller dans l'onglet "Variables"
-- Railway devrait automatiquement proposer de lier la variable `DATABASE_URL` de la base de données
-- Si ce n'est pas le cas, cliquer sur "Add Reference" et sélectionner la variable `DATABASE_URL` de votre service PostgreSQL
-- **IMPORTANT** : Assurez-vous que `DATABASE_URL` est bien liée et visible dans les variables du service backend
+#### 2. Créer une base de données NeonDB
+- Aller sur [Neon](https://neon.tech) et créer un compte
+- Créer un nouveau projet
+- Créer une nouvelle base de données PostgreSQL
+- **Important** : Copier la `Connection String` (DATABASE_URL) fournie par NeonDB
+- La chaîne de connexion ressemble à : `postgresql://user:password@ep-xxx-xxx.region.aws.neon.tech/dbname?sslmode=require`
 
-#### 5. Configurer les autres variables d'environnement
-Dans l'onglet "Variables" du service backend, ajouter :
+#### 3. Configurer les variables d'environnement sur Vercel
+Dans les paramètres du projet Vercel, aller dans "Environment Variables" et ajouter :
 ```env
+DATABASE_URL=<votre-connection-string-neondb>
 NODE_ENV=production
 JWT_SECRET=<générer-un-secret-fort>
 JWT_REFRESH_SECRET=<générer-un-secret-fort>
@@ -186,15 +179,22 @@ OTP_EXPIRES_IN=5m
 OTP_LENGTH=6
 ```
 
-#### 6. Déployer
-- Railway déploiera automatiquement à chaque push sur la branche configurée
-- Vérifier les logs de déploiement pour s'assurer que tout fonctionne
-- L'URL de votre API sera disponible dans l'onglet "Settings" → "Domains"
+#### 4. Configurer le projet Vercel
+- **Root Directory** : `backend` (important : Vercel doit pointer vers le dossier backend)
+- **Framework Preset** : Other
+- **Build Command** : Laisser vide (pas nécessaire pour un projet Node.js simple)
+- **Output Directory** : Laisser vide
+- **Install Command** : `npm install` (car on est déjà dans le dossier backend)
 
-#### 7. Vérification
-- Vérifier que `DATABASE_URL` est bien définie dans les variables du service backend
-- Vérifier les logs pour confirmer la connexion à PostgreSQL
-- Tester l'endpoint `/health` pour vérifier que l'API fonctionne
+#### 5. Déployer
+- Vercel déploiera automatiquement à chaque push sur la branche principale
+- Vérifier les logs de déploiement dans le dashboard Vercel
+- L'URL de votre API sera disponible après le déploiement (ex: `https://agroboost.vercel.app`)
+
+#### 6. Vérification
+- Vérifier que `DATABASE_URL` est bien définie dans les variables d'environnement Vercel
+- Vérifier les logs pour confirmer la connexion à NeonDB
+- Tester l'endpoint `/health` pour vérifier que l'API fonctionne : `https://votre-projet.vercel.app/health`
 
 ## Variables d'Environnement Production
 
