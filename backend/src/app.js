@@ -11,6 +11,9 @@ dotenv.config();
 const { PORT, NODE_ENV } = require('./config/env');
 const { connectDB } = require('./config/database');
 
+// Détecter si on est sur Vercel (serverless)
+const isVercel = process.env.VERCEL === '1';
+
 // Importer les routes
 const routes = require('./routes');
 
@@ -71,8 +74,34 @@ const swaggerOptions = {
   },
 };
 
-app.use('/api-docs', swaggerUi.serve);
-app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions));
+// Configuration Swagger UI
+const swaggerUiOptions = {
+  explorer: true,
+  swaggerOptions: swaggerOptions.swaggerOptions,
+  customCss: swaggerOptions.customCss,
+  customSiteTitle: swaggerOptions.customSiteTitle,
+};
+
+// Sur Vercel, swagger-ui-express a des problèmes avec les fichiers statiques
+// On utilise une configuration qui charge depuis un CDN via les options
+if (isVercel) {
+  // Utiliser swagger-ui-express avec une configuration qui charge les assets depuis unpkg
+  swaggerUiOptions.customJs = [
+    'https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js',
+    'https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js',
+  ];
+  swaggerUiOptions.customCssUrl = 'https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css';
+}
+
+// Servir Swagger UI
+// Sur Vercel, on ne peut pas utiliser swaggerUi.serve car les fichiers statiques
+// ne sont pas accessibles, donc on sert uniquement la page HTML avec les assets CDN
+if (isVercel) {
+  app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerUiOptions));
+} else {
+  app.use('/api-docs', swaggerUi.serve);
+  app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerUiOptions));
+}
 
 /**
  * @swagger
@@ -211,8 +240,6 @@ const startServer = async () => {
 };
 
 // Ne démarrer le serveur que si on n'est pas en mode test et pas sur Vercel
-// Vercel définit VERCEL=1 dans l'environnement
-const isVercel = process.env.VERCEL === '1';
 const isTest = process.env.NODE_ENV === 'test';
 const isMainModule = require.main === module;
 
