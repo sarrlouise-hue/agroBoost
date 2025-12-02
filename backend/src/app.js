@@ -74,6 +74,23 @@ const swaggerOptions = {
 app.use('/api-docs', swaggerUi.serve);
 app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions));
 
+// Route d'accueil
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Bienvenue sur l\'API AGRO BOOST',
+    version: '1.0.0',
+    environment: NODE_ENV,
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/health',
+      api: '/api',
+      documentation: '/api-docs',
+    },
+    status: 'OK',
+  });
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
