@@ -1,0 +1,242 @@
+const swaggerJsdoc = require('swagger-jsdoc');
+const { PORT, NODE_ENV } = require('./env');
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'AGRO BOOST API',
+      version: '1.0.0',
+      description: 'API REST pour la plateforme AGRO BOOST - Réservation de services agricoles au Sénégal',
+      contact: {
+        name: 'AGRO BOOST',
+        email: 'infos@agro-boost.com',
+      },
+      license: {
+        name: 'ISC',
+      },
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+        description: 'Serveur de développement',
+      },
+      {
+        url: 'https://api.agroboost.com',
+        description: 'Serveur de production',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Entrer le token JWT obtenu lors de la connexion',
+        },
+      },
+      schemas: {
+        User: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'ID unique de l\'utilisateur',
+            },
+            phoneNumber: {
+              type: 'string',
+              description: 'Numéro de téléphone (format international)',
+              example: '+221771234567',
+            },
+            firstName: {
+              type: 'string',
+              description: 'Prénom',
+              example: 'Amadou',
+            },
+            lastName: {
+              type: 'string',
+              description: 'Nom',
+              example: 'Diallo',
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              description: 'Adresse email (optionnel)',
+              example: 'amadou@example.com',
+            },
+            language: {
+              type: 'string',
+              enum: ['fr', 'wolof'],
+              description: 'Langue préférée',
+              example: 'fr',
+            },
+            role: {
+              type: 'string',
+              enum: ['user', 'provider', 'admin'],
+              description: 'Rôle de l\'utilisateur',
+              example: 'user',
+            },
+            isVerified: {
+              type: 'boolean',
+              description: 'Statut de vérification',
+              example: false,
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
+        SuccessResponse: {
+          type: 'object',
+          properties: {
+            success: {
+              type: 'boolean',
+              example: true,
+            },
+            message: {
+              type: 'string',
+              example: 'Opération réussie',
+            },
+            data: {
+              type: 'object',
+            },
+          },
+        },
+        ErrorResponse: {
+          type: 'object',
+          properties: {
+            success: {
+              type: 'boolean',
+              example: false,
+            },
+            message: {
+              type: 'string',
+              example: 'Message d\'erreur',
+            },
+          },
+        },
+        RegisterRequest: {
+          type: 'object',
+          required: ['phoneNumber', 'firstName', 'lastName'],
+          properties: {
+            phoneNumber: {
+              type: 'string',
+              pattern: '^[0-9+]+$',
+              example: '+221771234567',
+              description: 'Numéro de téléphone au format international',
+            },
+            firstName: {
+              type: 'string',
+              minLength: 2,
+              maxLength: 50,
+              example: 'Amadou',
+            },
+            lastName: {
+              type: 'string',
+              minLength: 2,
+              maxLength: 50,
+              example: 'Diallo',
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              example: 'amadou@example.com',
+            },
+            language: {
+              type: 'string',
+              enum: ['fr', 'wolof'],
+              default: 'fr',
+              example: 'fr',
+            },
+          },
+        },
+        VerifyOTPRequest: {
+          type: 'object',
+          required: ['phoneNumber', 'code'],
+          properties: {
+            phoneNumber: {
+              type: 'string',
+              example: '+221771234567',
+            },
+            code: {
+              type: 'string',
+              pattern: '^[0-9]{6}$',
+              example: '123456',
+              description: 'Code OTP à 6 chiffres',
+            },
+          },
+        },
+        LoginRequest: {
+          type: 'object',
+          required: ['phoneNumber'],
+          properties: {
+            phoneNumber: {
+              type: 'string',
+              example: '+221771234567',
+            },
+          },
+        },
+        RefreshTokenRequest: {
+          type: 'object',
+          required: ['refreshToken'],
+          properties: {
+            refreshToken: {
+              type: 'string',
+              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            },
+          },
+        },
+        AuthResponse: {
+          type: 'object',
+          properties: {
+            success: {
+              type: 'boolean',
+              example: true,
+            },
+            message: {
+              type: 'string',
+              example: 'Connexion réussie',
+            },
+            data: {
+              type: 'object',
+              properties: {
+                user: {
+                  $ref: '#/components/schemas/User',
+                },
+                token: {
+                  type: 'string',
+                  description: 'Token JWT d\'accès',
+                },
+                refreshToken: {
+                  type: 'string',
+                  description: 'Token de rafraîchissement',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    tags: [
+      {
+        name: 'Health',
+        description: 'Vérification de l\'état du serveur',
+      },
+      {
+        name: 'Authentification',
+        description: 'Endpoints d\'authentification et de gestion des utilisateurs',
+      },
+    ],
+  },
+  apis: ['./src/routes/*.js', './src/app.js'],
+};
+
+const swaggerSpec = swaggerJsdoc(options);
+
+module.exports = swaggerSpec;
+

@@ -1,18 +1,9 @@
- 
- 
- 
- 
- 
- 
- 
- 
- 
 CAHIER DES CHARGES 
+
 APPLICATION AGRO BOOST  
- 
- 
+
  1. PRÉSENTATION DU PROJET  
-  
+
 *Nom du projet* : AGRO BOOST   
 *Type de projet* : Application mobile de réservation de tracteurs et services agricoles (Android & 
 iOS)  
