@@ -82,23 +82,53 @@ const swaggerUiOptions = {
   customSiteTitle: swaggerOptions.customSiteTitle,
 };
 
-// Sur Vercel, swagger-ui-express a des problèmes avec les fichiers statiques
-// On utilise une configuration qui charge depuis un CDN via les options
+// Sur Vercel, créer une route personnalisée qui sert Swagger UI avec les assets depuis un CDN
 if (isVercel) {
-  // Utiliser swagger-ui-express avec une configuration qui charge les assets depuis unpkg
-  swaggerUiOptions.customJs = [
-    'https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js',
-    'https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js',
-  ];
-  swaggerUiOptions.customCssUrl = 'https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css';
-}
-
-// Servir Swagger UI
-// Sur Vercel, on ne peut pas utiliser swaggerUi.serve car les fichiers statiques
-// ne sont pas accessibles, donc on sert uniquement la page HTML avec les assets CDN
-if (isVercel) {
-  app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerUiOptions));
+  app.get('/api-docs', (req, res) => {
+    const html = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>${swaggerOptions.customSiteTitle}</title>
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css" />
+  <style>
+    ${swaggerOptions.customCss}
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = function() {
+      const ui = SwaggerUIBundle({
+        url: '/api-docs/swagger.json',
+        dom_id: '#swagger-ui',
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        layout: "StandaloneLayout",
+        deepLinking: true,
+        showExtensions: true,
+        showCommonExtensions: true,
+        ${JSON.stringify(swaggerOptions.swaggerOptions).slice(1, -1)}
+      });
+    };
+  </script>
+</body>
+</html>
+    `;
+    res.send(html);
+  });
+  
+  // Servir le JSON Swagger
+  app.get('/api-docs/swagger.json', (req, res) => {
+    res.json(swaggerSpec);
+  });
 } else {
+  // Configuration normale pour le développement
   app.use('/api-docs', swaggerUi.serve);
   app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerUiOptions));
 }
