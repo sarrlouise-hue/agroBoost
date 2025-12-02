@@ -1,3 +1,5 @@
+// S'assurer que pg est chargé avant Sequelize
+require('pg');
 const { Sequelize } = require('sequelize');
 const { DB } = require('./env');
 
