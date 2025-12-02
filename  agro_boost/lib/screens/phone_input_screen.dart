@@ -76,7 +76,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) =>
-                                OtpScreen(phone: _phoneController.text),
+                                OtpScreen(phoneNumber: _phoneController.text),
+
                           ),
                         );
                       }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../core/constants/app_colors.dart';
+import 'otp_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -9,17 +11,18 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
-  bool _obscurePassword = true;
+  // 🔥 Variables séparées pour chaque champ
+  bool _passwordVisible = false;
+  bool _confirmPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // fond blanc neutre
+      backgroundColor: AppColors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 50),
@@ -32,7 +35,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: AppColors.darkText,
                 ),
               ),
               const SizedBox(height: 10),
@@ -40,7 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 "Inscrivez-vous pour réserver vos services agricoles facilement",
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.black54,
+                  color: AppColors.darkText,
                 ),
               ),
               const SizedBox(height: 40),
@@ -48,29 +51,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildTextField("Nom complet", Icons.person, _nameController),
+                    _buildTextField(
+                        "Numéro de téléphone",
+                        Icons.phone,
+                        _phoneController,
+                        keyboardType: TextInputType.phone
+                    ),
                     const SizedBox(height: 20),
-                    _buildTextField("Email", Icons.email, _emailController),
+
+                    // 🔥 MOT DE PASSE AVEC ŒIL
+                    _buildTextField(
+                      "Mot de passe",
+                      Icons.lock,
+                      _passwordController,
+                      obscureText: !_passwordVisible,
+                      isPassword: true,
+                      onToggle: () {
+                        setState(() {
+                          _passwordVisible = !_passwordVisible;
+                        });
+                      },
+                    ),
                     const SizedBox(height: 20),
-                    _buildTextField("Mot de passe", Icons.lock, _passwordController, obscureText: true),
-                    const SizedBox(height: 20),
-                    _buildTextField("Confirmer mot de passe", Icons.lock, _confirmPasswordController, obscureText: true),
+
+                    // 🔥 CONFIRMER MOT DE PASSE AVEC ŒIL
+                    _buildTextField(
+                      "Confirmer mot de passe",
+                      Icons.lock,
+                      _confirmPasswordController,
+                      obscureText: !_confirmPasswordVisible,
+                      isPassword: true,
+                      onToggle: () {
+                        setState(() {
+                          _confirmPasswordVisible = !_confirmPasswordVisible;
+                        });
+                      },
+                    ),
                     const SizedBox(height: 30),
+
                     SizedBox(
                       width: double.infinity,
                       height: 55,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // bouton vert
-                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.primaryGreen,
+                          foregroundColor: AppColors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Compte créé avec succès !')),
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => OtpScreen(
+                                  phoneNumber: _phoneController.text,
+                                ),
+                              ),
                             );
                           }
                         },
@@ -83,22 +121,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
                           "Vous avez déjà un compte ?",
-                          style: TextStyle(color: Colors.black54),
+                          style: TextStyle(color: AppColors.darkText),
                         ),
                         TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
+                          onPressed: () => Navigator.pop(context),
                           child: const Text(
                             "Se connecter",
                             style: TextStyle(
-                              color: Colors.green,
+                              color: AppColors.primaryGreen,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -115,22 +152,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildTextField(String hint, IconData icon, TextEditingController controller, {bool obscureText = false}) {
+  // 🔥 VERSION CORRIGÉE DU BUILDER
+  Widget _buildTextField(
+      String hint,
+      IconData icon,
+      TextEditingController controller,
+      {
+        bool obscureText = false,
+        bool isPassword = false,
+        VoidCallback? onToggle,
+        TextInputType keyboardType = TextInputType.text,
+      }) {
     return TextFormField(
       controller: controller,
+      keyboardType: keyboardType,
       obscureText: obscureText,
       validator: (value) {
         if (value == null || value.isEmpty) return "Ce champ est requis";
-        if (hint.contains("Email") && !value.contains('@')) return "Email invalide";
-        if (hint.contains("Confirmer") && value != _passwordController.text) return "Les mots de passe ne correspondent pas";
+        if (hint.contains("Confirmer") && value != _passwordController.text) {
+          return "Les mots de passe ne correspondent pas";
+        }
         return null;
       },
       decoration: InputDecoration(
         hintText: hint,
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(icon, color: AppColors.darkText.withOpacity(0.6)),
+        filled: true,
+        fillColor: AppColors.veryLightGrey,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide.none,
         ),
+
+        // 🔥 L’icône œil seulement si isPassword = true
+        suffixIcon: isPassword
+            ? IconButton(
+          icon: Icon(
+            obscureText ? Icons.visibility_off : Icons.visibility,
+            color: AppColors.darkText.withOpacity(0.6),
+          ),
+          onPressed: onToggle,
+        )
+            : null,
       ),
     );
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../core/constants/app_colors.dart';
 import 'register_screen.dart';
-import 'home_screen.dart'; // à créer ou remplacer par ton écran d'accueil
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,14 +11,15 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
   bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // fond clair
+      backgroundColor: AppColors.greyBackground,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 50),
@@ -31,15 +32,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: AppColors.darkText,
                 ),
               ),
               const SizedBox(height: 10),
               const Text(
-                "Connectez-vous pour réserver vos services agricoles",
+                "Connectez-vous pour accéder à vos services agricoles",
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.black54,
+                  color: AppColors.darkText,
                 ),
               ),
               const SizedBox(height: 40),
@@ -47,36 +48,39 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildTextField("Email", Icons.email, _emailController),
+                    _buildTextField(
+                      "Numéro de téléphone",
+                      Icons.phone,
+                      _phoneController,
+                      keyboardType: TextInputType.phone,
+                    ),
                     const SizedBox(height: 20),
-                    _buildTextField("Mot de passe", Icons.lock, _passwordController, obscureText: true),
+                    _buildTextField(
+                      "Mot de passe",
+                      Icons.lock,
+                      _passwordController,
+                      obscureText: true,
+                    ),
                     const SizedBox(height: 30),
                     SizedBox(
                       width: double.infinity,
                       height: 55,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.primaryGreen,
+                          foregroundColor: AppColors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            // TODO: remplacer par AuthViewModel().login(...)
-                            bool success = _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty;
-
-                            if (success) {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (_) => const HomeScreen()),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Email ou mot de passe incorrect')),
-                              );
-                            }
+                            // TODO: implémenter la connexion réelle
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Connexion réussie !'),
+                              ),
+                            );
                           }
                         },
                         child: const Text(
@@ -94,19 +98,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         const Text(
                           "Pas de compte ?",
-                          style: TextStyle(color: Colors.black54),
+                          style: TextStyle(color: AppColors.darkText),
                         ),
                         TextButton(
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                              MaterialPageRoute(
+                                  builder: (_) => const RegisterScreen()),
                             );
                           },
                           child: const Text(
                             "S'inscrire",
                             style: TextStyle(
-                              color: Colors.green,
+                              color: AppColors.primaryGreen,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -123,28 +128,43 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Champ de texte stylé
-  Widget _buildTextField(String hint, IconData icon, TextEditingController controller, {bool obscureText = false}) {
+  Widget _buildTextField(
+      String hint,
+      IconData icon,
+      TextEditingController controller, {
+        bool obscureText = false,
+        TextInputType keyboardType = TextInputType.text,
+      }) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText ? _obscurePassword : false,
+      keyboardType: keyboardType,
       validator: (value) {
         if (value == null || value.isEmpty) return "Ce champ est requis";
-        if (hint == "Email" && !value.contains('@')) return "Email invalide";
+        if (hint == "Numéro de téléphone" &&
+            !RegExp(r'^\+?\d{8,15}$').hasMatch(value)) {
+          return "Numéro invalide";
+        }
+        if (hint == "Mot de passe" && value.length < 6) {
+          return "Le mot de passe doit contenir au moins 6 caractères";
+        }
         return null;
       },
       decoration: InputDecoration(
         hintText: hint,
-        prefixIcon: Icon(icon, color: Colors.grey[600]),
+        prefixIcon: Icon(icon, color: AppColors.darkText.withOpacity(0.6)),
         filled: true,
-        fillColor: Colors.grey[200],
+        fillColor: AppColors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide.none,
         ),
         suffixIcon: obscureText
             ? IconButton(
-          icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off, color: Colors.grey[600]),
+          icon: Icon(
+            _obscurePassword ? Icons.visibility : Icons.visibility_off,
+            color: AppColors.darkText.withOpacity(0.6),
+          ),
           onPressed: () {
             setState(() {
               _obscurePassword = !_obscurePassword;

@@ -1,110 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../view_models/auth_view_model.dart';
 import 'home_screen.dart';
-import '../core/constants/app_colors.dart';
-import 'dart:async';
-
 class OtpScreen extends StatefulWidget {
-  final String phone;
-  const OtpScreen({super.key, required this.phone});
+  final String phoneNumber; // numéro reçu depuis l'écran précédent
+
+  const OtpScreen({super.key, required this.phoneNumber});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  List<String> otpValues = ["", "", "", ""]; // 4 cases
-  final List<FocusNode> focusNodes = List.generate(4, (_) => FocusNode());
-  final auth = AuthViewModel();
-
-  int timer = 30;
-  Timer? countdown;
-
-  @override
-  void initState() {
-    super.initState();
-    startTimer();
-  }
-
-  void startTimer() {
-    timer = 30;
-    countdown?.cancel();
-    countdown = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (timer == 0) {
-        t.cancel();
-      } else {
-        setState(() => timer--);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    countdown?.cancel();
-    for (var node in focusNodes) node.dispose();
-    super.dispose();
-  }
-
-  void submitOtp() {
-    String enteredOtp = otpValues.join();
-    if (enteredOtp == "1234") { // code OTP fixe
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => const HomeScreen()));
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("OTP incorrect")));
-    }
-  }
-
-  Widget otpBox(int index) {
-    return SizedBox(
-      width: 55,
-      child: TextField(
-        focusNode: focusNodes[index],
-        keyboardType: TextInputType.number,
-        textAlign: TextAlign.center,
-        maxLength: 1,
-        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        decoration: InputDecoration(
-          counterText: "",
-          filled: true,
-          fillColor: AppColors.greyBackground,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        onChanged: (val) {
-          if (val.isNotEmpty && index < 3) {
-            focusNodes[index + 1].requestFocus();
-          }
-          if (val.isEmpty && index > 0) {
-            focusNodes[index - 1].requestFocus();
-          }
-          otpValues[index] = val;
-        },
-      ),
-    );
-  }
+  final _formKey = GlobalKey<FormState>();
+  final List<TextEditingController> _otpControllers =
+  List.generate(6, (_) => TextEditingController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Validation OTP")),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("Vérification OTP"),
+        backgroundColor: Colors.green,
+        elevation: 0,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(25),
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 50),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Code envoyé à ${widget.phone}",
-              style: const TextStyle(fontSize: 18),
-              textAlign: TextAlign.center,
+            const Text(
+              "Entrez le code OTP",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: List.generate(4, (index) => otpBox(index)),
+            const SizedBox(height: 10),
+            Text(
+              "Nous avons envoyé un code à votre numéro : ${widget.phoneNumber}",
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
+            ),
+            const SizedBox(height: 40),
+            Form(
+              key: _formKey,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(6, (index) => _buildOtpField(index)),
+              ),
             ),
             const SizedBox(height: 30),
             SizedBox(
@@ -112,30 +55,87 @@ class _OtpScreenState extends State<OtpScreen> {
               height: 55,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
+                  backgroundColor: Colors.green,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
-                onPressed: submitOtp,
+                onPressed: () {
+                  if (_otpControllers.every((c) => c.text.isNotEmpty)) {
+                    String otp = _otpControllers.map((c) => c.text).join();
+
+                    // Simuler une vérification
+                    if (otp == "123456") {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HomeScreen(), // Remplace par ta page d'accueil
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Code OTP incorrect')),
+                      );
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Veuillez remplir tous les champs')),
+                    );
+                  }
+                },
+
                 child: const Text(
-                  "Valider OTP",
+                  "Vérifier",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-            const SizedBox(height: 15),
-            TextButton(
-              onPressed: timer == 0 ? startTimer : null,
-              child: Text(
-                timer == 0 ? "Renvoyer OTP" : "Renvoyer dans $timer s",
-                style: TextStyle(
-                    color: timer == 0
-                        ? AppColors.primaryGreen
-                        : Colors.black54),
+            const SizedBox(height: 20),
+            Center(
+              child: TextButton(
+                onPressed: () {
+                  // TODO: implémenter renvoi OTP
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('OTP renvoyé')),
+                  );
+                },
+                child: const Text(
+                  "Renvoyer le code",
+                  style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                ),
               ),
-            )
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildOtpField(int index) {
+    return SizedBox(
+      width: 45,
+      child: TextFormField(
+        controller: _otpControllers[index],
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.center,
+        maxLength: 1,
+        decoration: InputDecoration(
+          counterText: "",
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        onChanged: (value) {
+          if (value.isNotEmpty && index < 5) {
+            FocusScope.of(context).nextFocus();
+          } else if (value.isEmpty && index > 0) {
+            FocusScope.of(context).previousFocus();
+          }
+        },
+        validator: (value) {
+          if (value == null || value.isEmpty) return "";
+          return null;
+        },
       ),
     );
   }
