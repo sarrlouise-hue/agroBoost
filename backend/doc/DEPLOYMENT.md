@@ -151,16 +151,50 @@ heroku config:set JWT_REFRESH_SECRET=your-refresh-secret
 git push heroku main
 ```
 
-### Option 3: Railway/Render + PostgreSQL
+### Option 3: Railway + PostgreSQL
 
-#### 1. Créer une base de données PostgreSQL
-- Railway : Créer un service PostgreSQL
-- Render : Créer une base de données PostgreSQL
+#### 1. Créer un projet sur Railway
+- Aller sur [Railway](https://railway.app)
+- Créer un nouveau projet
+- Connecter votre repository GitHub
 
-#### 2. Déployer l'application
-- Connecter le repository GitHub
-- Configurer les variables d'environnement
-- Déployer automatiquement
+#### 2. Créer une base de données PostgreSQL
+- Dans votre projet Railway, cliquer sur "New" → "Database" → "Add PostgreSQL"
+- Railway créera automatiquement une base de données PostgreSQL
+- Notez que Railway créera automatiquement une variable `DATABASE_URL` avec l'URL de connexion
+
+#### 3. Créer un service pour le backend
+- Dans votre projet Railway, cliquer sur "New" → "GitHub Repo"
+- Sélectionner votre repository `agroBoost`
+- Railway détectera automatiquement le fichier `railway.toml` à la racine
+
+#### 4. Lier la base de données au service backend
+- Dans le service backend, aller dans l'onglet "Variables"
+- Railway devrait automatiquement proposer de lier la variable `DATABASE_URL` de la base de données
+- Si ce n'est pas le cas, cliquer sur "Add Reference" et sélectionner la variable `DATABASE_URL` de votre service PostgreSQL
+- **IMPORTANT** : Assurez-vous que `DATABASE_URL` est bien liée et visible dans les variables du service backend
+
+#### 5. Configurer les autres variables d'environnement
+Dans l'onglet "Variables" du service backend, ajouter :
+```env
+NODE_ENV=production
+JWT_SECRET=<générer-un-secret-fort>
+JWT_REFRESH_SECRET=<générer-un-secret-fort>
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_EXPIRES_IN=30d
+OTP_EXPIRES_IN=5m
+OTP_LENGTH=6
+```
+
+#### 6. Déployer
+- Railway déploiera automatiquement à chaque push sur la branche configurée
+- Vérifier les logs de déploiement pour s'assurer que tout fonctionne
+- L'URL de votre API sera disponible dans l'onglet "Settings" → "Domains"
+
+#### 7. Vérification
+- Vérifier que `DATABASE_URL` est bien définie dans les variables du service backend
+- Vérifier les logs pour confirmer la connexion à PostgreSQL
+- Tester l'endpoint `/health` pour vérifier que l'API fonctionne
 
 ## Variables d'Environnement Production
 

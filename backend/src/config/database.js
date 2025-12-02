@@ -1,8 +1,22 @@
 const { Sequelize } = require('sequelize');
 const { DB } = require('./env');
 
+// Normaliser l'URL de connexion (postgres:// -> postgresql://)
+let databaseUrl = DB.URI;
+if (databaseUrl && databaseUrl.startsWith('postgres://')) {
+  databaseUrl = databaseUrl.replace('postgres://', 'postgresql://');
+}
+
+// Log de l'URL de connexion (sans mot de passe) pour débogage
+if (databaseUrl) {
+  const urlForLog = databaseUrl.replace(/:[^:@]+@/, ':****@');
+  console.log('🔗 Tentative de connexion à PostgreSQL:', urlForLog.split('@')[1] || 'URL invalide');
+} else {
+  console.error('❌ DATABASE_URL non définie. Vérifiez vos variables d\'environnement.');
+}
+
 // Configuration Sequelize
-const sequelize = new Sequelize(DB.URI, {
+const sequelize = new Sequelize(databaseUrl, {
   dialect: 'postgres',
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
   pool: {
@@ -11,11 +25,23 @@ const sequelize = new Sequelize(DB.URI, {
     acquire: 30000,
     idle: 10000,
   },
+  dialectOptions: {
+    ssl: process.env.NODE_ENV === 'production' ? {
+      require: true,
+      rejectUnauthorized: false,
+    } : false,
+  },
 });
 
 // Connexion à PostgreSQL
 const connectDB = async () => {
   try {
+    if (!databaseUrl || databaseUrl === 'postgresql://postgres:@127.0.0.1:5432/agroboost') {
+      console.error('❌ DATABASE_URL non configurée ou utilise les valeurs par défaut.');
+      console.error('💡 Sur Railway, assurez-vous que la variable DATABASE_URL est définie et liée à votre service PostgreSQL.');
+      throw new Error('DATABASE_URL non configurée');
+    }
+
     await sequelize.authenticate();
     console.log('✅ Connexion à PostgreSQL établie avec succès.');
     
@@ -25,7 +51,10 @@ const connectDB = async () => {
       console.log('✅ Modèles synchronisés avec la base de données.');
     }
   } catch (error) {
-    console.error('❌ Erreur de connexion à PostgreSQL:', error);
+    console.error('❌ Erreur de connexion à PostgreSQL:', error.message);
+    if (error.message.includes('ENOTFOUND')) {
+      console.error('💡 Vérifiez que la base de données PostgreSQL est provisionnée et que DATABASE_URL est correctement configurée sur Railway.');
+    }
     throw error;
   }
 };
