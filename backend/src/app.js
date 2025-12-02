@@ -23,7 +23,7 @@ const { rateLimiter } = require('./middleware/rateLimit.middleware');
 
 // Importer Swagger
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./config/swagger');
+const { swaggerSpec, generateSwaggerSpec } = require('./config/swagger');
 
 // Initialiser l'application Express
 const app = express();
@@ -92,7 +92,17 @@ const swaggerUiOptions = {
 // Servir le JSON Swagger (doit être défini avant les autres routes)
 app.get('/api-docs/swagger.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
-  res.json(swaggerSpec);
+  
+  // Générer la spécification Swagger avec l'URL dynamique basée sur la requête
+  const dynamicSpec = generateSwaggerSpec(req);
+  
+  // Log pour debug si nécessaire
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Swagger spec paths:', Object.keys(dynamicSpec.paths || {}));
+    console.log('Swagger server URL:', dynamicSpec.servers?.[0]?.url);
+  }
+  
+  res.json(dynamicSpec);
 });
 
 // Sur Vercel, créer une route personnalisée qui sert Swagger UI avec les assets depuis un CDN

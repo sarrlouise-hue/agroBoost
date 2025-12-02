@@ -23,19 +23,8 @@ const options = {
     },
     servers: [
       {
-        // Utiliser API_URL si définie, sinon VERCEL_URL (auto), sinon URL par défaut
-        url: process.env.API_URL 
-          ? process.env.API_URL
-          : process.env.VERCEL === '1' && process.env.VERCEL_URL
-          ? `https://${process.env.VERCEL_URL}`
-          : process.env.VERCEL === '1'
-          ? 'https://agro-boost-ruddy.vercel.app'
-          : `http://localhost:${PORT}`,
-        description: process.env.VERCEL === '1' ? 'Serveur de production (Vercel)' : 'Serveur de développement',
-      },
-      {
-        url: `http://localhost:${PORT}`,
-        description: 'Serveur de développement (local)',
+        url: '/', // URL relative - sera remplacée dynamiquement
+        description: 'Serveur de production',
       },
     ],
     components: {
@@ -303,7 +292,49 @@ const options = {
   ],
 };
 
+// Fonction pour générer la spécification Swagger avec l'URL dynamique basée sur la requête
+const generateSwaggerSpec = (req = null) => {
+  // Déterminer l'URL de base dynamiquement
+  let baseUrl;
+  
+  if (process.env.API_URL) {
+    // Priorité 1: Variable d'environnement API_URL
+    baseUrl = process.env.API_URL;
+  } else if (req && req.headers && req.headers.host) {
+    // Priorité 2: URL depuis les headers de la requête
+    const protocol = req.headers['x-forwarded-proto'] || (req.secure ? 'https' : 'http');
+    baseUrl = `${protocol}://${req.headers.host}`;
+  } else if (process.env.VERCEL === '1' && process.env.VERCEL_URL) {
+    // Priorité 3: URL automatique de Vercel
+    baseUrl = `https://${process.env.VERCEL_URL}`;
+  } else {
+    // Fallback: localhost
+    baseUrl = `http://localhost:${PORT}`;
+  }
+
+  // Cloner les options et mettre à jour l'URL du serveur
+  const dynamicOptions = {
+    ...options,
+    definition: {
+      ...options.definition,
+      servers: [
+        {
+          url: baseUrl,
+          description: process.env.VERCEL === '1' ? 'Serveur de production (Vercel)' : 'Serveur de développement',
+        },
+        {
+          url: `http://localhost:${PORT}`,
+          description: 'Serveur de développement (local)',
+        },
+      ],
+    },
+  };
+
+  return swaggerJsdoc(dynamicOptions);
+};
+
+// Spécification par défaut (sans requête) pour compatibilité
 const swaggerSpec = swaggerJsdoc(options);
 
-module.exports = swaggerSpec;
+module.exports = { swaggerSpec, generateSwaggerSpec };
 
