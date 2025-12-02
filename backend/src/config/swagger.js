@@ -23,10 +23,15 @@ const options = {
     },
     servers: [
       {
-        url: process.env.NODE_ENV === 'production' && process.env.VERCEL_URL 
-          ? `https://${process.env.VERCEL_URL}` 
+        // Utiliser API_URL si définie, sinon VERCEL_URL (auto), sinon URL par défaut
+        url: process.env.API_URL 
+          ? process.env.API_URL
+          : process.env.VERCEL === '1' && process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : process.env.VERCEL === '1'
+          ? 'https://agro-boost-ruddy.vercel.app'
           : `http://localhost:${PORT}`,
-        description: process.env.NODE_ENV === 'production' ? 'Serveur de production (Vercel)' : 'Serveur de développement',
+        description: process.env.VERCEL === '1' ? 'Serveur de production (Vercel)' : 'Serveur de développement',
       },
       {
         url: `http://localhost:${PORT}`,
