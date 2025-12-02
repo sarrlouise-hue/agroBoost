@@ -12,9 +12,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-
-  bool _obscurePassword = true;
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +47,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildTextField("Nom complet", Icons.person, _nameController),
+                    _buildTextField(
+                        "Nom complet", Icons.person, _nameController),
                     const SizedBox(height: 20),
                     _buildTextField("Email", Icons.email, _emailController),
                     const SizedBox(height: 20),
-                    _buildTextField("Mot de passe", Icons.lock, _passwordController, obscureText: true),
+                    _buildTextField(
+                        "Mot de passe", Icons.lock, _passwordController,
+                        obscureText: true),
                     const SizedBox(height: 20),
-                    _buildTextField("Confirmer mot de passe", Icons.lock, _confirmPasswordController, obscureText: true),
+                    _buildTextField("Confirmer mot de passe", Icons.lock,
+                        _confirmPasswordController,
+                        obscureText: true),
                     const SizedBox(height: 30),
                     SizedBox(
                       width: double.infinity,
@@ -70,7 +74,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Compte créé avec succès !')),
+                              const SnackBar(
+                                  content: Text('Compte créé avec succès !')),
                             );
                           }
                         },
@@ -115,14 +120,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildTextField(String hint, IconData icon, TextEditingController controller, {bool obscureText = false}) {
+  Widget _buildTextField(
+      String hint, IconData icon, TextEditingController controller,
+      {bool obscureText = false}) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
       validator: (value) {
         if (value == null || value.isEmpty) return "Ce champ est requis";
-        if (hint.contains("Email") && !value.contains('@')) return "Email invalide";
-        if (hint.contains("Confirmer") && value != _passwordController.text) return "Les mots de passe ne correspondent pas";
+        if (hint.contains("Email") && !value.contains('@'))
+          return "Email invalide";
+        if (hint.contains("Confirmer") && value != _passwordController.text)
+          return "Les mots de passe ne correspondent pas";
         return null;
       },
       decoration: InputDecoration(

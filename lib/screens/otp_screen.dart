@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../view_models/auth_view_model.dart';
 import 'home_screen.dart';
 import '../core/constants/app_colors.dart';
@@ -48,7 +47,8 @@ class _OtpScreenState extends State<OtpScreen> {
 
   void submitOtp() {
     String enteredOtp = otpValues.join();
-    if (enteredOtp == "1234") { // code OTP fixe
+    if (enteredOtp == "1234") {
+      // code OTP fixe
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (_) => const HomeScreen()));
     } else {
@@ -129,9 +129,8 @@ class _OtpScreenState extends State<OtpScreen> {
               child: Text(
                 timer == 0 ? "Renvoyer OTP" : "Renvoyer dans $timer s",
                 style: TextStyle(
-                    color: timer == 0
-                        ? AppColors.primaryGreen
-                        : Colors.black54),
+                    color:
+                        timer == 0 ? AppColors.primaryGreen : Colors.black54),
               ),
             )
           ],
