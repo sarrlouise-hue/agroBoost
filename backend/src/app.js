@@ -235,6 +235,11 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Route pour le favicon (évite les erreurs 404)
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end();
+});
+
 // Routes API
 app.use('/api', routes);
 
