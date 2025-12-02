@@ -2,6 +2,22 @@
 
 ## 🚀 Déploiement sur Railway
 
+### 📍 Où trouver l'URL de votre backend après déploiement ?
+
+**RÉPONSE RAPIDE** :
+1. Cliquez sur votre **service backend** dans Railway
+2. Allez dans **"Settings"** → Section **"Networking"** ou **"Domains"**
+3. Cliquez sur **"Generate Domain"** si aucun domaine n'existe
+4. **Copiez l'URL** (ex: `https://votre-service-production.up.railway.app`)
+5. Utilisez cette URL comme base pour tous vos tests API
+
+**Exemple d'URLs de test** :
+- Health : `https://votre-service.up.railway.app/health`
+- API : `https://votre-service.up.railway.app/api/auth/register`
+- Docs : `https://votre-service.up.railway.app/api-docs`
+
+---
+
 ### Prérequis
 - Un compte Railway (gratuit disponible)
 - Un repository GitHub avec le code du projet
@@ -84,11 +100,83 @@ openssl rand -base64 32
    - ✅ `✅ Connexion à PostgreSQL établie avec succès.`
    - ✅ `🚀 Serveur démarré sur le port ...`
 
-#### 9. Obtenir l'URL de l'API
+#### 9. Obtenir l'URL de l'API pour les Tests
 
-1. Aller dans l'onglet **"Settings"** du service backend
-2. Cliquer sur **"Generate Domain"** pour obtenir une URL publique
-3. Ou configurer un domaine personnalisé dans **"Custom Domain"**
+Une fois le déploiement réussi, voici comment obtenir l'URL de votre backend :
+
+**Méthode 1 : Via l'onglet Settings (Recommandé)**
+1. Cliquer sur votre **service backend** dans Railway
+2. Aller dans l'onglet **"Settings"** (en bas du menu latéral)
+3. Scroller jusqu'à la section **"Networking"** ou **"Domains"**
+4. Cliquer sur **"Generate Domain"** pour créer une URL publique
+5. Railway générera une URL comme : `https://votre-service-production.up.railway.app`
+6. **Copier cette URL** - c'est l'URL de base de votre API
+
+**Méthode 2 : Via l'onglet Deployments**
+1. Aller dans l'onglet **"Deployments"**
+2. Cliquer sur le dernier déploiement réussi
+3. L'URL publique devrait être visible dans les détails du déploiement
+
+**Méthode 3 : Domaine personnalisé (Optionnel)**
+- Dans **"Settings"** → **"Custom Domain"**, vous pouvez configurer votre propre domaine (ex: `api.agroboost.com`)
+
+#### 10. Tester l'API
+
+Une fois que vous avez l'URL de votre backend, vous pouvez tester les endpoints :
+
+**URL de base** : `https://votre-service-production.up.railway.app`
+
+**Endpoints de test** :
+
+1. **Health Check** (vérifier que l'API fonctionne) :
+   ```
+   GET https://votre-service-production.up.railway.app/health
+   ```
+   Réponse attendue :
+   ```json
+   {
+     "status": "OK",
+     "timestamp": "2024-01-01T00:00:00.000Z",
+     "environment": "production"
+   }
+   ```
+
+2. **Documentation Swagger** :
+   ```
+   https://votre-service-production.up.railway.app/api-docs
+   ```
+
+3. **Endpoints API** :
+   - Inscription : `POST https://votre-service-production.up.railway.app/api/auth/register`
+   - Connexion : `POST https://votre-service-production.up.railway.app/api/auth/login`
+   - Vérification OTP : `POST https://votre-service-production.up.railway.app/api/auth/verify-otp`
+   - etc.
+
+**Mettre à jour Postman pour tester avec Railway** :
+
+**Option 1 : Modifier l'environnement existant**
+1. Ouvrir Postman
+2. Cliquer sur l'environnement **"AGRO BOOST - Local"** (ou créer un nouvel environnement)
+3. Modifier la variable `base_url`
+4. Remplacer `http://localhost:5000` par votre URL Railway : `https://votre-service-production.up.railway.app`
+5. Sauvegarder l'environnement
+6. Tester vos requêtes
+
+**Option 2 : Créer un nouvel environnement Railway (Recommandé)**
+1. Dans Postman, créer un nouvel environnement : **"AGRO BOOST - Railway"**
+2. Ajouter la variable `base_url` avec la valeur : `https://votre-service-production.up.railway.app`
+3. Ajouter les autres variables (`access_token`, `refresh_token`, etc.)
+4. Sélectionner cet environnement lors des tests
+5. Vous pouvez maintenant basculer entre Local et Railway facilement
+
+**Tester rapidement** :
+```bash
+# Avec curl
+curl https://votre-service-production.up.railway.app/health
+
+# Devrait retourner :
+# {"status":"OK","timestamp":"...","environment":"production"}
+```
 
 ## 🔧 Résolution de Problèmes
 
