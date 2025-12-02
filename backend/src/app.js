@@ -210,8 +210,13 @@ const startServer = async () => {
   }
 };
 
-// Ne démarrer le serveur que si on n'est pas en mode test
-if (process.env.NODE_ENV !== 'test' && require.main === module) {
+// Ne démarrer le serveur que si on n'est pas en mode test et pas sur Vercel
+// Vercel définit VERCEL=1 dans l'environnement
+const isVercel = process.env.VERCEL === '1';
+const isTest = process.env.NODE_ENV === 'test';
+const isMainModule = require.main === module;
+
+if (!isTest && !isVercel && isMainModule) {
   startServer();
 }
 
