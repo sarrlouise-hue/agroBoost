@@ -1,5 +1,10 @@
 const swaggerJsdoc = require('swagger-jsdoc');
+const path = require('path');
 const { PORT, NODE_ENV } = require('./env');
+
+// Utiliser des chemins absolus pour éviter les problèmes sur Vercel
+const routesPath = path.join(__dirname, '../routes');
+const appPath = path.join(__dirname, '../app.js');
 
 const options = {
   definition: {
@@ -18,12 +23,14 @@ const options = {
     },
     servers: [
       {
-        url: `http://localhost:${PORT}`,
-        description: 'Serveur de développement',
+        url: process.env.NODE_ENV === 'production' && process.env.VERCEL_URL 
+          ? `https://${process.env.VERCEL_URL}` 
+          : `http://localhost:${PORT}`,
+        description: process.env.NODE_ENV === 'production' ? 'Serveur de production (Vercel)' : 'Serveur de développement',
       },
       {
-        url: 'https://api.agroboost.com',
-        description: 'Serveur de production',
+        url: `http://localhost:${PORT}`,
+        description: 'Serveur de développement (local)',
       },
     ],
     components: {
@@ -285,7 +292,10 @@ const options = {
       },
     ],
   },
-  apis: ['./src/routes/*.js', './src/app.js'],
+  apis: [
+    path.join(routesPath, '*.js'),
+    appPath,
+  ],
 };
 
 const swaggerSpec = swaggerJsdoc(options);

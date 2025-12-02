@@ -28,6 +28,10 @@ const swaggerSpec = require('./config/swagger');
 // Initialiser l'application Express
 const app = express();
 
+// Configurer trust proxy pour Vercel (nécessaire pour express-rate-limit)
+// Vercel utilise un proxy, donc on doit faire confiance aux headers X-Forwarded-*
+app.set('trust proxy', true);
+
 // Middleware de sécurité (configuré pour permettre Swagger UI)
 app.use(helmet({
   contentSecurityPolicy: {
@@ -112,7 +116,7 @@ if (isVercel) {
   <script>
     window.onload = function() {
       const ui = SwaggerUIBundle({
-        spec: ${JSON.stringify(swaggerSpec)},
+        url: '/api-docs/swagger.json',
         dom_id: '#swagger-ui',
         presets: [
           SwaggerUIBundle.presets.apis,
@@ -123,7 +127,8 @@ if (isVercel) {
         showExtensions: true,
         showCommonExtensions: true,
         persistAuthorization: ${swaggerOptions.swaggerOptions.persistAuthorization},
-        displayRequestDuration: ${swaggerOptions.swaggerOptions.displayRequestDuration}
+        displayRequestDuration: ${swaggerOptions.swaggerOptions.displayRequestDuration},
+        tryItOutEnabled: true
       });
     };
   </script>
