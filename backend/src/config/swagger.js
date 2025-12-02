@@ -178,6 +178,13 @@ const options = {
             phoneNumber: {
               type: 'string',
               example: '+221771234567',
+              description: 'Numéro de téléphone',
+            },
+            password: {
+              type: 'string',
+              minLength: 6,
+              example: 'password123',
+              description: 'Mot de passe (optionnel si l\'utilisateur n\'a pas de mot de passe)',
             },
           },
         },
@@ -217,6 +224,51 @@ const options = {
                   description: 'Token de rafraîchissement',
                 },
               },
+            },
+          },
+        },
+        ForgotPasswordRequest: {
+          type: 'object',
+          required: ['phoneNumber'],
+          properties: {
+            phoneNumber: {
+              type: 'string',
+              example: '+221771234567',
+              description: 'Numéro de téléphone',
+            },
+          },
+        },
+        ResetPasswordRequest: {
+          type: 'object',
+          required: ['token', 'newPassword'],
+          properties: {
+            token: {
+              type: 'string',
+              example: 'reset-token-here',
+              description: 'Token de réinitialisation reçu par email',
+            },
+            newPassword: {
+              type: 'string',
+              minLength: 6,
+              example: 'newPassword123',
+              description: 'Nouveau mot de passe (minimum 6 caractères)',
+            },
+          },
+        },
+        ChangePasswordRequest: {
+          type: 'object',
+          required: ['currentPassword', 'newPassword'],
+          properties: {
+            currentPassword: {
+              type: 'string',
+              example: 'currentPassword123',
+              description: 'Mot de passe actuel',
+            },
+            newPassword: {
+              type: 'string',
+              minLength: 6,
+              example: 'newPassword123',
+              description: 'Nouveau mot de passe (minimum 6 caractères)',
             },
           },
         },

@@ -74,6 +74,52 @@ const swaggerOptions = {
 app.use('/api-docs', swaggerUi.serve);
 app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions));
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Page d'accueil de l'API
+ *     tags: [Health]
+ *     description: Retourne des informations sur l'API et les endpoints disponibles
+ *     responses:
+ *       200:
+ *         description: Informations sur l'API
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Bienvenue sur l'API AGRO BOOST
+ *                 version:
+ *                   type: string
+ *                   example: "1.0.0"
+ *                 environment:
+ *                   type: string
+ *                   example: production
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                 endpoints:
+ *                   type: object
+ *                   properties:
+ *                     health:
+ *                       type: string
+ *                       example: /health
+ *                     api:
+ *                       type: string
+ *                       example: /api
+ *                     documentation:
+ *                       type: string
+ *                       example: /api-docs
+ *                 status:
+ *                   type: string
+ *                   example: OK
+ */
 // Route d'accueil
 app.get('/', (req, res) => {
   res.status(200).json({
@@ -91,6 +137,32 @@ app.get('/', (req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Vérifier l'état du serveur
+ *     tags: [Health]
+ *     description: Endpoint de health check pour vérifier que le serveur fonctionne correctement
+ *     responses:
+ *       200:
+ *         description: Serveur opérationnel
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: OK
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2024-01-01T00:00:00.000Z
+ *                 environment:
+ *                   type: string
+ *                   example: production
+ */
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
