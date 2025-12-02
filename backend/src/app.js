@@ -85,6 +85,12 @@ const swaggerUiOptions = {
   customSiteTitle: swaggerOptions.customSiteTitle,
 };
 
+// Servir le JSON Swagger (doit être défini avant les autres routes)
+app.get('/api-docs/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.json(swaggerSpec);
+});
+
 // Sur Vercel, créer une route personnalisée qui sert Swagger UI avec les assets depuis un CDN
 if (isVercel) {
   app.get('/api-docs', (req, res) => {
@@ -106,7 +112,7 @@ if (isVercel) {
   <script>
     window.onload = function() {
       const ui = SwaggerUIBundle({
-        url: '/api-docs/swagger.json',
+        spec: ${JSON.stringify(swaggerSpec)},
         dom_id: '#swagger-ui',
         presets: [
           SwaggerUIBundle.presets.apis,
@@ -116,7 +122,8 @@ if (isVercel) {
         deepLinking: true,
         showExtensions: true,
         showCommonExtensions: true,
-        ${JSON.stringify(swaggerOptions.swaggerOptions).slice(1, -1)}
+        persistAuthorization: ${swaggerOptions.swaggerOptions.persistAuthorization},
+        displayRequestDuration: ${swaggerOptions.swaggerOptions.displayRequestDuration}
       });
     };
   </script>
@@ -124,11 +131,6 @@ if (isVercel) {
 </html>
     `;
     res.send(html);
-  });
-  
-  // Servir le JSON Swagger
-  app.get('/api-docs/swagger.json', (req, res) => {
-    res.json(swaggerSpec);
   });
 } else {
   // Configuration normale pour le développement
