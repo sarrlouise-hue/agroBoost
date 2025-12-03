@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:agro_boost/core/constants/app_colors.dart';
 import 'package:agro_boost/core/constants/app_styles.dart';
+import 'package:agro_boost/screens/map_screen.dart';
+import 'package:agro_boost/screens/my_services_screen.dart';
+import 'package:agro_boost/screens/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -11,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  String _selectedFilter = 'all';
+  late PageController _pageController;
 
   // Données exemple des services
   final List<ServiceItem> services = [
@@ -66,47 +69,152 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.greyBackground,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // =========================================
-            // 1️⃣ EN-TÊTE AVEC PROFIL
-            // =========================================
-            _buildHeader(),
-
-            // =========================================
-            // 2️⃣ BARRE DE RECHERCHE
-            // =========================================
-            _buildSearchBar(),
-
-            // =========================================
-            // 3️⃣ SECTION RECOMMANDÉES
-            // =========================================
-            _buildRecommendedSection(),
-
-            // =========================================
-            // 4️⃣ FILTRES
-            // =========================================
-            _buildFilterChips(),
-
-            // =========================================
-            // 5️⃣ LISTE DES SERVICES
-            // =========================================
-            _buildServicesList(),
-
-            // Espace en bas pour la navigation
-            SizedBox(height: AppStyles.spacing40),
-          ],
-        ),
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        onPageChanged: (index) {
+          setState(() => _currentIndex = index);
+        },
+        children: [
+          HomeScreenContent(services: services),
+          const MapScreen(),
+          const MyServicesScreen(),
+          const ProfileScreen(),
+        ],
       ),
-
-      // =========================================
-      // BARRE DE NAVIGATION INFÉRIEURE
-      // =========================================
       bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+
+  // =========================================
+  // 🔷 BARRE DE NAVIGATION INFÉRIEURE
+  // =========================================
+  Widget _buildBottomNavigationBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: AppColors.primaryGreen,
+        unselectedItemColor: AppColors.grey,
+        elevation: 0,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(
+              _currentIndex == 0 ? Icons.home : Icons.home_outlined,
+            ),
+            label: 'Accueil',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              _currentIndex == 1 ? Icons.map : Icons.map_outlined,
+            ),
+            label: 'Carte',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              _currentIndex == 2
+                  ? Icons.bookmark
+                  : Icons.bookmark_border_outlined,
+            ),
+            label: 'Mes services',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              _currentIndex == 3 ? Icons.person : Icons.person_outlined,
+            ),
+            label: 'Profil',
+          ),
+        ],
+        onTap: (index) {
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        },
+      ),
+    );
+  }
+}
+
+// =========================================
+// 🔷 CONTENU DE L'ACCUEIL
+// =========================================
+class HomeScreenContent extends StatefulWidget {
+  final List<ServiceItem> services;
+
+  const HomeScreenContent({
+    Key? key,
+    required this.services,
+  }) : super(key: key);
+
+  @override
+  State<HomeScreenContent> createState() => _HomeScreenContentState();
+}
+
+class _HomeScreenContentState extends State<HomeScreenContent> {
+  String _selectedFilter = 'all';
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // =========================================
+          // 1️⃣ EN-TÊTE AVEC PROFIL
+          // =========================================
+          _buildHeader(),
+
+          // =========================================
+          // 2️⃣ BARRE DE RECHERCHE
+          // =========================================
+          _buildSearchBar(),
+
+          // =========================================
+          // 3️⃣ SECTION RECOMMANDÉES
+          // =========================================
+          _buildRecommendedSection(),
+
+          // =========================================
+          // 4️⃣ FILTRES
+          // =========================================
+          _buildFilterChips(),
+
+          // =========================================
+          // 5️⃣ LISTE DES SERVICES
+          // =========================================
+          _buildServicesList(),
+
+          // Espace en bas
+          const SizedBox(height: AppStyles.spacing40),
+        ],
+      ),
     );
   }
 
@@ -180,15 +288,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.white,
                       size: 28,
                     ),
-                    onPressed: () {
-                      // Action menu
-                    },
+                    onPressed: () {},
                   ),
                 ],
               ),
-
               const SizedBox(height: AppStyles.spacing20),
-
               // Salutation
               Text(
                 'Bonjour 👋',
@@ -197,9 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontSize: 22,
                 ),
               ),
-
               const SizedBox(height: AppStyles.spacing4),
-
               Text(
                 'Trouvez les meilleurs services agricoles près de vous',
                 style: AppStyles.bodyMedium.copyWith(
@@ -274,9 +376,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: AppColors.primaryGreen,
                 size: 22,
               ),
-              onPressed: () {
-                // Filtres
-              },
+              onPressed: () {},
             ),
           ),
         ],
@@ -343,7 +443,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: Stack(
                     children: [
-                      // Image
                       Container(
                         decoration: BoxDecoration(
                           color: AppColors.secondaryGreen.withOpacity(0.2),
@@ -359,7 +458,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      // Contenu
                       Padding(
                         padding: const EdgeInsets.all(AppStyles.spacing12),
                         child: Column(
@@ -372,7 +470,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 vertical: AppStyles.spacing4,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.primaryGreen.withOpacity(0.2),
+                                color: AppColors.primaryGreen
+                                    .withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -450,15 +549,14 @@ class _HomeScreenState extends State<HomeScreen> {
           children: filters.map((filter) {
             bool isSelected = _selectedFilter == filter['value'];
             return Padding(
-              padding: EdgeInsets.only(right: AppStyles.spacing12),
+              padding: const EdgeInsets.only(right: AppStyles.spacing12),
               child: FilterChip(
                 label: Row(
                   children: [
                     Icon(
                       filter['icon'] as IconData,
                       size: 16,
-                      color:
-                      isSelected ? Colors.white : AppColors.primaryGreen,
+                      color: isSelected ? Colors.white : AppColors.primaryGreen,
                     ),
                     const SizedBox(width: AppStyles.spacing8),
                     Text(
@@ -479,7 +577,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 backgroundColor: Colors.white,
                 selectedColor: AppColors.primaryGreen,
                 side: BorderSide(
-                  color: isSelected ? AppColors.primaryGreen : AppColors.border,
+                  color: isSelected
+                      ? AppColors.primaryGreen
+                      : AppColors.border,
                   width: 1.5,
                 ),
               ),
@@ -502,7 +602,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Services disponibles (${services.length})',
+            'Services disponibles (${widget.services.length})',
             style: AppStyles.headingSmall.copyWith(
               fontSize: 18,
             ),
@@ -511,9 +611,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: services.length,
+            itemCount: widget.services.length,
             itemBuilder: (context, index) {
-              return _buildServiceCard(services[index]);
+              return _buildServiceCard(widget.services[index]);
             },
           ),
         ],
@@ -526,9 +626,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // =========================================
   Widget _buildServiceCard(ServiceItem service) {
     return GestureDetector(
-      onTap: () {
-        // Naviguer vers les détails du service
-      },
+      onTap: () {},
       child: Container(
         margin: const EdgeInsets.only(bottom: AppStyles.spacing16),
         decoration: BoxDecoration(
@@ -580,9 +678,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      service.isAvailable
-                          ? '✓ Disponible'
-                          : '✗ Indisponible',
+                      service.isAvailable ? '✓ Disponible' : '✗ Indisponible',
                       style: AppStyles.labelSmall.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -701,9 +797,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           BorderRadius.circular(AppStyles.radiusMedium),
                         ),
                       ),
-                      onPressed: () {
-                        // Réserver
-                      },
+                      onPressed: () {},
                       child: Text(
                         'Réserver maintenant',
                         style: AppStyles.button.copyWith(
@@ -717,66 +811,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // =========================================
-  // 🔷 BARRE DE NAVIGATION INFÉRIEURE
-  // =========================================
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: AppColors.primaryGreen,
-        unselectedItemColor: AppColors.grey,
-        elevation: 0,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(
-              _currentIndex == 0 ? Icons.home : Icons.home_outlined,
-            ),
-            label: 'Accueil',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              _currentIndex == 1 ? Icons.map : Icons.map_outlined,
-            ),
-            label: 'Carte',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              _currentIndex == 2
-                  ? Icons.bookmark
-                  : Icons.bookmark_border_outlined,
-            ),
-            label: 'Mes services',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              _currentIndex == 3 ? Icons.person : Icons.person_outlined,
-            ),
-            label: 'Profil',
-          ),
-        ],
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-          // Naviguer vers les autres écrans
-        },
       ),
     );
   }
