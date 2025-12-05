@@ -15,6 +15,7 @@ Routes -> Controllers -> Services -> Data-Access -> PostgreSQL
 ## Repositories disponibles
 
 ### `user.repository.js`
+
 - `findByPhoneNumber(phoneNumber)` : Trouver un utilisateur par numéro de téléphone
 - `findById(userId)` : Trouver un utilisateur par ID
 - `findByIdWithPassword(userId)` : Trouver un utilisateur par ID avec mot de passe
@@ -26,6 +27,7 @@ Routes -> Controllers -> Services -> Data-Access -> PostgreSQL
 - `findByEmail(email)` : Trouver un utilisateur par email
 
 ### `otp.repository.js`
+
 - `findByPhoneNumberAndCode(phoneNumber, code)` : Trouver un OTP par numéro et code
 - `findValidByPhoneNumber(phoneNumber)` : Trouver un OTP valide par numéro
 - `create(otpData)` : Créer un nouvel OTP
@@ -34,6 +36,7 @@ Routes -> Controllers -> Services -> Data-Access -> PostgreSQL
 - `save(otp)` : Sauvegarder un OTP
 
 ### `passwordResetToken.repository.js`
+
 - `findValidByToken(token)` : Trouver un token valide
 - `create(tokenData)` : Créer un nouveau token
 - `invalidateByUserId(userId)` : Invalider tous les tokens précédents

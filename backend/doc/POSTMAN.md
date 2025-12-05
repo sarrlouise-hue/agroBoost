@@ -27,6 +27,9 @@ La collection utilise des variables pour faciliter les tests :
 - `access_token` : Token JWT d'accès (sauvegardé automatiquement après connexion)
 - `refresh_token` : Token de rafraîchissement (sauvegardé automatiquement après connexion)
 - `reset_token` : Token de réinitialisation de mot de passe (sauvegardé automatiquement)
+- `user_id` : ID de l'utilisateur connecté
+- `provider_id` : ID du prestataire (si applicable)
+- `service_id` : ID du service (pour les tests de services)
 
 ### Modifier l'URL de base
 
@@ -89,6 +92,31 @@ La collection utilise des variables pour faciliter les tests :
 ### 10. Déconnexion
 - Exécuter **"Déconnexion"**
 - Nécessite d'être authentifié
+
+### 11. Gestion du profil utilisateur
+- **"Obtenir profil"** - Récupérer le profil de l'utilisateur connecté
+- **"Mettre à jour profil"** - Modifier les informations du profil
+- **"Mettre à jour localisation"** - Mettre à jour la position géographique
+- **"Changer langue"** - Changer la langue de l'interface (fr/wolof)
+
+### 12. Gestion des prestataires
+- **"Inscription prestataire"** - Devenir prestataire (nécessite d'être utilisateur)
+- **"Obtenir profil prestataire"** - Récupérer le profil prestataire
+- **"Mettre à jour profil prestataire"** - Modifier les informations du prestataire
+- **"Liste prestataires"** - Obtenir tous les prestataires avec filtres
+- **"Prestataires approuvés"** - Obtenir uniquement les prestataires approuvés
+- **"Approuver prestataire"** - Approuver un prestataire (admin seulement)
+- **"Rejeter prestataire"** - Rejeter un prestataire (admin seulement)
+
+### 13. Gestion des services agricoles
+- **"Créer service"** - Créer un nouveau service (prestataire seulement)
+- **"Obtenir service"** - Récupérer les détails d'un service
+- **"Liste services"** - Obtenir tous les services avec filtres (type, prix, géolocalisation)
+- **"Mes services"** - Obtenir les services du prestataire connecté
+- **"Services d'un prestataire"** - Obtenir les services d'un prestataire spécifique
+- **"Mettre à jour service"** - Modifier un service (propriétaire seulement)
+- **"Mettre à jour disponibilité"** - Changer la disponibilité d'un service
+- **"Supprimer service"** - Supprimer un service (propriétaire seulement)
 
 ## Scripts automatiques
 

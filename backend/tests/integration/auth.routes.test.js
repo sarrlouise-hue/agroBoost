@@ -1,3 +1,117 @@
+// Mock de la base de données PostgreSQL AVANT l'import des modèles
+jest.mock('../../src/config/database', () => {
+  const createMockModel = () => {
+    const mockModel = {
+      findOne: jest.fn(),
+      findByPk: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      destroy: jest.fn(),
+      findAll: jest.fn(),
+      findAndCountAll: jest.fn(),
+      belongsTo: jest.fn().mockReturnThis(),
+      hasOne: jest.fn().mockReturnThis(),
+      hasMany: jest.fn().mockReturnThis(),
+      scope: jest.fn().mockReturnThis(),
+    };
+    return mockModel;
+  };
+
+  const mockSequelize = {
+    authenticate: jest.fn().mockResolvedValue(true),
+    sync: jest.fn().mockResolvedValue(true),
+    close: jest.fn().mockResolvedValue(true),
+    define: jest.fn().mockImplementation(() => createMockModel()),
+    models: {},
+  };
+  return {
+    sequelize: mockSequelize,
+    connectDB: jest.fn().mockResolvedValue(true),
+  };
+});
+
+// Mock des modèles AVANT leur import
+jest.mock('../../src/models/User', () => {
+  const mockModel = {
+    findOne: jest.fn(),
+    findByPk: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    destroy: jest.fn(),
+    findAll: jest.fn(),
+    findAndCountAll: jest.fn(),
+    belongsTo: jest.fn(),
+    hasOne: jest.fn(),
+    hasMany: jest.fn(),
+    scope: jest.fn().mockReturnThis(),
+  };
+  return mockModel;
+});
+
+jest.mock('../../src/models/OTP', () => {
+  const mockModel = {
+    findOne: jest.fn(),
+    findByPk: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    destroy: jest.fn(),
+    findAll: jest.fn(),
+    findAndCountAll: jest.fn(),
+    belongsTo: jest.fn(),
+    hasOne: jest.fn(),
+    hasMany: jest.fn(),
+  };
+  return mockModel;
+});
+
+jest.mock('../../src/models/PasswordResetToken', () => {
+  const mockModel = {
+    findOne: jest.fn(),
+    findByPk: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    destroy: jest.fn(),
+    findAll: jest.fn(),
+    findAndCountAll: jest.fn(),
+    belongsTo: jest.fn(),
+    hasOne: jest.fn(),
+    hasMany: jest.fn(),
+  };
+  return mockModel;
+});
+
+jest.mock('../../src/models/Provider', () => {
+  const mockModel = {
+    findOne: jest.fn(),
+    findByPk: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    destroy: jest.fn(),
+    findAll: jest.fn(),
+    findAndCountAll: jest.fn(),
+    belongsTo: jest.fn(),
+    hasOne: jest.fn(),
+    hasMany: jest.fn(),
+  };
+  return mockModel;
+});
+
+jest.mock('../../src/models/Service', () => {
+  const mockModel = {
+    findOne: jest.fn(),
+    findByPk: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    destroy: jest.fn(),
+    findAll: jest.fn(),
+    findAndCountAll: jest.fn(),
+    belongsTo: jest.fn(),
+    hasOne: jest.fn(),
+    hasMany: jest.fn(),
+  };
+  return mockModel;
+});
+
 const request = require('supertest');
 const express = require('express');
 const routes = require('../../src/routes');
@@ -5,26 +119,12 @@ const errorMiddleware = require('../../src/middleware/error.middleware');
 const User = require('../../src/models/User');
 const OTP = require('../../src/models/OTP');
 
-// Mock de la base de données PostgreSQL
-jest.mock('../../src/config/database', () => ({
-  sequelize: {
-    authenticate: jest.fn().mockResolvedValue(true),
-    sync: jest.fn().mockResolvedValue(true),
-    close: jest.fn().mockResolvedValue(true),
-  },
-  connectDB: jest.fn().mockResolvedValue(true),
-}));
-
 // Créer une application Express pour les tests sans démarrer le serveur
 const app = express();
 app.use(express.json());
 app.use('/api', routes);
 // Ajouter le middleware d'erreur
 app.use(errorMiddleware);
-
-// Mock des modèles
-jest.mock('../../src/models/User');
-jest.mock('../../src/models/OTP');
 
 describe('Routes d\'authentification', () => {
   beforeEach(() => {

@@ -13,7 +13,7 @@
     "test:coverage": "jest --coverage",
     "test:unit": "jest tests/unit",
     "test:integration": "jest tests/integration",
-    "test:integration:real": "jest tests/integration/auth.routes.integration.test.js",
+    "test:integration:real": "jest --testMatch='**/tests/integration/*.integration.test.js'",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix"
   },

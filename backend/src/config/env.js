@@ -6,11 +6,20 @@ module.exports = {
 
   // Database PostgreSQL
   DB: {
-    URI: process.env.DATABASE_URL || process.env.DB_URI || `postgresql://${process.env.DB_USER || 'postgres'}:${process.env.DB_PASSWORD || ''}@${process.env.DB_HOST || '127.0.0.1'}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME || 'agroboost'}`,
+    URI: process.env.DATABASE_URL || process.env.DB_URI || (() => {
+      const user = process.env.DB_USER || 'postgres';
+      const password = String(process.env.DB_PASSWORD || '');
+      const host = process.env.DB_HOST || '127.0.0.1';
+      const port = process.env.DB_PORT || 5432;
+      const name = process.env.DB_NAME || 'agroboost';
+      // Encoder le mot de passe pour l'URL si nécessaire
+      const encodedPassword = encodeURIComponent(password);
+      return `postgresql://${user}:${encodedPassword}@${host}:${port}/${name}`;
+    })(),
     HOST: process.env.DB_HOST || '127.0.0.1',
     PORT: process.env.DB_PORT || 5432,
     USER: process.env.DB_USER || 'postgres',
-    PASSWORD: process.env.DB_PASSWORD || '',
+    PASSWORD: String(process.env.DB_PASSWORD || ''), // S'assurer que c'est toujours une chaîne
     NAME: process.env.DB_NAME || 'agroboost',
   },
 

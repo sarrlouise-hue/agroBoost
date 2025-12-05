@@ -36,6 +36,64 @@ const options = {
           description: 'Entrer le token JWT obtenu lors de la connexion',
         },
       },
+      responses: {
+        ValidationError: {
+          description: 'Erreur de validation',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ErrorResponse',
+              },
+              example: {
+                success: false,
+                message: 'Erreur de validation',
+              },
+            },
+          },
+        },
+        UnauthorizedError: {
+          description: 'Non autorisé - Token invalide ou expiré',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ErrorResponse',
+              },
+              example: {
+                success: false,
+                message: 'Non autorisé',
+              },
+            },
+          },
+        },
+        ForbiddenError: {
+          description: 'Accès interdit',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ErrorResponse',
+              },
+              example: {
+                success: false,
+                message: 'Accès interdit',
+              },
+            },
+          },
+        },
+        NotFoundError: {
+          description: 'Ressource non trouvée',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ErrorResponse',
+              },
+              example: {
+                success: false,
+                message: 'Ressource non trouvée',
+              },
+            },
+          },
+        },
+      },
       schemas: {
         User: {
           type: 'object',
@@ -81,6 +139,27 @@ const options = {
               type: 'boolean',
               description: 'Statut de vérification',
               example: false,
+            },
+            latitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -90,
+              maximum: 90,
+              description: 'Latitude',
+              example: 14.7167,
+            },
+            longitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -180,
+              maximum: 180,
+              description: 'Longitude',
+              example: -17.4677,
+            },
+            address: {
+              type: 'string',
+              description: 'Adresse',
+              example: 'Dakar, Sénégal',
             },
             createdAt: {
               type: 'string',
@@ -273,6 +352,418 @@ const options = {
             },
           },
         },
+        Provider: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'ID unique du prestataire',
+            },
+            userId: {
+              type: 'string',
+              description: 'ID de l\'utilisateur associé',
+            },
+            businessName: {
+              type: 'string',
+              description: 'Nom de l\'entreprise',
+              example: 'Agri Services Sénégal',
+            },
+            description: {
+              type: 'string',
+              description: 'Description du prestataire',
+              example: 'Services agricoles de qualité',
+            },
+            documents: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              description: 'Documents du prestataire',
+              example: ['doc1.pdf', 'doc2.pdf'],
+            },
+            isApproved: {
+              type: 'boolean',
+              description: 'Statut d\'approbation',
+              example: false,
+            },
+            rating: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              maximum: 5,
+              description: 'Note moyenne',
+              example: 0,
+            },
+            totalBookings: {
+              type: 'integer',
+              description: 'Nombre total de réservations',
+              example: 0,
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
+        Service: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'ID unique du service',
+            },
+            providerId: {
+              type: 'string',
+              description: 'ID du prestataire',
+            },
+            serviceType: {
+              type: 'string',
+              enum: ['tractor', 'semoir', 'operator', 'other'],
+              description: 'Type de service',
+              example: 'tractor',
+            },
+            name: {
+              type: 'string',
+              description: 'Nom du service',
+              example: 'Tracteur John Deere 6120',
+            },
+            description: {
+              type: 'string',
+              description: 'Description du service',
+              example: 'Tracteur puissant pour travaux agricoles',
+            },
+            pricePerHour: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              description: 'Prix par heure',
+              example: 5000,
+            },
+            pricePerDay: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              description: 'Prix par jour',
+              example: 40000,
+            },
+            images: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              description: 'Images du service',
+              example: ['image1.jpg', 'image2.jpg'],
+            },
+            availability: {
+              type: 'boolean',
+              description: 'Disponibilité',
+              example: true,
+            },
+            latitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -90,
+              maximum: 90,
+              description: 'Latitude',
+              example: 14.7167,
+            },
+            longitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -180,
+              maximum: 180,
+              description: 'Longitude',
+              example: -17.4677,
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
+        UpdateProfileRequest: {
+          type: 'object',
+          properties: {
+            firstName: {
+              type: 'string',
+              minLength: 2,
+              maxLength: 50,
+              example: 'Amadou',
+            },
+            lastName: {
+              type: 'string',
+              minLength: 2,
+              maxLength: 50,
+              example: 'Diallo',
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              example: 'amadou@example.com',
+            },
+            address: {
+              type: 'string',
+              example: 'Dakar, Sénégal',
+            },
+          },
+        },
+        UpdateLocationRequest: {
+          type: 'object',
+          required: ['latitude', 'longitude'],
+          properties: {
+            latitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -90,
+              maximum: 90,
+              example: 14.7167,
+              description: 'Latitude (-90 à 90)',
+            },
+            longitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -180,
+              maximum: 180,
+              example: -17.4677,
+              description: 'Longitude (-180 à 180)',
+            },
+            address: {
+              type: 'string',
+              example: 'Dakar, Sénégal',
+              description: 'Adresse (optionnel)',
+            },
+          },
+        },
+        UpdateLanguageRequest: {
+          type: 'object',
+          required: ['language'],
+          properties: {
+            language: {
+              type: 'string',
+              enum: ['fr', 'wolof'],
+              example: 'wolof',
+              description: 'Langue préférée',
+            },
+          },
+        },
+        RegisterProviderRequest: {
+          type: 'object',
+          required: ['businessName'],
+          properties: {
+            businessName: {
+              type: 'string',
+              minLength: 2,
+              maxLength: 100,
+              example: 'Agri Services Sénégal',
+              description: 'Nom de l\'entreprise (2-100 caractères)',
+            },
+            description: {
+              type: 'string',
+              example: 'Services agricoles de qualité',
+              description: 'Description du prestataire',
+            },
+            documents: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              example: ['doc1.pdf', 'doc2.pdf'],
+              description: 'Documents du prestataire',
+            },
+          },
+        },
+        UpdateProviderRequest: {
+          type: 'object',
+          properties: {
+            businessName: {
+              type: 'string',
+              minLength: 2,
+              maxLength: 100,
+              example: 'Nouveau nom',
+            },
+            description: {
+              type: 'string',
+              example: 'Nouvelle description',
+            },
+            documents: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              example: ['nouveau-doc.pdf'],
+            },
+          },
+        },
+        CreateServiceRequest: {
+          type: 'object',
+          required: ['serviceType', 'name'],
+          properties: {
+            serviceType: {
+              type: 'string',
+              enum: ['tractor', 'semoir', 'operator', 'other'],
+              example: 'tractor',
+              description: 'Type de service',
+            },
+            name: {
+              type: 'string',
+              minLength: 2,
+              maxLength: 100,
+              example: 'Tracteur John Deere 6120',
+              description: 'Nom du service (2-100 caractères)',
+            },
+            description: {
+              type: 'string',
+              example: 'Tracteur puissant pour travaux agricoles',
+            },
+            pricePerHour: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              example: 5000,
+              description: 'Prix par heure (au moins un prix requis)',
+            },
+            pricePerDay: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              example: 40000,
+              description: 'Prix par jour (au moins un prix requis)',
+            },
+            images: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              example: ['image1.jpg', 'image2.jpg'],
+            },
+            availability: {
+              type: 'boolean',
+              default: true,
+              example: true,
+            },
+            latitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -90,
+              maximum: 90,
+              example: 14.7167,
+            },
+            longitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -180,
+              maximum: 180,
+              example: -17.4677,
+            },
+          },
+        },
+        UpdateServiceRequest: {
+          type: 'object',
+          properties: {
+            serviceType: {
+              type: 'string',
+              enum: ['tractor', 'semoir', 'operator', 'other'],
+            },
+            name: {
+              type: 'string',
+              minLength: 2,
+              maxLength: 100,
+            },
+            description: {
+              type: 'string',
+            },
+            pricePerHour: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+            },
+            pricePerDay: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+            },
+            images: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+            },
+            availability: {
+              type: 'boolean',
+            },
+            latitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -90,
+              maximum: 90,
+            },
+            longitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -180,
+              maximum: 180,
+            },
+          },
+        },
+        UpdateAvailabilityRequest: {
+          type: 'object',
+          required: ['availability'],
+          properties: {
+            availability: {
+              type: 'boolean',
+              example: false,
+              description: 'Statut de disponibilité',
+            },
+          },
+        },
+        PaginatedResponse: {
+          type: 'object',
+          properties: {
+            success: {
+              type: 'boolean',
+              example: true,
+            },
+            message: {
+              type: 'string',
+              example: 'Données récupérées avec succès',
+            },
+            data: {
+              type: 'array',
+              items: {
+                type: 'object',
+              },
+            },
+            pagination: {
+              type: 'object',
+              properties: {
+                page: {
+                  type: 'integer',
+                  example: 1,
+                },
+                limit: {
+                  type: 'integer',
+                  example: 20,
+                },
+                total: {
+                  type: 'integer',
+                  example: 100,
+                },
+                totalPages: {
+                  type: 'integer',
+                  example: 5,
+                },
+              },
+            },
+          },
+        },
       },
     },
     tags: [
@@ -283,6 +774,18 @@ const options = {
       {
         name: 'Authentification',
         description: 'Endpoints d\'authentification et de gestion des utilisateurs',
+      },
+      {
+        name: 'Users',
+        description: 'Gestion des utilisateurs',
+      },
+      {
+        name: 'Providers',
+        description: 'Gestion des prestataires',
+      },
+      {
+        name: 'Services',
+        description: 'Gestion des services agricoles',
       },
     ],
   },
