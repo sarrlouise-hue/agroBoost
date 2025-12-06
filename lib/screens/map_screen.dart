@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:agro_boost/core/constants/app_colors.dart';
 import 'package:agro_boost/core/constants/app_styles.dart';
+import 'package:agro_boost/screens/service_detail_screen.dart';
+import 'package:agro_boost/screens/home_screen.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
@@ -9,428 +11,332 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
-  String _selectedFilter = 'all';
+class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   bool _showList = false;
-  double _zoom = 10.0;
+  late AnimationController _slideController;
 
-  // Services sur la carte
   final List<MapService> mapServices = [
     MapService(
       id: '1',
-      title: 'Tracteur MASSEY FERGUSON',
+      title: 'Tracteur',
       latitude: 14.1456,
       longitude: -14.6928,
-      category: 'tractor',
-      distance: '2.3 km',
+      category: 'Tracteur',
+      distance: '2.3',
       rating: 4.8,
+      price: '15000',
+      icon: '🚜',
     ),
     MapService(
       id: '2',
-      title: 'Semoir mécanique JOHN DEERE',
+      title: 'Semoir',
       latitude: 13.7720,
       longitude: -14.1948,
-      category: 'seeder',
-      distance: '5.1 km',
+      category: 'Semoir',
+      distance: '5.1',
       rating: 4.5,
+      price: '8000',
+      icon: '🌾',
     ),
     MapService(
       id: '3',
-      title: 'Opérateur agricole',
+      title: 'Opérateur',
       latitude: 14.6756,
       longitude: -17.2398,
-      category: 'operator',
-      distance: '8.7 km',
+      category: 'Opérateur',
+      distance: '8.7',
       rating: 4.9,
+      price: '5000',
+      icon: '👨‍🌾',
     ),
     MapService(
       id: '4',
-      title: 'Pulvérisateur STIHL',
+      title: 'Pulvérisateur',
       latitude: 14.7167,
       longitude: -17.4674,
-      category: 'equipment',
-      distance: '1.5 km',
+      category: 'Équipement',
+      distance: '1.5',
       rating: 4.6,
+      price: '3500',
+      icon: '💨',
     ),
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _slideController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.veryLightGrey,
-      // ⚠️ PAS d'appBar - laisser la place pour la carte
+      backgroundColor: Colors.blue.shade100,
       body: Stack(
         children: [
-          // =========================================
-          // 1️⃣ CARTE (PLACEHOLDER) - OCCUPE TOUT L'ÉCRAN
-          // =========================================
-          Positioned.fill(
-            child: _buildMapPlaceholder(),
+          // Carte
+          Container(
+            color: Colors.blue.shade100,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.map,
+                    size: 80,
+                    color: Colors.blue.shade300,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '📍 Carte',
+                    style: AppStyles.headingSmall.copyWith(
+                      color: Colors.blue.shade700,
+                      fontSize: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${mapServices.length} services détectés',
+                    style: AppStyles.bodyMedium.copyWith(
+                      color: Colors.blue.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
 
-          // =========================================
-          // 2️⃣ BARRE SUPÉRIEURE (RECHERCHE + FILTRES)
-          // =========================================
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: _buildTopBar(),
-          ),
-
-          // =========================================
-          // 3️⃣ BOUTON ZOOM
-          // =========================================
-          Positioned(
-            bottom: 280,
-            right: 16,
-            child: _buildZoomButtons(),
-          ),
-
-          // =========================================
-          // 4️⃣ BOUTON LOCALISATION
-          // =========================================
-          Positioned(
-            bottom: 280,
-            left: 16,
-            child: _buildLocationButton(),
-          ),
-
-          // =========================================
-          // 5️⃣ PANNEAU INFÉRIEUR (SERVICES)
-          // =========================================
+          // Services en bas
           if (!_showList)
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
-              child: _buildBottomSheet(),
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 1),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(
+                  parent: _slideController,
+                  curve: Curves.easeOut,
+                )),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 15,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: AppColors.grey,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '🎯 Services',
+                              style: AppStyles.headingSmall.copyWith(
+                                fontSize: 18,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() => _showList = true);
+                                _slideController.forward();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryGreen
+                                      .withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.list,
+                                  color: AppColors.primaryGreen,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 160,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          itemCount: mapServices.length,
+                          itemBuilder: (context, index) {
+                            return _buildServiceCard(mapServices[index]);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
 
-          // =========================================
-          // 6️⃣ VUE LISTE (OPTIONNEL)
-          // =========================================
+          // Liste vue
           if (_showList)
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
-              child: _buildListView(),
-            ),
-        ],
-      ),
-    );
-  }
-
-  // =========================================
-  // 🔷 CARTE (PLACEHOLDER)
-  // =========================================
-  Widget _buildMapPlaceholder() {
-    return Container(
-      color: Colors.blue.shade100,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.map,
-            size: 80,
-            color: Colors.blue.shade300,
-          ),
-          const SizedBox(height: AppStyles.spacing16),
-          Text(
-            'Google Maps Placeholder',
-            style: AppStyles.headingSmall.copyWith(
-              color: Colors.blue.shade700,
-            ),
-          ),
-          const SizedBox(height: AppStyles.spacing8),
-          Text(
-            'Remplacer par Google Maps API',
-            style: AppStyles.bodyMedium.copyWith(
-              color: Colors.blue.shade600,
-            ),
-          ),
-          const SizedBox(height: AppStyles.spacing32),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppStyles.spacing16,
-              vertical: AppStyles.spacing12,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
-              border: Border.all(color: Colors.blue.shade200),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  '📍 ${mapServices.length} Services détectés',
-                  style: AppStyles.bodyMedium.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue.shade700,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 1),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(
+                  parent: _slideController,
+                  curve: Curves.easeOut,
+                )),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 15,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: AppStyles.spacing8),
-                Text(
-                  'Voir ci-dessous',
-                  style: AppStyles.caption.copyWith(
-                    color: Colors.blue.shade600,
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.7,
                   ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // 🔥 Évite l’overflow
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '📋 Liste',
+                              style: AppStyles.headingSmall.copyWith(fontSize: 18),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() => _showList = false);
+                                _slideController.reverse();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: AppColors.error.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.close,
+                                  color: AppColors.error,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
-  // =========================================
-  // 🔷 BARRE SUPÉRIEURE
-  // =========================================
-  Widget _buildTopBar() {
-    return SafeArea(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppStyles.spacing12),
-          child: Column(
-            children: [
-              // Barre recherche
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Chercher un service...',
-                  hintStyle: AppStyles.caption,
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: AppColors.grey,
+                      // 🔥 Le fix important
+                      Flexible(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: mapServices.length,
+                          itemBuilder: (context, index) {
+                            return _buildListItem(mapServices[index]);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  filled: true,
-                  fillColor: AppColors.lightGrey,
-                  border: OutlineInputBorder(
-                    borderRadius:
-                    BorderRadius.circular(AppStyles.radiusMedium),
-                    borderSide: BorderSide.none,
+
+                ),
+              ),
+            ),
+
+          // Boutons flottants
+          Positioned(
+            top: 20,
+            right: 16,
+            child: SafeArea(
+              child: Column(
+                children: [
+                  FloatingActionButton.small(
+                    heroTag: 'zoom_in',
+                    backgroundColor: Colors.white,
+                    onPressed: () {},
+                    child: const Icon(
+                      Icons.add,
+                      color: AppColors.primaryGreen,
+                    ),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppStyles.spacing12,
-                    vertical: AppStyles.spacing8,
+                  const SizedBox(height: 8),
+                  FloatingActionButton.small(
+                    heroTag: 'zoom_out',
+                    backgroundColor: Colors.white,
+                    onPressed: () {},
+                    child: const Icon(
+                      Icons.remove,
+                      color: AppColors.primaryGreen,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  FloatingActionButton.small(
+                    heroTag: 'location',
+                    backgroundColor: Colors.white,
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('📍 Localisation actuelle'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                    child: const Icon(
+                      Icons.my_location,
+                      color: AppColors.primaryGreen,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppStyles.spacing12),
-              // Filtres
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildFilterChip('Tous', 'all', Icons.apps),
-                    _buildFilterChip(
-                        'Tracteurs', 'tractor', Icons.agriculture),
-                    _buildFilterChip('Opérateurs', 'operator', Icons.people),
-                    _buildFilterChip(
-                        'Équipement', 'equipment', Icons.build),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(String label, String value, IconData icon) {
-    bool isSelected = _selectedFilter == value;
-    return Padding(
-      padding: const EdgeInsets.only(right: AppStyles.spacing8),
-      child: FilterChip(
-        label: Row(
-          children: [
-            Icon(
-              icon,
-              size: 14,
-              color: isSelected ? Colors.white : AppColors.primaryGreen,
-            ),
-            const SizedBox(width: 4),
-            Text(label),
-          ],
-        ),
-        selected: isSelected,
-        onSelected: (selected) {
-          setState(() => _selectedFilter = value);
-        },
-        backgroundColor: Colors.white,
-        selectedColor: AppColors.primaryGreen,
-        side: BorderSide(
-          color: isSelected ? AppColors.primaryGreen : AppColors.border,
-        ),
-        labelStyle: TextStyle(
-          color: isSelected ? Colors.white : AppColors.primaryGreen,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
-
-  // =========================================
-  // 🔷 BOUTONS DE ZOOM
-  // =========================================
-  Widget _buildZoomButtons() {
-    return Column(
-      children: [
-        // Zoom +
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 4,
-              ),
-            ],
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              setState(() => _zoom++);
-            },
-          ),
-        ),
-        const SizedBox(height: 8),
-        // Zoom -
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 4,
-              ),
-            ],
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.remove),
-            onPressed: () {
-              setState(() => _zoom--);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  // =========================================
-  // 🔷 BOUTON LOCALISATION
-  // =========================================
-  Widget _buildLocationButton() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      child: IconButton(
-        icon: const Icon(
-          Icons.my_location,
-          color: AppColors.primaryGreen,
-        ),
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Localisation actuelle'),
-              duration: Duration(seconds: 1),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  // =========================================
-  // 🔷 PANNEAU INFÉRIEUR
-  // =========================================
-  Widget _buildBottomSheet() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Barre drag
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppStyles.spacing12),
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.grey,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          // Titre + Bouton liste
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppStyles.spacing16,
-              vertical: AppStyles.spacing8,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Services à proximité',
-                  style: AppStyles.headingSmall.copyWith(fontSize: 16),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.list_alt),
-                  onPressed: () {
-                    setState(() => _showList = true);
-                  },
-                ),
-              ],
-            ),
-          ),
-          // Services horizontaux
-          SizedBox(
-            height: 200,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppStyles.spacing12,
-              ),
-              itemCount: mapServices.length,
-              itemBuilder: (context, index) {
-                return _buildServiceCard(mapServices[index]);
-              },
             ),
           ),
         ],
@@ -439,193 +345,302 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Widget _buildServiceCard(MapService service) {
-    return Container(
-      width: 260,
-      margin: const EdgeInsets.only(right: AppStyles.spacing12),
-      decoration: BoxDecoration(
-        color: AppColors.lightGrey,
-        borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppStyles.spacing12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Titre
-            Text(
-              service.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppStyles.bodyLarge.copyWith(
-                fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ServiceDetailScreen(
+              service: ServiceItem(
+                id: service.id,
+                title: service.title,
+                category: service.category,
+                location: 'Localisation',
+                rating: service.rating,
+                reviews: 24,
+                price: service.price,
+                image: 'assets/images/tractor.jpg',
+                isAvailable: true,
+                distance: service.distance,
+                icon: service.icon,
               ),
             ),
-            const SizedBox(height: AppStyles.spacing4),
-            // Distance
-            Row(
-              children: [
-                const Icon(
-                  Icons.location_on_outlined,
-                  size: 14,
-                  color: AppColors.grey,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  service.distance,
-                  style: AppStyles.caption,
-                ),
-              ],
+          ),
+        );
+      },
+      child: Container(
+        width: 140,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: AppColors.primaryGreen.withOpacity(0.2),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            const SizedBox(height: AppStyles.spacing8),
-            // Rating
-            Row(
-              children: [
-                const Icon(
-                  Icons.star,
-                  size: 14,
-                  color: Colors.amber,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '${service.rating}',
-                  style: AppStyles.caption,
-                ),
-              ],
-            ),
-            const Spacer(),
-            // Bouton
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  backgroundColor: AppColors.primaryGreen,
-                ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${service.title} sélectionné'),
-                      duration: const Duration(seconds: 1),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                service.icon,
+                style: const TextStyle(fontSize: 32),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    service.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
-                },
-                child: Text(
-                  'Voir détails',
-                  style: AppStyles.caption.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        size: 12,
+                        color: AppColors.grey,
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${service.distance}km',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppColors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            size: 12,
+                            color: Colors.amber,
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            '${service.rating}',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryGreen.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '${service.price}F',
+                          style: const TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: double.infinity,
+                height: 28,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryGreen,
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ServiceDetailScreen(
+                          service: ServiceItem(
+                            id: service.id,
+                            title: service.title,
+                            category: service.category,
+                            location: 'Localisation',
+                            rating: service.rating,
+                            reviews: 24,
+                            price: service.price,
+                            image: 'assets/images/tractor.jpg',
+                            isAvailable: true,
+                            distance: service.distance,
+                            icon: service.icon,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    'Voir',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListItem(MapService service) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ServiceDetailScreen(
+              service: ServiceItem(
+                id: service.id,
+                title: service.title,
+                category: service.category,
+                location: 'Localisation',
+                rating: service.rating,
+                reviews: 24,
+                price: service.price,
+                image: 'assets/images/tractor.jpg',
+                isAvailable: true,
+                distance: service.distance,
+                icon: service.icon,
+              ),
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.primaryGreen.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: AppColors.primaryGreen.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: Text(
+                  service.icon,
+                  style: const TextStyle(fontSize: 28),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    service.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        size: 12,
+                        color: AppColors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${service.distance}km',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.star,
+                      size: 12,
+                      color: Colors.amber,
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      '${service.rating}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${service.price}F',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
-
-  // =========================================
-  // 🔷 VUE LISTE
-  // =========================================
-  Widget _buildListView() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppStyles.spacing16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Services (${mapServices.length})',
-                  style: AppStyles.headingSmall.copyWith(fontSize: 16),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    setState(() => _showList = false);
-                  },
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: mapServices.length,
-              itemBuilder: (context, index) {
-                final service = mapServices[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor:
-                    AppColors.primaryGreen.withOpacity(0.1),
-                    child: Icon(
-                      Icons.agriculture,
-                      color: AppColors.primaryGreen,
-                    ),
-                  ),
-                  title: Text(
-                    service.title,
-                    style: AppStyles.bodyMedium.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Row(
-                    children: [
-                      const Icon(Icons.location_on_outlined,
-                          size: 12, color: AppColors.grey),
-                      const SizedBox(width: 4),
-                      Text(
-                        service.distance,
-                        style: AppStyles.caption,
-                      ),
-                    ],
-                  ),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.star,
-                          size: 14, color: Colors.amber),
-                      Text(
-                        '${service.rating}',
-                        style: AppStyles.caption,
-                      ),
-                    ],
-                  ),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(service.title),
-                        duration: const Duration(seconds: 1),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-// =========================================
-// 🔷 MODÈLE SERVICE CARTE
-// =========================================
 class MapService {
   final String id;
   final String title;
@@ -634,6 +649,8 @@ class MapService {
   final String category;
   final String distance;
   final double rating;
+  final String price;
+  final String icon;
 
   MapService({
     required this.id,
@@ -643,5 +660,7 @@ class MapService {
     required this.category,
     required this.distance,
     required this.rating,
+    required this.price,
+    required this.icon,
   });
 }

@@ -4,6 +4,8 @@ import 'view_models/auth_view_model.dart';
 import 'screens/phone_input_screen.dart';
 import 'core/constants/app_colors.dart';
 import 'package:agro_boost/screens/login_screen.dart';
+import 'screens/splash_screen.dart';
+
 
 void main() {
   runApp(const AgroBoostApp());
@@ -28,7 +30,7 @@ class AgroBoostApp extends StatelessWidget {
             backgroundColor: AppColors.primaryGreen,
           ),
         ),
-        home: const LoginScreen(),
+        home: const SplashScreen(),
 
       ),
     );

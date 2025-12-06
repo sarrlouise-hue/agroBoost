@@ -1,3 +1,4 @@
+// ===== PROFILE SCREEN (Modifiée) =====
 import 'package:flutter/material.dart';
 import 'package:agro_boost/core/constants/app_colors.dart';
 import 'package:agro_boost/core/constants/app_styles.dart';
@@ -9,528 +10,193 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateMixin {
   bool _isEditing = false;
+  late AnimationController _scaleController;
 
-  // Données utilisateur
-  final user = UserProfile(
-    id: '1',
-    firstName: 'Amadou',
-    lastName: 'Sow',
-    email: 'amadou.sow@example.com',
-    phone: '+221 77 123 45 67',
-    userType: 'farmer',
-    location: 'Kaolack, Sénégal',
-    profileImage: 'assets/images/profile.jpg',
-    totalBookings: 12,
-    totalSpent: '450 000',
-    rating: 4.8,
-    reviews: 24,
-  );
+  @override
+  void initState() {
+    super.initState();
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.veryLightGrey,
-      appBar: _buildAppBar(),
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: Text(
+          '👤 Mon Profil',
+          style: AppStyles.headingMedium.copyWith(
+            color: Colors.white,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isEditing ? Icons.close : Icons.edit_outlined,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              setState(() => _isEditing = !_isEditing);
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // =========================================
-            // 1️⃣ EN-TÊTE PROFIL
-            // =========================================
             _buildProfileHeader(),
-
-            // =========================================
-            // 2️⃣ STATISTIQUES
-            // =========================================
-            _buildStatistics(),
-
-            // =========================================
-            // 3️⃣ FORMULAIRE ÉDITION
-            // =========================================
-            if (_isEditing) _buildEditForm(),
-
-            // =========================================
-            // 4️⃣ MENU PARAMÈTRES
-            // =========================================
-            _buildSettingsMenu(),
-
-            // Espace final
-            const SizedBox(height: AppStyles.spacing24),
+            const SizedBox(height: 10),
+            _buildMenu(),
+            const SizedBox(height: 30),
           ],
         ),
       ),
     );
   }
 
-  // =========================================
-  // 🔷 APP BAR
-  // =========================================
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.primary,
-      elevation: 0,
-      title: Text(
-        'Mon Profil',
-        style: AppStyles.headingMedium.copyWith(
-          color: Colors.white,
-          fontSize: 20,
-        ),
-      ),
-      centerTitle: true,
-      actions: [
-        IconButton(
-          icon: Icon(
-            _isEditing ? Icons.close : Icons.edit_outlined,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            setState(() => _isEditing = !_isEditing);
-          },
-        ),
-      ],
-    );
-  }
-
-  // =========================================
-  // 🔷 EN-TÊTE PROFIL
-  // =========================================
   Widget _buildProfileHeader() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-        ),
+    return ScaleTransition(
+      scale: Tween<double>(begin: 0.8, end: 1).animate(
+        CurvedAnimation(parent: _scaleController, curve: Curves.easeOut),
       ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppStyles.spacing20,
-            vertical: AppStyles.spacing24,
-          ),
-          child: Column(
-            children: [
-              // Photo de profil
-              Stack(
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 3,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.person,
-                      size: 50,
-                      color: Colors.white,
-                    ),
-                  ),
-                  if (_isEditing)
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 2,
-                          ),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.camera_alt_outlined,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Prendre une photo...'),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: AppStyles.spacing16),
-
-              // Nom
-              Text(
-                '${user.firstName} ${user.lastName}',
-                style: AppStyles.headingSmall.copyWith(
-                  color: Colors.white,
-                  fontSize: 22,
-                ),
-              ),
-              const SizedBox(height: AppStyles.spacing4),
-
-              // Type d'utilisateur
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppStyles.spacing12,
-                  vertical: AppStyles.spacing6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
-                  ),
-                ),
-                child: Text(
-                  user.userType == 'farmer'
-                      ? '👨‍🌾 Agriculteur'
-                      : '👨‍💼 Prestataire',
-                  style: AppStyles.labelSmall.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppStyles.spacing12),
-
-              // Email
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.email_outlined,
-                    color: Colors.white70,
-                    size: 16,
-                  ),
-                  const SizedBox(width: AppStyles.spacing6),
-                  Text(
-                    user.email,
-                    style: AppStyles.bodySmall.copyWith(
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppStyles.spacing8),
-
-              // Localisation
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.location_on_outlined,
-                    color: Colors.white70,
-                    size: 16,
-                  ),
-                  const SizedBox(width: AppStyles.spacing6),
-                  Text(
-                    user.location,
-                    style: AppStyles.bodySmall.copyWith(
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(24),
+            bottomRight: Radius.circular(24),
           ),
         ),
-      ),
-    );
-  }
-
-  // =========================================
-  // 🔷 STATISTIQUES
-  // =========================================
-  Widget _buildStatistics() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppStyles.spacing16,
-        vertical: AppStyles.spacing20,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildStatCard(
-            icon: Icons.shopping_bag_outlined,
-            label: 'Réservations',
-            value: user.totalBookings.toString(),
-          ),
-          _buildStatCard(
-            icon: Icons.payment_outlined,
-            label: 'Dépensé',
-            value: '${user.totalSpent} FCFA',
-          ),
-          _buildStatCard(
-            icon: Icons.star_outlined,
-            label: 'Rating',
-            value: '${user.rating}',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatCard({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(AppStyles.spacing16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 8,
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: AppColors.primary,
-            size: 28,
-          ),
-          const SizedBox(height: AppStyles.spacing8),
-          Text(
-            value,
-            style: AppStyles.bodyLarge.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+        padding: const EdgeInsets.symmetric(vertical: 30),
+        child: Column(
+          children: [
+            const Icon(
+              Icons.person,
+              size: 80,
+              color: Colors.black,
             ),
-          ),
-          const SizedBox(height: AppStyles.spacing4),
-          Text(
-            label,
-            style: AppStyles.caption,
-            textAlign: TextAlign.center,
-          ),
-        ],
+            const SizedBox(height: 16),
+            const Text(
+              '👨‍🌾 Agriculteur',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  // =========================================
-  // 🔷 FORMULAIRE D'ÉDITION
-  // =========================================
-  Widget _buildEditForm() {
-    return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppStyles.spacing16,
-        vertical: AppStyles.spacing16,
-      ),
-      padding: const EdgeInsets.all(AppStyles.spacing16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 8,
-          ),
-        ],
-      ),
+  Widget _buildMenu() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Éditer votre profil',
-            style: AppStyles.bodyLarge.copyWith(
+          const Text(
+            '⚙️ Paramètres',
+            style: TextStyle(
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: AppStyles.spacing16),
-
-          // Prénom
-          _buildTextField(
-            label: 'Prénom',
-            initialValue: user.firstName,
-          ),
-          const SizedBox(height: AppStyles.spacing12),
-
-          // Nom
-          _buildTextField(
-            label: 'Nom',
-            initialValue: user.lastName,
-          ),
-          const SizedBox(height: AppStyles.spacing12),
-
-          // Email
-          _buildTextField(
-            label: 'Email',
-            initialValue: user.email,
-            enabled: false,
-          ),
-          const SizedBox(height: AppStyles.spacing12),
-
-          // Téléphone
-          _buildTextField(
-            label: 'Téléphone',
-            initialValue: user.phone,
-          ),
-          const SizedBox(height: AppStyles.spacing12),
-
-          // Localisation
-          _buildTextField(
-            label: 'Localisation',
-            initialValue: user.location,
-          ),
-          const SizedBox(height: AppStyles.spacing16),
-
-          // Boutons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    setState(() => _isEditing = false);
-                  },
-                  child: const Text('Annuler'),
-                ),
-              ),
-              const SizedBox(width: AppStyles.spacing12),
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                  ),
-                  onPressed: () {
-                    setState(() => _isEditing = false);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Profil mis à jour'),
-                        backgroundColor: AppColors.success,
-                      ),
-                    );
-                  },
-                  child: const Text('Enregistrer'),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required String label,
-    required String initialValue,
-    bool enabled = true,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: AppStyles.labelSmall,
-        ),
-        const SizedBox(height: AppStyles.spacing6),
-        TextField(
-          controller: TextEditingController(text: initialValue),
-          enabled: enabled,
-          decoration: InputDecoration(
-            hintText: label,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
-            ),
-            filled: true,
-            fillColor: enabled
-                ? Colors.white
-                : AppColors.lightGrey,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppStyles.spacing12,
-              vertical: AppStyles.spacing10,
+          const SizedBox(height: 12),
+          _buildMenuItem(Icons.lock_outline, 'Mot de passe', () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => const ChangePasswordScreen(),
+            ));
+          }),
+          _buildMenuItem(Icons.notifications_none, 'Notifications', () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => const NotificationsScreen(),
+            ));
+          }),
+          _buildMenuItem(Icons.language, 'Langue', () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => const LanguageScreen(),
+            ));
+          }),
+          const SizedBox(height: 16),
+          const Text(
+            'ℹ️ À Propos',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  // =========================================
-  // 🔷 MENU PARAMÈTRES
-  // =========================================
-  Widget _buildSettingsMenu() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppStyles.spacing16,
-        vertical: AppStyles.spacing16,
-      ),
-      child: Column(
-        children: [
-          // Section Compte
-          _buildMenuSection(
-            title: 'COMPTE',
-            items: [
-              MenuItem(
-                icon: Icons.lock_outlined,
-                label: 'Changer le mot de passe',
-                onTap: () => _showPasswordDialog(),
-              ),
-              MenuItem(
-                icon: Icons.notifications_outlined,
-                label: 'Notifications',
-                onTap: () => _showNotificationSettings(),
-              ),
-              MenuItem(
-                icon: Icons.language_outlined,
-                label: 'Langue',
-                onTap: () => _showLanguageSettings(),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppStyles.spacing16),
-
-          // Section Infos
-          _buildMenuSection(
-            title: 'INFORMATIONS',
-            items: [
-              MenuItem(
-                icon: Icons.info_outlined,
-                label: 'À propos de AGRO BOOST',
-                onTap: () => _showAboutDialog(),
-              ),
-              MenuItem(
-                icon: Icons.description_outlined,
-                label: 'Conditions d\'utilisation',
-                onTap: () => _showTermsDialog(),
-              ),
-              MenuItem(
-                icon: Icons.privacy_tip_outlined,
-                label: 'Politique de confidentialité',
-                onTap: () => _showPrivacyDialog(),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppStyles.spacing16),
-
-          // Bouton Déconnexion
+          const SizedBox(height: 12),
+          _buildMenuItem(Icons.description_outlined, 'Conditions d\'utilisation', () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => const TermsScreen(),
+            ));
+          }),
+          _buildMenuItem(Icons.privacy_tip_outlined, 'Confidentialité', () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => const PrivacyScreen(),
+            ));
+          }),
+          _buildMenuItem(Icons.info_outline, 'Version 1.0.0', () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => const VersionScreen(),
+            ));
+          }),
+          const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
+            height: 48,
             child: ElevatedButton.icon(
-              icon: const Icon(Icons.logout_outlined),
+              icon: const Icon(Icons.logout),
               label: const Text('Se déconnecter'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.error,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppStyles.spacing12,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               onPressed: () {
-                _showLogoutDialog();
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    title: const Text('Déconnexion'),
+                    content: const Text('Êtes-vous sûr ?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Non'),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.error,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pushReplacementNamed(context, '/login');
+                        },
+                        child: const Text('Oui'),
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
           ),
@@ -539,293 +205,404 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildMenuSection({
-    required String title,
-    required List<MenuItem> items,
+  Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.border,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: AppColors.primary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: AppColors.grey,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ===== CHANGE PASSWORD SCREEN =====
+class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+}
+
+class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _currentPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _showCurrentPassword = false;
+  bool _showNewPassword = false;
+  bool _showConfirmPassword = false;
+
+  @override
+  void dispose() {
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.veryLightGrey,
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: const Text(
+          'Changer le mot de passe',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              _buildPasswordField(
+                label: 'Mot de passe actuel',
+                controller: _currentPasswordController,
+                obscure: !_showCurrentPassword,
+                onToggle: () {
+                  setState(() => _showCurrentPassword = !_showCurrentPassword);
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildPasswordField(
+                label: 'Nouveau mot de passe',
+                controller: _newPasswordController,
+                obscure: !_showNewPassword,
+                onToggle: () {
+                  setState(() => _showNewPassword = !_showNewPassword);
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildPasswordField(
+                label: 'Confirmer le mot de passe',
+                controller: _confirmPasswordController,
+                obscure: !_showConfirmPassword,
+                onToggle: () {
+                  setState(() => _showConfirmPassword = !_showConfirmPassword);
+                },
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Mot de passe mis à jour')),
+                      );
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text('Mettre à jour', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField({
+    required String label,
+    required TextEditingController controller,
+    required bool obscure,
+    required VoidCallback onToggle,
   }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        suffixIcon: IconButton(
+          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+          onPressed: onToggle,
+        ),
+      ),
+      validator: (value) {
+        if (value?.isEmpty ?? true) return 'Ce champ est requis';
+        if (label.contains('Confirmer') &&
+            value != _newPasswordController.text) {
+          return 'Les mots de passe ne correspondent pas';
+        }
+        if (label.contains('Nouveau') && value!.length < 6) {
+          return 'Minimum 6 caractères';
+        }
+        return null;
+      },
+    );
+  }
+}
+
+// ===== NOTIFICATIONS SCREEN =====
+class NotificationsScreen extends StatefulWidget {
+  const NotificationsScreen({Key? key}) : super(key: key);
+
+  @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  bool _emailNotifications = true;
+  bool _pushNotifications = true;
+  bool _smsNotifications = false;
+  bool _weeklyDigest = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.veryLightGrey,
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: const Text(
+          'Notifications',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const SizedBox(height: 10),
+          _buildNotificationTile(
+            'Notifications par email',
+            'Recevoir les mises à jour par email',
+            _emailNotifications,
+                (value) => setState(() => _emailNotifications = value),
+          ),
+          _buildNotificationTile(
+            'Notifications push',
+            'Recevoir les alertes en temps réel',
+            _pushNotifications,
+                (value) => setState(() => _pushNotifications = value),
+          ),
+          _buildNotificationTile(
+            'Notifications SMS',
+            'Recevoir les alertes par SMS',
+            _smsNotifications,
+                (value) => setState(() => _smsNotifications = value),
+          ),
+          _buildNotificationTile(
+            'Résumé hebdomadaire',
+            'Recevoir un résumé de la semaine',
+            _weeklyDigest,
+                (value) => setState(() => _weeklyDigest = value),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationTile(
+      String title,
+      String subtitle,
+      bool value,
+      ValueChanged<bool> onChanged,
+      ) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 8,
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
       ),
-      child: Column(
+      child: ListTile(
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
+        trailing: Switch(
+          value: value,
+          onChanged: onChanged,
+          activeColor: AppColors.primary,
+        ),
+      ),
+    );
+  }
+}
+
+// ===== LANGUAGE SCREEN =====
+class LanguageScreen extends StatefulWidget {
+  const LanguageScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LanguageScreen> createState() => _LanguageScreenState();
+}
+
+class _LanguageScreenState extends State<LanguageScreen> {
+  String _selectedLanguage = 'fr';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.veryLightGrey,
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: const Text(
+          'Langue',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          Padding(
-            padding: const EdgeInsets.all(AppStyles.spacing12),
-            child: Text(
-              title,
-              style: AppStyles.labelSmall.copyWith(
-                color: AppColors.grey,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          ...List.generate(items.length, (index) {
-            return Column(
-              children: [
-                ListTile(
-                  leading: Icon(
-                    items[index].icon,
-                    color: AppColors.primary,
-                  ),
-                  title: Text(
-                    items[index].label,
-                    style: AppStyles.bodyMedium,
-                  ),
-                  trailing: const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: AppColors.grey,
-                  ),
-                  onTap: items[index].onTap,
-                ),
-                if (index < items.length - 1)
-                  Divider(
-                    height: 1,
-                    color: AppColors.border,
-                  ),
-              ],
+          const SizedBox(height: 10),
+          _buildLanguageTile('Français', 'fr', '🇫🇷'),
+          _buildLanguageTile('Wolof', 'wo', '🇸🇳'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageTile(String name, String code, String flag) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: _selectedLanguage == code ? AppColors.primary : AppColors.border,
+          width: _selectedLanguage == code ? 2 : 1,
+        ),
+      ),
+      child: ListTile(
+        leading: Text(flag, style: const TextStyle(fontSize: 24)),
+        title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
+        trailing: Radio<String>(
+          value: code,
+          groupValue: _selectedLanguage,
+          onChanged: (value) {
+            setState(() => _selectedLanguage = value!);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Langue changée en $name')),
             );
-          }),
-        ],
+          },
+          activeColor: AppColors.primary,
+        ),
+        onTap: () {
+          setState(() => _selectedLanguage = code);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Langue changée en $name')),
+          );
+        },
       ),
     );
   }
+}
 
-  // =========================================
-  // 🔷 DIALOGUES
-  // =========================================
-  void _showPasswordDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Changer le mot de passe'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Ancien mot de passe',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+// ===== TERMS SCREEN =====
+class TermsScreen extends StatelessWidget {
+  const TermsScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.veryLightGrey,
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: const Text(
+          'Conditions d\'utilisation',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Conditions d\'utilisation',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              ),
-            ),
-            const SizedBox(height: AppStyles.spacing12),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Nouveau mot de passe',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                SizedBox(height: 16),
+                Text(
+                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\n'
+                      '1. Acceptation des conditions\n'
+                      'En utilisant cette application, vous acceptez les présentes conditions.\n\n'
+                      '2. Utilisation de l\'application\n'
+                      'Vous acceptez d\'utiliser l\'application conformément à la loi et à ces conditions.\n\n'
+                      '3. Propriété intellectuelle\n'
+                      'Tout contenu de l\'application est protégé par les droits d\'auteur.\n\n'
+                      '4. Limitation de responsabilité\n'
+                      'L\'application est fournie "telle quelle" sans garantie.',
+                  style: TextStyle(fontSize: 13, height: 1.6),
                 ),
-              ),
+              ],
             ),
-            const SizedBox(height: AppStyles.spacing12),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Confirmer',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Mot de passe changé'),
-                  backgroundColor: AppColors.success,
-                ),
-              );
-            },
-            child: const Text('Enregistrer'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showNotificationSettings() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Notifications'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CheckboxListTile(
-              value: true,
-              onChanged: (value) {},
-              title: const Text('Notifications par email'),
-            ),
-            CheckboxListTile(
-              value: true,
-              onChanged: (value) {},
-              title: const Text('Notifications par SMS'),
-            ),
-            CheckboxListTile(
-              value: false,
-              onChanged: (value) {},
-              title: const Text('Notifications push'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showLanguageSettings() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Langue'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile(
-              value: 'fr',
-              groupValue: 'fr',
-              onChanged: (value) {},
-              title: const Text('🇫🇷 Français'),
-            ),
-            RadioListTile(
-              value: 'wo',
-              groupValue: 'fr',
-              onChanged: (value) {},
-              title: const Text('🇸🇳 Wolof'),
-            ),
-            RadioListTile(
-              value: 'en',
-              groupValue: 'fr',
-              onChanged: (value) {},
-              title: const Text('🇬🇧 English'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAboutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('À propos'),
-        content: Text(
-          'AGRO BOOST v1.0.0\n\n'
-              'Application de réservation de services agricoles au Sénégal.\n\n'
-              '© 2024 AGRO BOOST. Tous droits réservés.',
-          style: AppStyles.bodyMedium,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showTermsDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Conditions d\'utilisation'),
-        content: SingleChildScrollView(
-          child: Text(
-            'Lorem ipsum dolor sit amet...\n\n'
-                '1. Utilisation du service\n'
-                '2. Responsabilités de l\'utilisateur\n'
-                '3. Propriété intellectuelle\n'
-                '4. Limitations de responsabilité\n'
-                '5. Modifications des conditions',
-            style: AppStyles.bodySmall,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showPrivacyDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Politique de confidentialité'),
-        content: SingleChildScrollView(
-          child: Text(
-            'Vos données personnelles sont protégées...\n\n'
-                '1. Données collectées\n'
-                '2. Utilisation des données\n'
-                '3. Protection des données\n'
-                '4. Cookies\n'
-                '5. Vos droits',
-            style: AppStyles.bodySmall,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Se déconnecter?'),
-        content: const Text('Êtes-vous sûr de vouloir vous déconnecter?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Non'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Implémenter la déconnexion
-              // Navigator.pushReplacementNamed(context, '/login');
-            },
-            child: const Text('Oui, déconnecter'),
           ),
         ],
       ),
@@ -833,47 +610,142 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-// =========================================
-// 🔷 MODÈLES
-// =========================================
-class UserProfile {
-  final String id;
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String phone;
-  final String userType;
-  final String location;
-  final String profileImage;
-  final int totalBookings;
-  final String totalSpent;
-  final double rating;
-  final int reviews;
+// ===== PRIVACY SCREEN =====
+class PrivacyScreen extends StatelessWidget {
+  const PrivacyScreen({Key? key}) : super(key: key);
 
-  UserProfile({
-    required this.id,
-    required this.firstName,
-    required this.lastName,
-    required this.email,
-    required this.phone,
-    required this.userType,
-    required this.location,
-    required this.profileImage,
-    required this.totalBookings,
-    required this.totalSpent,
-    required this.rating,
-    required this.reviews,
-  });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.veryLightGrey,
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: const Text(
+          'Politique de Confidentialité',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Politique de Confidentialité',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Nous nous engageons à protéger votre vie privée.\n\n'
+                      '1. Collecte de données\n'
+                      'Nous collectons uniquement les données nécessaires pour fournir nos services.\n\n'
+                      '2. Utilisation des données\n'
+                      'Vos données sont utilisées pour améliorer nos services.\n\n'
+                      '3. Partage des données\n'
+                      'Vos données ne seront jamais partagées avec des tiers sans votre consentement.\n\n'
+                      '4. Sécurité\n'
+                      'Nous utilisons le chiffrement pour protéger vos données.',
+                  style: TextStyle(fontSize: 13, height: 1.6),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class MenuItem {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
+// ===== VERSION SCREEN =====
+class VersionScreen extends StatelessWidget {
+  const VersionScreen({Key? key}) : super(key: key);
 
-  MenuItem({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.veryLightGrey,
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: const Text(
+          'À propos',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.info_outline, size: 60, color: AppColors.primary),
+              const SizedBox(height: 16),
+              const Text(
+                'AgroBoost',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Version 1.0.0',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Application de gestion agricole développée pour les agriculteurs sénégalais.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.veryLightGrey,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Column(
+                  children: [
+                    Text(
+                      'Droits d\'auteur © 2024',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Tous droits réservés',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
