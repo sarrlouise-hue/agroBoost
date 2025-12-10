@@ -89,13 +89,60 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log('✅ Connexion à PostgreSQL établie avec succès.');
     
+    // Charger les modèles pour qu'ils soient enregistrés
+    require('../models/User');
+    require('../models/OTP');
+    require('../models/PasswordResetToken');
+    require('../models/Provider');
+    require('../models/Service');
+    
     // Charger les associations entre modèles
     require('../models/associations');
     
-    // Synchroniser les modèles en développement
+    // Synchroniser les modèles
     if (process.env.NODE_ENV === 'development') {
+      // En développement, utiliser alter pour mettre à jour les tables
       await sequelize.sync({ alter: true });
-      console.log('✅ Modèles synchronisés avec la base de données.');
+      console.log('✅ Modèles synchronisés avec la base de données (développement).');
+    } else {
+      // En production, créer les tables seulement si elles n'existent pas
+      try {
+        // Vérifier si la table users existe (table principale)
+        const [results] = await sequelize.query(`
+          SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            AND table_name = 'users'
+          ) as exists;
+        `);
+        
+        const tablesExist = results && results[0] && (results[0].exists === true || results[0].exists === 't');
+        
+        if (!tablesExist) {
+          console.log('📦 Création des tables en production...');
+          // Créer les tables sans alter (force: false pour ne pas supprimer les données existantes)
+          await sequelize.sync({ force: false, alter: false });
+          console.log('✅ Tables créées avec succès en production.');
+        } else {
+          console.log('✅ Tables existent déjà en production.');
+        }
+      } catch (syncError) {
+        // Si la vérification échoue, essayer quand même de créer les tables
+        // (peut arriver si la base de données est vide)
+        console.warn('⚠️  Erreur lors de la vérification des tables:', syncError.message);
+        console.log('📦 Tentative de création des tables...');
+        try {
+          await sequelize.sync({ force: false, alter: false });
+          console.log('✅ Tables créées avec succès en production.');
+        } catch (createError) {
+          console.error('❌ Erreur lors de la création des tables:', createError.message);
+          // Ne pas faire échouer le démarrage si les tables existent déjà
+          if (!createError.message.includes('already exists') && !createError.message.includes('déjà existe')) {
+            throw createError;
+          }
+          console.log('✅ Les tables existent déjà.');
+        }
+      }
     }
   } catch (error) {
     console.error('❌ Erreur de connexion à PostgreSQL:', error.message);

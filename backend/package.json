@@ -14,6 +14,8 @@
     "test:unit": "jest tests/unit",
     "test:integration": "jest tests/integration",
     "test:integration:real": "jest --testMatch='**/tests/integration/*.integration.test.js'",
+    "init-db": "node scripts/init-db.js",
+    "init-db:force": "node -e \"require('dotenv').config(); const {sequelize} = require('./src/config/database'); require('./src/models/User'); require('./src/models/OTP'); require('./src/models/PasswordResetToken'); require('./src/models/Provider'); require('./src/models/Service'); require('./src/models/associations'); sequelize.sync({force: true}).then(() => {console.log('✅ Tables recréées'); process.exit(0);}).catch(e => {console.error('❌ Erreur:', e); process.exit(1);});\"",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix"
   },
