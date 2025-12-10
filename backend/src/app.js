@@ -32,7 +32,7 @@ const app = express();
 // Vercel utilise un proxy, donc on doit faire confiance aux headers X-Forwarded-*
 app.set('trust proxy', true);
 
-// Middleware de sécurité (configuré pour permettre Swagger UI)
+// Middleware de sécurité (configuré pour permettre Swagger UI et les apps mobiles)
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -47,13 +47,75 @@ app.use(helmet({
     },
   },
   crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' }, // Permettre les ressources cross-origin pour les apps mobiles
+  crossOriginOpenerPolicy: false, // Désactiver pour permettre l'accès depuis les apps mobiles
 }));
 
-// Configuration CORS
-app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+// Configuration CORS pour permettre les requêtes depuis les applications mobiles
+const corsOptions = {
+  origin: function (origin, callback) {
+    // 1. TOUJOURS autoriser les requêtes sans origine (applications mobiles natives)
+    // Les apps Flutter, React Native, etc. n'envoient pas d'en-tête Origin
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+    
+    // 2. En développement, autoriser toutes les origines
+    if (NODE_ENV === 'development') {
+      callback(null, true);
+      return;
+    }
+    
+    // 3. En production, vérifier la liste des origines autorisées
+    const allowedOrigins = process.env.ALLOWED_ORIGINS 
+      ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+      : [process.env.FRONTEND_URL || '*'];
+    
+    // 4. Si '*' est dans la liste, tout autoriser
+    if (allowedOrigins.includes('*')) {
+      callback(null, true);
+      return;
+    }
+    
+    // 5. Vérifier si l'origine est dans la liste autorisée
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Non autorisé par la politique CORS'));
+    }
+  },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers',
+    'X-Forwarded-For',
+    'X-Forwarded-Proto',
+    'X-Forwarded-Port'
+  ],
+  exposedHeaders: [
+    'Content-Length',
+    'Content-Type',
+    'Authorization',
+    'X-Total-Count',
+    'X-Page',
+    'X-Limit'
+  ],
+  maxAge: 86400, // 24 heures - cache des preflight requests
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+
+// Gestion explicite des requêtes OPTIONS (preflight) pour les applications mobiles
+app.options('*', cors(corsOptions));
 
 // Middleware de parsing du corps
 app.use(express.json());
