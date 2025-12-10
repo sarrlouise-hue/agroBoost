@@ -399,6 +399,22 @@ const options = {
               description: 'Nombre total de réservations',
               example: 0,
             },
+            latitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -90,
+              maximum: 90,
+              description: 'Latitude',
+              example: 14.7167,
+            },
+            longitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -180,
+              maximum: 180,
+              description: 'Longitude',
+              example: -17.4677,
+            },
             createdAt: {
               type: 'string',
               format: 'date-time',
@@ -406,6 +422,235 @@ const options = {
             updatedAt: {
               type: 'string',
               format: 'date-time',
+            },
+          },
+        },
+        Booking: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'ID unique de la réservation',
+            },
+            userId: {
+              type: 'string',
+              description: 'ID de l\'utilisateur',
+            },
+            serviceId: {
+              type: 'string',
+              description: 'ID du service',
+            },
+            providerId: {
+              type: 'string',
+              description: 'ID du prestataire',
+            },
+            bookingDate: {
+              type: 'string',
+              format: 'date',
+              description: 'Date de réservation',
+              example: '2024-12-15',
+            },
+            startTime: {
+              type: 'string',
+              pattern: '^([0-1][0-9]|2[0-3]):[0-5][0-9]$',
+              description: 'Heure de début (HH:MM)',
+              example: '08:00',
+            },
+            endTime: {
+              type: 'string',
+              pattern: '^([0-1][0-9]|2[0-3]):[0-5][0-9]$',
+              description: 'Heure de fin (HH:MM)',
+              example: '17:00',
+            },
+            duration: {
+              type: 'integer',
+              minimum: 1,
+              description: 'Durée en heures',
+              example: 8,
+            },
+            totalPrice: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              description: 'Prix total',
+              example: 40000,
+            },
+            status: {
+              type: 'string',
+              enum: ['pending', 'confirmed', 'completed', 'cancelled'],
+              description: 'Statut de la réservation',
+              example: 'pending',
+            },
+            latitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -90,
+              maximum: 90,
+              description: 'Latitude',
+              example: 14.7167,
+            },
+            longitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -180,
+              maximum: 180,
+              description: 'Longitude',
+              example: -17.4677,
+            },
+            notes: {
+              type: 'string',
+              description: 'Notes additionnelles',
+              example: 'Travaux de labour',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
+        Payment: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'ID unique du paiement',
+            },
+            bookingId: {
+              type: 'string',
+              description: 'ID de la réservation',
+            },
+            userId: {
+              type: 'string',
+              description: 'ID de l\'utilisateur',
+            },
+            providerId: {
+              type: 'string',
+              description: 'ID du prestataire',
+            },
+            amount: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              description: 'Montant du paiement',
+              example: 40000,
+            },
+            paymentMethod: {
+              type: 'string',
+              enum: ['paytech'],
+              description: 'Méthode de paiement',
+              example: 'paytech',
+            },
+            transactionId: {
+              type: 'string',
+              description: 'ID de transaction',
+              example: 'paytech-txn-123',
+            },
+            paytechTransactionId: {
+              type: 'string',
+              description: 'ID de transaction PayTech',
+              example: 'paytech-txn-123',
+            },
+            status: {
+              type: 'string',
+              enum: ['pending', 'success', 'failed', 'cancelled'],
+              description: 'Statut du paiement',
+              example: 'pending',
+            },
+            paymentDate: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Date du paiement',
+            },
+            metadata: {
+              type: 'object',
+              description: 'Métadonnées du paiement',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
+        CreateBookingRequest: {
+          type: 'object',
+          required: ['serviceId', 'bookingDate', 'startTime'],
+          properties: {
+            serviceId: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID du service',
+              example: 'service-id-123',
+            },
+            bookingDate: {
+              type: 'string',
+              format: 'date',
+              description: 'Date de réservation (YYYY-MM-DD)',
+              example: '2024-12-15',
+            },
+            startTime: {
+              type: 'string',
+              pattern: '^([0-1][0-9]|2[0-3]):[0-5][0-9]$',
+              description: 'Heure de début (HH:MM)',
+              example: '08:00',
+            },
+            endTime: {
+              type: 'string',
+              pattern: '^([0-1][0-9]|2[0-3]):[0-5][0-9]$',
+              description: 'Heure de fin (HH:MM) - requis si duration non fourni',
+              example: '17:00',
+            },
+            duration: {
+              type: 'integer',
+              minimum: 1,
+              description: 'Durée en heures - requis si endTime non fourni',
+              example: 8,
+            },
+            latitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -90,
+              maximum: 90,
+              description: 'Latitude',
+              example: 14.7167,
+            },
+            longitude: {
+              type: 'number',
+              format: 'float',
+              minimum: -180,
+              maximum: 180,
+              description: 'Longitude',
+              example: -17.4677,
+            },
+            notes: {
+              type: 'string',
+              description: 'Notes additionnelles',
+              example: 'Travaux de labour',
+            },
+          },
+        },
+        InitiatePaymentRequest: {
+          type: 'object',
+          required: ['bookingId', 'phoneNumber'],
+          properties: {
+            bookingId: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID de la réservation',
+              example: 'booking-id-123',
+            },
+            phoneNumber: {
+              type: 'string',
+              pattern: '^\\+?[0-9]+$',
+              description: 'Numéro de téléphone pour le paiement Mobile Money',
+              example: '+221771234567',
             },
           },
         },
@@ -786,6 +1031,14 @@ const options = {
       {
         name: 'Services',
         description: 'Gestion des services agricoles',
+      },
+      {
+        name: 'Bookings',
+        description: 'Gestion des réservations',
+      },
+      {
+        name: 'Payments',
+        description: 'Gestion des paiements PayTech',
       },
     ],
   },

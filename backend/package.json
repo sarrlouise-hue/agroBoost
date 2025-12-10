@@ -15,7 +15,7 @@
     "test:integration": "jest tests/integration",
     "test:integration:real": "jest --testMatch='**/tests/integration/*.integration.test.js'",
     "init-db": "node scripts/init-db.js",
-    "init-db:force": "node -e \"require('dotenv').config(); const {sequelize} = require('./src/config/database'); require('./src/models/User'); require('./src/models/OTP'); require('./src/models/PasswordResetToken'); require('./src/models/Provider'); require('./src/models/Service'); require('./src/models/associations'); sequelize.sync({force: true}).then(() => {console.log('✅ Tables recréées'); process.exit(0);}).catch(e => {console.error('❌ Erreur:', e); process.exit(1);});\"",
+    "init-db:force": "node -e \"require('dotenv').config(); const {sequelize} = require('./src/config/database'); require('./src/models/User'); require('./src/models/OTP'); require('./src/models/PasswordResetToken'); require('./src/models/Provider'); require('./src/models/Service'); require('./src/models/Booking'); require('./src/models/Payment'); require('./src/models/associations'); sequelize.sync({force: true}).then(() => {console.log('✅ Tables recréées'); process.exit(0);}).catch(e => {console.error('❌ Erreur:', e); process.exit(1);});\"",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix"
   },
@@ -51,6 +51,7 @@
     "moment": "^2.30.1",
     "node-geocoder": "^4.2.0",
     "geolib": "^3.3.4",
+    "cloudinary": "^1.41.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
   },

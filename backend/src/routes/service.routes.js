@@ -332,5 +332,175 @@ router.delete('/:id', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), serv
  */
 router.put('/:id/availability', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), validate(updateAvailabilitySchema), serviceController.updateAvailability);
 
+/**
+ * @swagger
+ * /api/services/search:
+ *   get:
+ *     summary: Recherche avancée de services avec filtres, texte et géolocalisation
+ *     tags: [Services]
+ *     description: Recherche textuelle, filtres avancés, calcul de distance et tri par pertinence
+ *     parameters:
+ *       - in: query
+ *         name: query
+ *         schema:
+ *           type: string
+ *         description: Recherche textuelle (nom, description)
+ *         example: tracteur
+ *       - in: query
+ *         name: serviceType
+ *         schema:
+ *           type: string
+ *           enum: [tractor, semoir, operator, other]
+ *         description: Filtrer par type de service
+ *       - in: query
+ *         name: availability
+ *         schema:
+ *           type: boolean
+ *         description: Filtrer par disponibilité
+ *       - in: query
+ *         name: minPrice
+ *         schema:
+ *           type: number
+ *         description: Prix minimum
+ *       - in: query
+ *         name: maxPrice
+ *         schema:
+ *           type: number
+ *         description: Prix maximum
+ *       - in: query
+ *         name: latitude
+ *         schema:
+ *           type: number
+ *           format: float
+ *         description: Latitude pour calcul de distance
+ *         example: 14.7167
+ *       - in: query
+ *         name: longitude
+ *         schema:
+ *           type: number
+ *           format: float
+ *         description: Longitude pour calcul de distance
+ *         example: -17.4677
+ *       - in: query
+ *         name: radius
+ *         schema:
+ *           type: number
+ *           format: float
+ *         description: Rayon de recherche en km (requiert latitude/longitude)
+ *         example: 20
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [relevance, distance, priceAsc, priceDesc, rating]
+ *           default: relevance
+ *         description: Critère de tri
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Numéro de page
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: Nombre d'éléments par page
+ *     responses:
+ *       200:
+ *         description: Résultats de recherche avec distances calculées
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedResponse'
+ *             example:
+ *               success: true
+ *               message: Résultats de recherche récupérés avec succès
+ *               data:
+ *                 - id: service-id-123
+ *                   name: Tracteur John Deere
+ *                   distance: 5.2
+ *                   ...
+ *               pagination:
+ *                 page: 1
+ *                 limit: 20
+ *                 total: 50
+ *                 totalPages: 3
+ */
+router.get('/search', serviceController.searchServices);
+
+/**
+ * @swagger
+ * /api/services/nearby:
+ *   get:
+ *     summary: Services à proximité (triés par distance)
+ *     tags: [Services]
+ *     description: Retourne les services dans un rayon spécifique, triés par distance croissante
+ *     parameters:
+ *       - in: query
+ *         name: latitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *           format: float
+ *           minimum: -90
+ *           maximum: 90
+ *         description: Latitude de la position
+ *         example: 14.7167
+ *       - in: query
+ *         name: longitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *           format: float
+ *           minimum: -180
+ *           maximum: 180
+ *         description: Longitude de la position
+ *         example: -17.4677
+ *       - in: query
+ *         name: radius
+ *         schema:
+ *           type: number
+ *           format: float
+ *           default: 10
+ *           minimum: 0
+ *         description: Rayon de recherche en km
+ *         example: 15
+ *       - in: query
+ *         name: serviceType
+ *         schema:
+ *           type: string
+ *           enum: [tractor, semoir, operator, other]
+ *         description: Filtrer par type de service
+ *       - in: query
+ *         name: availability
+ *         schema:
+ *           type: boolean
+ *         description: Filtrer par disponibilité
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Numéro de page
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: Nombre d'éléments par page
+ *     responses:
+ *       200:
+ *         description: Services à proximité triés par distance
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedResponse'
+ *       400:
+ *         description: Coordonnées GPS requises
+ */
+router.get('/nearby', serviceController.getNearbyServices);
+
 module.exports = router;
 

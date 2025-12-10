@@ -1,4 +1,5 @@
 const serviceService = require('../../services/service/service.service');
+const searchService = require('../../services/search/search.service');
 const providerService = require('../../services/provider/provider.service');
 const { success, paginated } = require('../../utils/response');
 
@@ -176,6 +177,84 @@ const updateAvailability = async (req, res, next) => {
   }
 };
 
+/**
+ * Recherche avancée de services
+ * GET /api/services/search
+ */
+const searchServices = async (req, res, next) => {
+  try {
+    const {
+      query,
+      serviceType,
+      availability,
+      minPrice,
+      maxPrice,
+      latitude,
+      longitude,
+      radius,
+      sortBy,
+      page,
+      limit,
+    } = req.query;
+
+    const result = await searchService.searchServices({
+      query,
+      serviceType,
+      availability: availability !== undefined ? availability === 'true' : true,
+      minPrice: minPrice ? parseFloat(minPrice) : null,
+      maxPrice: maxPrice ? parseFloat(maxPrice) : null,
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
+      radius: radius ? parseFloat(radius) : null,
+      sortBy: sortBy || 'relevance',
+      page,
+      limit,
+    });
+
+    return paginated(
+      res,
+      result.services,
+      result.pagination,
+      'Résultats de recherche récupérés avec succès'
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Services à proximité
+ * GET /api/services/nearby
+ */
+const getNearbyServices = async (req, res, next) => {
+  try {
+    const { latitude, longitude, radius = 10 } = req.query;
+
+    if (!latitude || !longitude) {
+      return res.status(400).json({
+        success: false,
+        message: 'Les coordonnées GPS (latitude, longitude) sont requises',
+      });
+    }
+
+    const result = await searchService.searchNearby(
+      parseFloat(latitude),
+      parseFloat(longitude),
+      parseFloat(radius),
+      req.query
+    );
+
+    return paginated(
+      res,
+      result.services,
+      result.pagination,
+      'Services à proximité récupérés avec succès'
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createService,
   getServiceById,
@@ -185,5 +264,7 @@ module.exports = {
   getServicesByProvider,
   getMyServices,
   updateAvailability,
+  searchServices,
+  getNearbyServices,
 };
 

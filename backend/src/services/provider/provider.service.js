@@ -138,6 +138,32 @@ class ProviderService {
     }
     return provider;
   }
+
+  /**
+   * Mettre à jour la géolocalisation d'un prestataire
+   */
+  async updateLocation(userId, locationData) {
+    const { latitude, longitude } = locationData;
+
+    if (latitude !== undefined && (latitude < -90 || latitude > 90)) {
+      throw new AppError('La latitude doit être entre -90 et 90', 400);
+    }
+    if (longitude !== undefined && (longitude < -180 || longitude > 180)) {
+      throw new AppError('La longitude doit être entre -180 et 180', 400);
+    }
+
+    const provider = await this.getProfileByUserId(userId);
+    
+    const updateData = {};
+    if (latitude !== undefined) updateData.latitude = latitude;
+    if (longitude !== undefined) updateData.longitude = longitude;
+
+    const updatedProvider = await providerRepository.updateById(provider.id, updateData);
+    if (!updatedProvider) {
+      throw new AppError(ERROR_MESSAGES.NOT_FOUND, 404);
+    }
+    return updatedProvider;
+  }
 }
 
 module.exports = new ProviderService();

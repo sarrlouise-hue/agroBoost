@@ -1,6 +1,7 @@
 # Documentation API - AGRO BOOST
 
 ## Base URL
+
 ```
 http://localhost:5000/api
 ```
@@ -16,9 +17,11 @@ Tous les endpoints d'authentification sont publics et ne nécessitent pas de tok
 ### 1. Health Check
 
 #### GET `/health`
+
 Vérifier le statut du serveur
 
 **Réponse (200):**
+
 ```json
 {
   "status": "OK",
@@ -36,6 +39,7 @@ Vérifier le statut du serveur
 Inscrire un nouvel utilisateur
 
 **Body:**
+
 ```json
 {
   "phoneNumber": "+221771234567",
@@ -47,6 +51,7 @@ Inscrire un nouvel utilisateur
 ```
 
 **Réponse réussie (201):**
+
 ```json
 {
   "success": true,
@@ -69,6 +74,7 @@ Inscrire un nouvel utilisateur
 ```
 
 **Erreurs possibles:**
+
 - `400` - Erreur de validation
 - `409` - Utilisateur existe déjà
 
@@ -77,9 +83,11 @@ Inscrire un nouvel utilisateur
 ### 3. Vérifier OTP
 
 #### POST `/auth/verify-otp`
+
 Vérifier le code OTP et activer le compte
 
 **Body:**
+
 ```json
 {
   "phoneNumber": "+221771234567",
@@ -88,6 +96,7 @@ Vérifier le code OTP et activer le compte
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -110,6 +119,7 @@ Vérifier le code OTP et activer le compte
 ```
 
 **Erreurs possibles:**
+
 - `400` - OTP invalide ou expiré
 - `404` - Utilisateur non trouvé
 
@@ -118,9 +128,11 @@ Vérifier le code OTP et activer le compte
 ### 4. Renvoyer OTP
 
 #### POST `/auth/resend-otp`
+
 Renvoyer un nouveau code OTP
 
 **Body:**
+
 ```json
 {
   "phoneNumber": "+221771234567"
@@ -128,6 +140,7 @@ Renvoyer un nouveau code OTP
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -137,6 +150,7 @@ Renvoyer un nouveau code OTP
 ```
 
 **Erreurs possibles:**
+
 - `400` - Erreur de validation
 
 ---
@@ -144,9 +158,11 @@ Renvoyer un nouveau code OTP
 ### 5. Connexion
 
 #### POST `/auth/login`
+
 Connecter un utilisateur existant
 
 **Body:**
+
 ```json
 {
   "phoneNumber": "+221771234567"
@@ -154,6 +170,7 @@ Connecter un utilisateur existant
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -176,6 +193,7 @@ Connecter un utilisateur existant
 ```
 
 **Erreurs possibles:**
+
 - `400` - Erreur de validation
 - `404` - Utilisateur non trouvé
 
@@ -184,9 +202,11 @@ Connecter un utilisateur existant
 ### 6. Rafraîchir Token
 
 #### POST `/auth/refresh-token`
+
 Rafraîchir le token d'accès
 
 **Body:**
+
 ```json
 {
   "refreshToken": "votre-refresh-token-ici"
@@ -194,6 +214,7 @@ Rafraîchir le token d'accès
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -205,6 +226,7 @@ Rafraîchir le token d'accès
 ```
 
 **Erreurs possibles:**
+
 - `400` - Refresh token requis
 - `401` - Token invalide ou expiré
 - `404` - Utilisateur non trouvé
@@ -214,9 +236,11 @@ Rafraîchir le token d'accès
 ### 7. Déconnexion
 
 #### POST `/auth/logout`
+
 Déconnecter un utilisateur (suppression du token côté client)
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -240,14 +264,17 @@ Authorization: Bearer votre-token-ici
 ## 8. Gestion des Utilisateurs
 
 ### GET `/users/profile`
+
 Obtenir le profil de l'utilisateur connecté
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -269,19 +296,23 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `401` - Non autorisé
 
 ---
 
 ### PUT `/users/profile`
+
 Mettre à jour le profil de l'utilisateur connecté
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Body:**
+
 ```json
 {
   "firstName": "Amadou",
@@ -292,6 +323,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -301,20 +333,24 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `400` - Erreur de validation
 - `401` - Non autorisé
 
 ---
 
 ### PUT `/users/location`
+
 Mettre à jour la localisation de l'utilisateur
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Body:**
+
 ```json
 {
   "latitude": 14.7167,
@@ -324,6 +360,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -333,20 +370,24 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `400` - Erreur de validation (latitude/longitude invalides)
 - `401` - Non autorisé
 
 ---
 
 ### PUT `/users/language`
+
 Changer la langue de l'utilisateur
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Body:**
+
 ```json
 {
   "language": "wolof"
@@ -354,6 +395,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -363,24 +405,29 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `400` - Langue non supportée (doit être "fr" ou "wolof")
 - `401` - Non autorisé
 
 ---
 
 ### GET `/users`
+
 Obtenir tous les utilisateurs (admin seulement)
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-admin-ici
 ```
 
 **Query Parameters:**
+
 - `page` (optionnel) : Numéro de page (défaut: 1)
 - `limit` (optionnel) : Nombre d'éléments par page (défaut: 20)
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -399,6 +446,7 @@ Authorization: Bearer votre-token-admin-ici
 ```
 
 **Erreurs possibles:**
+
 - `401` - Non autorisé
 - `403` - Accès interdit (admin seulement)
 
@@ -407,14 +455,17 @@ Authorization: Bearer votre-token-admin-ici
 ## 9. Gestion des Prestataires
 
 ### POST `/providers/register`
+
 Inscription d'un prestataire (utilisateur connecté)
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Body:**
+
 ```json
 {
   "businessName": "Agri Services Sénégal",
@@ -424,6 +475,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Réponse réussie (201):**
+
 ```json
 {
   "success": true,
@@ -443,6 +495,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `400` - Erreur de validation ou utilisateur déjà prestataire
 - `401` - Non autorisé
 - `404` - Utilisateur non trouvé
@@ -450,14 +503,17 @@ Authorization: Bearer votre-token-ici
 ---
 
 ### GET `/providers/profile`
+
 Obtenir le profil du prestataire connecté
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -475,6 +531,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `401` - Non autorisé
 - `403` - Accès interdit (prestataire ou admin seulement)
 - `404` - Prestataire non trouvé
@@ -482,9 +539,11 @@ Authorization: Bearer votre-token-ici
 ---
 
 ### GET `/providers/:id`
+
 Obtenir le profil d'un prestataire par ID
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -494,19 +553,23 @@ Obtenir le profil d'un prestataire par ID
 ```
 
 **Erreurs possibles:**
+
 - `404` - Prestataire non trouvé
 
 ---
 
 ### PUT `/providers/profile`
+
 Mettre à jour le profil du prestataire connecté
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Body:**
+
 ```json
 {
   "businessName": "Nouveau nom",
@@ -516,6 +579,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -525,6 +589,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `400` - Erreur de validation
 - `401` - Non autorisé
 - `403` - Accès interdit
@@ -532,15 +597,18 @@ Authorization: Bearer votre-token-ici
 ---
 
 ### GET `/providers`
+
 Obtenir tous les prestataires
 
 **Query Parameters:**
+
 - `page` (optionnel) : Numéro de page
 - `limit` (optionnel) : Nombre d'éléments par page
 - `isApproved` (optionnel) : Filtrer par statut d'approbation (true/false)
 - `minRating` (optionnel) : Note minimale
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -553,14 +621,17 @@ Obtenir tous les prestataires
 ---
 
 ### GET `/providers/approved`
+
 Obtenir les prestataires approuvés
 
 **Query Parameters:**
+
 - `page` (optionnel)
 - `limit` (optionnel)
 - `minRating` (optionnel)
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -573,14 +644,17 @@ Obtenir les prestataires approuvés
 ---
 
 ### PUT `/providers/:id/approve`
+
 Approuver un prestataire (admin seulement)
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-admin-ici
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -590,6 +664,7 @@ Authorization: Bearer votre-token-admin-ici
 ```
 
 **Erreurs possibles:**
+
 - `401` - Non autorisé
 - `403` - Accès interdit (admin seulement)
 - `404` - Prestataire non trouvé
@@ -597,14 +672,17 @@ Authorization: Bearer votre-token-admin-ici
 ---
 
 ### PUT `/providers/:id/reject`
+
 Rejeter un prestataire (admin seulement)
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-admin-ici
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -614,23 +692,69 @@ Authorization: Bearer votre-token-admin-ici
 ```
 
 **Erreurs possibles:**
+
 - `401` - Non autorisé
 - `403` - Accès interdit (admin seulement)
 - `404` - Prestataire non trouvé
 
 ---
 
-## 10. Gestion des Services Agricoles
+### PUT `/providers/profile/location`
 
-### POST `/services`
-Créer un nouveau service (prestataire seulement)
+Mettre à jour la géolocalisation du prestataire
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Body:**
+
+```json
+{
+  "latitude": 14.7167,
+  "longitude": -17.4677
+}
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Géolocalisation mise à jour avec succès",
+  "data": {
+    "id": "provider-id-123",
+    "latitude": 14.7167,
+    "longitude": -17.4677,
+    ...
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `400` - Coordonnées GPS invalides
+- `401` - Non autorisé
+- `403` - Accès interdit (prestataire seulement)
+
+---
+
+## 10. Gestion des Services Agricoles
+
+### POST `/services`
+
+Créer un nouveau service (prestataire seulement)
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Body:**
+
 ```json
 {
   "serviceType": "tractor",
@@ -646,12 +770,14 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Types de services disponibles:**
+
 - `tractor` - Tracteur
 - `semoir` - Semoir
 - `operator` - Opérateur
 - `other` - Autre
 
 **Réponse réussie (201):**
+
 ```json
 {
   "success": true,
@@ -674,6 +800,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `400` - Erreur de validation (au moins un prix requis)
 - `401` - Non autorisé
 - `403` - Accès interdit (prestataire seulement) ou prestataire non approuvé
@@ -681,9 +808,11 @@ Authorization: Bearer votre-token-ici
 ---
 
 ### GET `/services/:id`
+
 Obtenir un service par ID
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -708,14 +837,17 @@ Obtenir un service par ID
 ```
 
 **Erreurs possibles:**
+
 - `404` - Service non trouvé
 
 ---
 
 ### GET `/services`
+
 Obtenir tous les services avec filtres
 
 **Query Parameters:**
+
 - `page` (optionnel) : Numéro de page
 - `limit` (optionnel) : Nombre d'éléments par page
 - `serviceType` (optionnel) : Filtrer par type (tractor, semoir, operator, other)
@@ -727,11 +859,13 @@ Obtenir tous les services avec filtres
 - `radius` (optionnel) : Rayon de recherche en km (requiert latitude/longitude)
 
 **Exemple avec recherche par proximité:**
+
 ```
 GET /api/services?latitude=14.7167&longitude=-17.4677&radius=10&serviceType=tractor
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -749,18 +883,22 @@ GET /api/services?latitude=14.7167&longitude=-17.4677&radius=10&serviceType=trac
 ---
 
 ### GET `/services/my-services`
+
 Obtenir les services du prestataire connecté
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Query Parameters:**
+
 - `page` (optionnel)
 - `limit` (optionnel)
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -771,19 +909,23 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `401` - Non autorisé
 - `403` - Accès interdit (prestataire seulement)
 
 ---
 
 ### GET `/services/provider/:providerId`
+
 Obtenir les services d'un prestataire
 
 **Query Parameters:**
+
 - `page` (optionnel)
 - `limit` (optionnel)
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -796,14 +938,17 @@ Obtenir les services d'un prestataire
 ---
 
 ### PUT `/services/:id`
+
 Mettre à jour un service (prestataire seulement)
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Body:**
+
 ```json
 {
   "name": "Nouveau nom",
@@ -814,6 +959,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -823,6 +969,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `400` - Erreur de validation
 - `401` - Non autorisé
 - `403` - Accès interdit ou service n'appartient pas au prestataire
@@ -831,14 +978,17 @@ Authorization: Bearer votre-token-ici
 ---
 
 ### DELETE `/services/:id`
+
 Supprimer un service (prestataire seulement)
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -848,6 +998,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `401` - Non autorisé
 - `403` - Accès interdit ou service n'appartient pas au prestataire
 - `404` - Service non trouvé
@@ -855,14 +1006,17 @@ Authorization: Bearer votre-token-ici
 ---
 
 ### PUT `/services/:id/availability`
+
 Mettre à jour la disponibilité d'un service
 
 **Headers:**
+
 ```
 Authorization: Bearer votre-token-ici
 ```
 
 **Body:**
+
 ```json
 {
   "availability": false
@@ -870,6 +1024,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Réponse réussie (200):**
+
 ```json
 {
   "success": true,
@@ -879,9 +1034,467 @@ Authorization: Bearer votre-token-ici
 ```
 
 **Erreurs possibles:**
+
 - `400` - Erreur de validation
 - `401` - Non autorisé
 - `403` - Accès interdit
+
+---
+
+### GET `/services/search`
+
+Recherche avancée de services
+
+**Query Parameters:**
+
+- `query` (optionnel) : Recherche textuelle (nom, description)
+- `serviceType` (optionnel) : Filtrer par type
+- `availability` (optionnel) : Filtrer par disponibilité
+- `minPrice` (optionnel) : Prix minimum
+- `maxPrice` (optionnel) : Prix maximum
+- `latitude` (optionnel) : Latitude pour calcul de distance
+- `longitude` (optionnel) : Longitude pour calcul de distance
+- `radius` (optionnel) : Rayon de recherche en km
+- `sortBy` (optionnel) : `relevance`, `distance`, `priceAsc`, `priceDesc`, `rating` (défaut: `relevance`)
+- `page` (optionnel) : Numéro de page
+- `limit` (optionnel) : Nombre d'éléments par page
+
+**Exemple:**
+
+```
+GET /api/services/search?query=tracteur&latitude=14.7167&longitude=-17.4677&radius=20&sortBy=distance
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Résultats de recherche récupérés avec succès",
+  "data": [
+    {
+      "id": "service-id-123",
+      "name": "Tracteur John Deere",
+      "distance": 5.2,
+      ...
+    }
+  ],
+  "pagination": { ... }
+}
+```
+
+---
+
+### GET `/services/nearby`
+
+Services à proximité
+
+**Query Parameters:**
+
+- `latitude` (requis) : Latitude
+- `longitude` (requis) : Longitude
+- `radius` (optionnel) : Rayon en km (défaut: 10)
+- Autres filtres disponibles (serviceType, availability, etc.)
+
+**Exemple:**
+
+```
+GET /api/services/nearby?latitude=14.7167&longitude=-17.4677&radius=15
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Services à proximité récupérés avec succès",
+  "data": [
+    {
+      "id": "service-id-123",
+      "name": "Tracteur",
+      "distance": 2.5,
+      ...
+    }
+  ],
+  "pagination": { ... }
+}
+```
+
+**Erreurs possibles:**
+
+- `400` - Coordonnées GPS requises
+
+---
+
+## 11. Gestion des Réservations (Bookings)
+
+### POST `/bookings`
+
+Créer une réservation
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Body:**
+
+```json
+{
+  "serviceId": "service-id-123",
+  "bookingDate": "2024-12-15",
+  "startTime": "08:00",
+  "endTime": "17:00",
+  "duration": 8,
+  "latitude": 14.7167,
+  "longitude": -17.4677,
+  "notes": "Travaux de labour"
+}
+```
+
+**Note:** Soit `endTime` soit `duration` doit être fourni.
+
+**Réponse réussie (201):**
+
+```json
+{
+  "success": true,
+  "message": "Réservation créée avec succès",
+  "data": {
+    "id": "booking-id-123",
+    "userId": "user-id-123",
+    "serviceId": "service-id-123",
+    "providerId": "provider-id-123",
+    "bookingDate": "2024-12-15",
+    "startTime": "08:00",
+    "endTime": "17:00",
+    "duration": 8,
+    "totalPrice": 40000,
+    "status": "pending",
+    "service": { ... },
+    "provider": { ... }
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `400` - Erreur de validation ou service non disponible
+- `401` - Non autorisé
+- `409` - Conflit de disponibilité (double réservation)
+
+---
+
+### GET `/bookings`
+
+Obtenir toutes les réservations
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Query Parameters:**
+
+- `page` (optionnel) : Numéro de page
+- `limit` (optionnel) : Nombre d'éléments par page
+- `status` (optionnel) : Filtrer par statut (`pending`, `confirmed`, `completed`, `cancelled`)
+- `userId` (optionnel) : Filtrer par utilisateur (admin seulement)
+- `providerId` (optionnel) : Filtrer par prestataire
+- `serviceId` (optionnel) : Filtrer par service
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Réservations récupérées avec succès",
+  "data": [ ... ],
+  "pagination": { ... }
+}
+```
+
+---
+
+### GET `/bookings/:id`
+
+Obtenir une réservation par ID
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Réservation récupérée avec succès",
+  "data": {
+    "id": "booking-id-123",
+    "status": "confirmed",
+    "service": { ... },
+    "provider": { ... },
+    "user": { ... },
+    "payment": { ... }
+  }
+}
+```
+
+---
+
+### PUT `/bookings/:id/confirm`
+
+Confirmer une réservation (provider)
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Réservation confirmée avec succès",
+  "data": {
+    "id": "booking-id-123",
+    "status": "confirmed",
+    ...
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `400` - Réservation ne peut pas être confirmée
+- `401` - Non autorisé
+- `403` - Vous n'êtes pas autorisé à confirmer cette réservation
+
+---
+
+### PUT `/bookings/:id/cancel`
+
+Annuler une réservation
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Réservation annulée avec succès",
+  "data": { ... }
+}
+```
+
+**Erreurs possibles:**
+
+- `400` - Réservation ne peut pas être annulée
+- `403` - Vous n'êtes pas autorisé à annuler cette réservation
+
+---
+
+### PUT `/bookings/:id/complete`
+
+Marquer une réservation comme terminée (provider)
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Réservation marquée comme terminée",
+  "data": { ... }
+}
+```
+
+---
+
+## 12. Gestion des Paiements (Payments)
+
+### POST `/payments/initiate`
+
+Initialiser un paiement PayTech
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Body:**
+
+```json
+{
+  "bookingId": "booking-id-123",
+  "phoneNumber": "+221771234567"
+}
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Paiement initialisé avec succès",
+  "data": {
+    "payment": {
+      "id": "payment-id-123",
+      "bookingId": "booking-id-123",
+      "amount": 40000,
+      "status": "pending",
+      "transactionId": "paytech-txn-123",
+      ...
+    },
+    "paytech": {
+      "transaction_id": "paytech-txn-123",
+      "payment_url": "https://paytech.sn/pay/...",
+      "token": "payment-token-123"
+    }
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `400` - Erreur de validation
+- `401` - Non autorisé
+- `404` - Réservation non trouvée
+- `400` - Réservation déjà payée
+
+---
+
+### GET `/payments/:id`
+
+Obtenir un paiement par ID
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Paiement récupéré avec succès",
+  "data": {
+    "id": "payment-id-123",
+    "status": "success",
+    "amount": 40000,
+    "paymentMethod": "paytech",
+    "paymentDate": "2024-12-15T10:30:00.000Z",
+    "booking": { ... }
+  }
+}
+```
+
+---
+
+### GET `/payments/:id/status`
+
+Vérifier le statut d'un paiement
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Statut du paiement récupéré avec succès",
+  "data": {
+    "id": "payment-id-123",
+    "status": "success",
+    ...
+  }
+}
+```
+
+**Note:** Cette méthode vérifie également le statut auprès de PayTech.
+
+---
+
+### GET `/payments`
+
+Obtenir tous les paiements
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Query Parameters:**
+
+- `page` (optionnel)
+- `limit` (optionnel)
+- `status` (optionnel) : `pending`, `success`, `failed`
+- `userId` (optionnel) : Admin seulement
+- `providerId` (optionnel)
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Paiements récupérés avec succès",
+  "data": [ ... ],
+  "pagination": { ... }
+}
+```
+
+---
+
+### POST `/payments/webhook/paytech`
+
+Webhook PayTech (pas d'authentification requise)
+
+**Body:** (Données envoyées par PayTech)
+
+```json
+{
+  "token": "paytech-txn-123",
+  "status": "success",
+  "amount": 40000,
+  "custom_field": "{...}"
+}
+```
+
+**Réponse (200):**
+
+```json
+{
+  "success": true,
+  "message": "Webhook reçu avec succès"
+}
+```
+
+**Note:** Ce webhook met automatiquement à jour le statut du paiement et de la réservation associée.
 
 ---
 
@@ -901,6 +1514,7 @@ Authorization: Bearer votre-token-ici
 ## Format des Réponses
 
 ### Succès
+
 ```json
 {
   "success": true,
@@ -910,6 +1524,7 @@ Authorization: Bearer votre-token-ici
 ```
 
 ### Erreur
+
 ```json
 {
   "success": false,
@@ -931,6 +1546,7 @@ Authorization: Bearer votre-token-ici
 Tous les champs sont validés avec Joi :
 
 ### Champs utilisateur
+
 - `phoneNumber` : Format international avec `+` (ex: `+221771234567`)
 - `firstName` : 2-50 caractères
 - `lastName` : 2-50 caractères
@@ -941,22 +1557,51 @@ Tous les champs sont validés avec Joi :
 - `longitude` : Entre -180 et 180
 
 ### Champs prestataire
+
 - `businessName` : 2-100 caractères (requis)
 - `description` : Texte libre (optionnel)
 - `documents` : Tableau de chaînes (optionnel)
 
 ### Champs service
+
 - `serviceType` : `tractor`, `semoir`, `operator`, ou `other` (requis)
 - `name` : 2-100 caractères (requis)
 - `description` : Texte libre (optionnel)
 - `pricePerHour` : Nombre positif (optionnel, mais au moins un prix requis)
 - `pricePerDay` : Nombre positif (optionnel, mais au moins un prix requis)
-- `images` : Tableau de chaînes (optionnel)
+- `images` : Tableau de chaînes (optionnel) - URLs Cloudinary
 - `availability` : Boolean (défaut: true)
 - `latitude` : Entre -90 et 90 (optionnel)
 - `longitude` : Entre -180 et 180 (optionnel)
 
+### Champs réservation
+
+- `serviceId` : UUID (requis)
+- `bookingDate` : Date ISO (requis, ex: "2024-12-15")
+- `startTime` : Format HH:MM (requis, ex: "08:00")
+- `endTime` : Format HH:MM (optionnel si duration fournie)
+- `duration` : Nombre entier d'heures (optionnel si endTime fourni, min: 1)
+- `latitude` : Entre -90 et 90 (optionnel)
+- `longitude` : Entre -180 et 180 (optionnel)
+- `notes` : Texte libre (optionnel)
+
+### Champs paiement
+
+- `bookingId` : UUID (requis)
+- `phoneNumber` : Format international avec `+` (requis)
+
 ---
 
-*Documentation mise à jour le 2024-01-01*
+## Upload d'Images
 
+Les images des services sont uploadées via Cloudinary. Les URLs des images uploadées doivent être fournies dans le champ `images` lors de la création/mise à jour d'un service.
+
+### Processus recommandé
+
+1. Uploader l'image sur Cloudinary (via votre frontend)
+2. Récupérer l'URL sécurisée fournie par Cloudinary
+3. Ajouter cette URL dans le champ `images` lors de la création du service
+
+---
+
+*Documentation mise à jour le 2024-12-10*

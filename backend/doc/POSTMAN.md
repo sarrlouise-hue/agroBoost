@@ -34,11 +34,13 @@ La collection utilise des variables pour faciliter les tests :
 ### Modifier l'URL de base
 
 **Option 1 : Variables de collection** (si vous n'utilisez pas d'environnement)
+
 1. Cliquer sur la collection "AGRO BOOST API - Authentification"
 2. Aller dans l'onglet "Variables"
 3. Modifier la valeur de `base_url` si nécessaire (ex: `http://localhost:5000`)
 
 **Option 2 : Variables d'environnement** (recommandé)
+
 1. Cliquer sur l'environnement "AGRO BOOST - Local" (en haut à droite)
 2. Cliquer sur l'icône d'édition (œil)
 3. Modifier la valeur de `base_url` si nécessaire
@@ -46,60 +48,97 @@ La collection utilise des variables pour faciliter les tests :
 ## Flux de test recommandé
 
 ### 1. Vérifier que le serveur fonctionne
+
 - Exécuter la requête **"Health Check"**
 - Devrait retourner `{"status": "OK", ...}`
 
 ### 2. Inscription d'un nouvel utilisateur
+
 - Exécuter **"Inscription"**
 - Modifier le `phoneNumber` dans le body si nécessaire
 - Le serveur retournera un `token` et `refreshToken`
 - Un OTP sera créé (visible dans les logs du serveur en développement)
 
 ### 3. Vérifier l'OTP
+
 - Exécuter **"Vérifier OTP"**
 - Utiliser le code OTP généré (visible dans les logs du serveur)
 - Le compte sera activé (`isVerified: true`)
 
 ### 4. Connexion
+
 - **Option A** : **"Connexion (sans mot de passe)"** - Utilise uniquement le numéro de téléphone
 - **Option B** : **"Connexion (avec mot de passe)"** - Utilise le numéro et le mot de passe
 - Les tokens seront automatiquement sauvegardés dans les variables de collection
 
 ### 5. Utiliser les tokens
+
 - Les tokens sont automatiquement sauvegardés après une connexion réussie
 - Les requêtes suivantes utilisent automatiquement `{{access_token}}` dans l'en-tête Authorization
 
 ### 6. Rafraîchir le token
+
 - Exécuter **"Rafraîchir Token"**
 - Utilise le `refresh_token` sauvegardé
 - Retourne un nouveau `access_token`
 
 ### 7. Changer le mot de passe
+
 - Exécuter **"Changer mot de passe"**
 - Nécessite d'être authentifié (token dans l'en-tête)
 - Fournir l'ancien et le nouveau mot de passe
 
 ### 8. Mot de passe oublié
+
 - Exécuter **"Mot de passe oublié"**
 - Un token de réinitialisation sera créé
 - Le token sera sauvegardé automatiquement dans `reset_token`
 
 ### 9. Réinitialiser le mot de passe
+
 - Exécuter **"Réinitialiser mot de passe"**
 - Utilise le `reset_token` sauvegardé
 - Fournir le nouveau mot de passe
 
 ### 10. Déconnexion
+
 - Exécuter **"Déconnexion"**
 - Nécessite d'être authentifié
 
 ### 11. Gestion du profil utilisateur
+
 - **"Obtenir profil"** - Récupérer le profil de l'utilisateur connecté
 - **"Mettre à jour profil"** - Modifier les informations du profil
 - **"Mettre à jour localisation"** - Mettre à jour la position géographique
 - **"Changer langue"** - Changer la langue de l'interface (fr/wolof)
 
+### 12. Géolocalisation prestataire
+
+- **"Mettre à jour géolocalisation prestataire"** - Mettre à jour les coordonnées GPS du prestataire
+
+### 13. Recherche avancée de services
+
+- **"Recherche services"** - Recherche avec filtres, texte et géolocalisation
+- **"Services à proximité"** - Services dans un rayon spécifique
+
+### 14. Gestion des réservations
+
+- **"Créer réservation"** - Créer une nouvelle réservation (avec vérification de disponibilité)
+- **"Obtenir réservations"** - Liste des réservations avec filtres
+- **"Obtenir réservation"** - Détails d'une réservation
+- **"Confirmer réservation"** - Confirmer une réservation (provider)
+- **"Annuler réservation"** - Annuler une réservation
+- **"Terminer réservation"** - Marquer une réservation comme terminée (provider)
+
+### 15. Gestion des paiements
+
+- **"Initialiser paiement PayTech"** - Créer un paiement pour une réservation
+- **"Obtenir paiement"** - Détails d'un paiement
+- **"Vérifier statut paiement"** - Vérifier le statut auprès de PayTech
+- **"Obtenir paiements"** - Liste des paiements avec filtres
+
 ### 12. Gestion des prestataires
+
 - **"Inscription prestataire"** - Devenir prestataire (nécessite d'être utilisateur)
 - **"Obtenir profil prestataire"** - Récupérer le profil prestataire
 - **"Mettre à jour profil prestataire"** - Modifier les informations du prestataire
@@ -109,6 +148,7 @@ La collection utilise des variables pour faciliter les tests :
 - **"Rejeter prestataire"** - Rejeter un prestataire (admin seulement)
 
 ### 13. Gestion des services agricoles
+
 - **"Créer service"** - Créer un nouveau service (prestataire seulement)
 - **"Obtenir service"** - Récupérer les détails d'un service
 - **"Liste services"** - Obtenir tous les services avec filtres (type, prix, géolocalisation)
@@ -121,12 +161,14 @@ La collection utilise des variables pour faciliter les tests :
 ## Scripts automatiques
 
 La collection inclut un script de test qui :
+
 - Sauvegarde automatiquement les tokens après une connexion réussie
 - Sauvegarde le `reset_token` après une demande de réinitialisation
 
 ## Exemples de réponses
 
 ### Inscription réussie (201)
+
 ```json
 {
   "success": true,
@@ -149,6 +191,7 @@ La collection inclut un script de test qui :
 ```
 
 ### Connexion réussie (200)
+
 ```json
 {
   "success": true,
@@ -162,6 +205,7 @@ La collection inclut un script de test qui :
 ```
 
 ### Erreur (400/401/404)
+
 ```json
 {
   "success": false,
@@ -181,19 +225,22 @@ La collection inclut un script de test qui :
 ## Dépannage
 
 ### Erreur 401 (Non autorisé)
+
 - Vérifier que le token est valide et non expiré
 - Vérifier que l'en-tête Authorization contient `Bearer {{access_token}}`
 
 ### Erreur 409 (Conflit)
+
 - L'utilisateur existe déjà avec ce numéro de téléphone
 - Utiliser un autre numéro de téléphone
 
 ### Erreur 429 (Trop de requêtes)
+
 - Rate limiting activé
 - Attendre quelques minutes avant de réessayer
 
 ### Erreur de connexion
+
 - Vérifier que le serveur est démarré (`npm start` ou `npm run dev`)
 - Vérifier que l'URL dans `base_url` est correcte
 - Vérifier que PostgreSQL est en cours d'exécution
-

@@ -133,6 +133,21 @@ const rejectProvider = async (req, res, next) => {
   }
 };
 
+/**
+ * Mettre à jour la géolocalisation du prestataire
+ * PUT /api/providers/profile/location
+ */
+const updateLocation = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const { latitude, longitude } = req.body;
+    const provider = await providerService.updateLocation(userId, { latitude, longitude });
+    return success(res, provider, 'Géolocalisation mise à jour avec succès');
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   registerProvider,
   getProfile,
@@ -142,5 +157,6 @@ module.exports = {
   getApprovedProviders,
   approveProvider,
   rejectProvider,
+  updateLocation,
 };
 

@@ -59,6 +59,22 @@ const Provider = sequelize.define('Provider', {
       min: 0,
     },
   },
+  latitude: {
+    type: DataTypes.DECIMAL(10, 8),
+    allowNull: true,
+    validate: {
+      min: -90,
+      max: 90,
+    },
+  },
+  longitude: {
+    type: DataTypes.DECIMAL(11, 8),
+    allowNull: true,
+    validate: {
+      min: -180,
+      max: 180,
+    },
+  },
 }, {
   tableName: 'providers',
   timestamps: true,
@@ -72,6 +88,9 @@ const Provider = sequelize.define('Provider', {
     },
     {
       fields: ['rating'],
+    },
+    {
+      fields: ['latitude', 'longitude'],
     },
   ],
 });

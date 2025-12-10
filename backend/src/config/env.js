@@ -42,7 +42,16 @@ module.exports = {
     URL: process.env.REDIS_URL || 'redis://localhost:6379',
   },
 
-  // Mobile Money
+  // PayTech Mobile Money
+  PAYTECH: {
+    API_KEY: process.env.PAYTECH_API_KEY || '',
+    API_SECRET: process.env.PAYTECH_API_SECRET || '',
+    MERCHANT_ID: process.env.PAYTECH_MERCHANT_ID || '',
+    BASE_URL: process.env.PAYTECH_BASE_URL || 'https://paytech.sn',
+    WEBHOOK_SECRET: process.env.PAYTECH_WEBHOOK_SECRET || '',
+  },
+
+  // Mobile Money (Legacy - conservé pour compatibilité)
   WAVE: {
     API_KEY: process.env.WAVE_API_KEY || '',
     API_SECRET: process.env.WAVE_API_SECRET || '',
@@ -91,6 +100,13 @@ module.exports = {
   UPLOAD: {
     MAX_FILE_SIZE: parseInt(process.env.MAX_FILE_SIZE, 10) || 5242880, // 5MB
     PATH: process.env.UPLOAD_PATH || './uploads',
+  },
+
+  // Cloudinary
+  CLOUDINARY: {
+    CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || '',
+    API_KEY: process.env.CLOUDINARY_API_KEY || '',
+    API_SECRET: process.env.CLOUDINARY_API_SECRET || '',
   },
 
   // Rate Limiting

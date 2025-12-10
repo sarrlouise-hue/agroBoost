@@ -95,6 +95,8 @@ const connectDB = async () => {
     require('../models/PasswordResetToken');
     require('../models/Provider');
     require('../models/Service');
+    require('../models/Booking');
+    require('../models/Payment');
     
     // Charger les associations entre modèles
     require('../models/associations');

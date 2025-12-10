@@ -282,5 +282,65 @@ router.put('/:id/approve', authenticate, authorize(ROLES.ADMIN), providerControl
  */
 router.put('/:id/reject', authenticate, authorize(ROLES.ADMIN), providerController.rejectProvider);
 
+/**
+ * @swagger
+ * /api/providers/profile/location:
+ *   put:
+ *     summary: Mettre à jour la géolocalisation du prestataire
+ *     tags: [Providers]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - latitude
+ *               - longitude
+ *             properties:
+ *               latitude:
+ *                 type: number
+ *                 format: float
+ *                 minimum: -90
+ *                 maximum: 90
+ *                 description: Latitude GPS
+ *                 example: 14.7167
+ *               longitude:
+ *                 type: number
+ *                 format: float
+ *                 minimum: -180
+ *                 maximum: 180
+ *                 description: Longitude GPS
+ *                 example: -17.4677
+ *     responses:
+ *       200:
+ *         description: Géolocalisation mise à jour avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Provider'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
+ */
+router.put(
+  '/profile/location',
+  authenticate,
+  authorize(ROLES.PROVIDER, ROLES.ADMIN),
+  providerController.updateLocation
+);
+
 module.exports = router;
 

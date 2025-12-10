@@ -26,6 +26,8 @@ const initDatabase = async () => {
     require('../src/models/PasswordResetToken');
     require('../src/models/Provider');
     require('../src/models/Service');
+    require('../src/models/Booking');
+    require('../src/models/Payment');
 
     // Charger les associations
     require('../src/models/associations');
