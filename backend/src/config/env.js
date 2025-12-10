@@ -51,24 +51,7 @@ module.exports = {
     WEBHOOK_SECRET: process.env.PAYTECH_WEBHOOK_SECRET || '',
   },
 
-  // Mobile Money (Legacy - conservé pour compatibilité)
-  WAVE: {
-    API_KEY: process.env.WAVE_API_KEY || '',
-    API_SECRET: process.env.WAVE_API_SECRET || '',
-    BASE_URL: process.env.WAVE_BASE_URL || 'https://api.wave.com',
-  },
 
-  ORANGE_MONEY: {
-    API_KEY: process.env.ORANGE_MONEY_API_KEY || '',
-    API_SECRET: process.env.ORANGE_MONEY_API_SECRET || '',
-    BASE_URL: process.env.ORANGE_MONEY_BASE_URL || '',
-  },
-
-  FREE_MONEY: {
-    API_KEY: process.env.FREE_MONEY_API_KEY || '',
-    API_SECRET: process.env.FREE_MONEY_API_SECRET || '',
-    BASE_URL: process.env.FREE_MONEY_BASE_URL || '',
-  },
 
   // Google Maps
   GOOGLE_MAPS: {
@@ -81,20 +64,6 @@ module.exports = {
     PROJECT_ID: process.env.FIREBASE_PROJECT_ID || '',
   },
 
-  // SMS
-  SMS: {
-    API_KEY: process.env.SMS_API_KEY || '',
-    API_URL: process.env.SMS_API_URL || '',
-    SENDER_ID: process.env.SMS_SENDER_ID || '',
-  },
-
-  // AWS S3
-  AWS: {
-    ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || '',
-    SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || '',
-    BUCKET_NAME: process.env.AWS_BUCKET_NAME || '',
-    REGION: process.env.AWS_REGION || 'us-east-1',
-  },
 
   // File Upload
   UPLOAD: {
@@ -118,5 +87,19 @@ module.exports = {
   // URLs
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3001',
   ADMIN_URL: process.env.ADMIN_URL || 'http://localhost:3002',
+
+  // Email
+  EMAIL: {
+    HOST: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    PORT: parseInt(process.env.EMAIL_PORT, 10) || 587,
+    SECURE: process.env.EMAIL_SECURE === 'true' || false, // true pour 465, false pour les autres ports
+    USER: process.env.EMAIL_USER || '',
+    PASSWORD: process.env.EMAIL_PASSWORD || '',
+    FROM_EMAIL: process.env.EMAIL_FROM_EMAIL || process.env.EMAIL_USER || '',
+    FROM_NAME: process.env.EMAIL_FROM_NAME || 'AlloTracteur',
+    APP_NAME: process.env.EMAIL_APP_NAME || 'AlloTracteur',
+    SUPPORT_EMAIL: process.env.EMAIL_SUPPORT_EMAIL || process.env.EMAIL_USER || '',
+    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3001',
+  },
 };
 

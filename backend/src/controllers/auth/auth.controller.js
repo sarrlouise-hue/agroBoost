@@ -1,6 +1,7 @@
 const authService = require('../../services/auth/auth.service');
 const otpService = require('../../services/auth/otp.service');
 const passwordService = require('../../services/auth/password.service');
+const emailService = require('../../services/email/email.service');
 const userRepository = require('../../data-access/user.repository');
 const { success, error } = require('../../utils/response');
 const { AppError } = require('../../utils/errors');
@@ -14,6 +15,10 @@ const register = async (req, res, next) => {
   try {
     const { phoneNumber, firstName, lastName, email, language } = req.body;
 
+    if (!email) {
+      return error(res, 'L\'email est requis pour l\'inscription', 400);
+    }
+
     // Inscrire l'utilisateur
     const result = await authService.register({
       phoneNumber,
@@ -23,10 +28,21 @@ const register = async (req, res, next) => {
       language,
     });
 
-    // Générer et envoyer l'OTP
-    await otpService.createOTP(phoneNumber);
+    // Générer et envoyer l'OTP par email
+    await otpService.createOTP(email);
 
-    return success(res, result, 'Utilisateur inscrit avec succès. Veuillez vérifier l\'OTP.', 201);
+    // Envoyer l'email de bienvenue
+    try {
+      const user = await userRepository.findByEmail(email);
+      if (user) {
+        await emailService.sendWelcomeEmail(user);
+      }
+    } catch (emailError) {
+      logger.error('Erreur lors de l\'envoi de l\'email de bienvenue:', emailError);
+      // On continue même si l'email de bienvenue échoue
+    }
+
+    return success(res, result, 'Utilisateur inscrit avec succès. Veuillez vérifier votre email pour le code OTP.', 201);
   } catch (err) {
     next(err);
   }
@@ -38,21 +54,30 @@ const register = async (req, res, next) => {
  */
 const verifyOTP = async (req, res, next) => {
   try {
-    const { phoneNumber, code } = req.body;
+    const { email, code } = req.body;
+
+    if (!email) {
+      return error(res, 'L\'email est requis', 400);
+    }
 
     // Vérifier l'OTP
-    const otpResult = await otpService.verifyOTP(phoneNumber, code);
+    const otpResult = await otpService.verifyOTP(email, code);
 
     if (!otpResult.valid) {
       return error(res, otpResult.message, 400);
     }
 
+    // Trouver l'utilisateur par email
+    const user = await userRepository.findByEmail(email);
+    if (!user) {
+      return error(res, 'Utilisateur non trouvé', 404);
+    }
+
     // Vérifier le compte utilisateur
-    const user = await authService.login(phoneNumber);
-    await authService.verifyUser(user.user.id);
+    await authService.verifyUser(user.id);
 
     // Retourner l'utilisateur mis à jour avec les tokens
-    const result = await authService.login(phoneNumber);
+    const result = await authService.loginWithEmail(email);
 
     return success(res, result, 'OTP vérifié avec succès. Compte activé.');
   } catch (err) {
@@ -66,14 +91,16 @@ const verifyOTP = async (req, res, next) => {
  */
 const resendOTP = async (req, res, next) => {
   try {
-    const { phoneNumber } = req.body;
+    const { email } = req.body;
 
-    // Créer un nouvel OTP
-    await otpService.createOTP(phoneNumber);
+    if (!email) {
+      return error(res, 'L\'email est requis', 400);
+    }
 
-    // TODO: Envoyer l'OTP via le service SMS
+    // Créer un nouvel OTP et l'envoyer par email
+    await otpService.createOTP(email);
 
-    return success(res, null, 'OTP envoyé avec succès');
+    return success(res, null, 'Code OTP envoyé par email avec succès');
   } catch (err) {
     next(err);
   }
@@ -107,23 +134,32 @@ const login = async (req, res, next) => {
  */
 const forgotPassword = async (req, res, next) => {
   try {
-    const { phoneNumber } = req.body;
+    const { email } = req.body;
+
+    if (!email) {
+      return error(res, 'L\'email est requis', 400);
+    }
 
     // Trouver l'utilisateur
-    const user = await userRepository.findByPhoneNumber(phoneNumber);
+    const user = await userRepository.findByEmail(email);
     if (!user) {
       // Ne pas révéler si l'utilisateur existe ou non pour la sécurité
-      return success(res, null, 'Si ce numéro existe, un email avec les instructions sera envoyé.');
+      return success(res, null, 'Si cet email existe, un email avec les instructions sera envoyé.');
     }
 
     // Créer un token de réinitialisation
     const resetToken = await passwordService.createPasswordResetToken(user.id);
 
-    // TODO: Envoyer l'email avec le lien de réinitialisation
-    // Pour l'instant, on retourne le token (à supprimer en production)
-    logger.info(`Token de réinitialisation créé pour ${phoneNumber}: ${resetToken}`);
+    // Envoyer l'email avec le lien de réinitialisation
+    try {
+      await emailService.sendPasswordResetRequestEmail(user, resetToken.token);
+      logger.info(`Email de réinitialisation envoyé à ${email}`);
+    } catch (emailError) {
+      logger.error('Erreur lors de l\'envoi de l\'email de réinitialisation:', emailError);
+      // On continue même si l'email échoue
+    }
 
-    return success(res, { resetToken }, 'Instructions de réinitialisation envoyées');
+    return success(res, null, 'Si cet email existe, un email avec les instructions de réinitialisation sera envoyé.');
   } catch (err) {
     next(err);
   }

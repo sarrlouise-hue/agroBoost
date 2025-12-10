@@ -1,9 +1,9 @@
 {
   "info": {
-    "name": "AGRO BOOST API - Complète",
-    "description": "Collection Postman complète pour tester l'API AGRO BOOST (Authentification, Users, Providers, Services)",
+    "name": "AlloTracteur API - Complète",
+    "description": "Collection Postman complète pour tester l'API AlloTracteur (Authentification par email, Users, Providers, Services)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "agroboost-api"
+    "_exporter_id": "allotracteur-api"
   },
   "item": [
     {
@@ -47,7 +47,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "register"]
             },
-            "description": "Inscrire un nouvel utilisateur. Un OTP sera envoyé par SMS."
+            "description": "Inscrire un nouvel utilisateur. L'email est requis. Un code OTP sera envoyé par email et un email de bienvenue sera également envoyé."
           },
           "response": []
         },
@@ -63,7 +63,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phoneNumber\": \"+221771234567\",\n  \"code\": \"123456\"\n}",
+              "raw": "{\n  \"email\": \"amadou@example.com\",\n  \"code\": \"123456\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -75,7 +75,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "verify-otp"]
             },
-            "description": "Vérifier le code OTP et activer le compte utilisateur"
+            "description": "Vérifier le code OTP reçu par email et activer le compte utilisateur. Utilise l'email au lieu du téléphone."
           },
           "response": []
         },
@@ -91,7 +91,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phoneNumber\": \"+221771234567\"\n}",
+              "raw": "{\n  \"email\": \"amadou@example.com\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -103,7 +103,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "resend-otp"]
             },
-            "description": "Renvoyer un nouveau code OTP"
+            "description": "Renvoyer un nouveau code OTP par email. Utilise l'email au lieu du téléphone."
           },
           "response": []
         },
@@ -227,7 +227,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phoneNumber\": \"+221771234567\"\n}",
+              "raw": "{\n  \"email\": \"amadou@example.com\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -239,7 +239,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "forgot-password"]
             },
-            "description": "Demander la réinitialisation du mot de passe. Un token sera envoyé."
+            "description": "Demander la réinitialisation du mot de passe. Un email avec un lien de réinitialisation sera envoyé. Utilise l'email au lieu du téléphone."
           },
           "response": []
         },
@@ -267,7 +267,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "reset-password"]
             },
-            "description": "Réinitialiser le mot de passe avec le token reçu"
+            "description": "Réinitialiser le mot de passe avec le token reçu par email. Un email de confirmation sera envoyé après la réinitialisation."
           },
           "response": []
         },

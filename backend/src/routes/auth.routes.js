@@ -124,11 +124,13 @@ router.post(
  *           schema:
  *             type: object
  *             required:
- *               - phoneNumber
+ *               - email
  *             properties:
- *               phoneNumber:
+ *               email:
  *                 type: string
- *                 example: "+221771234567"
+ *                 format: email
+ *                 example: "amadou@example.com"
+ *                 description: "Adresse email pour recevoir le code OTP"
  *     responses:
  *       200:
  *         description: OTP envoyé avec succès

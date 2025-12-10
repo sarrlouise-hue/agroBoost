@@ -1,4 +1,6 @@
 const otpRepository = require('../../data-access/otp.repository');
+const userRepository = require('../../data-access/user.repository');
+const emailService = require('../email/email.service');
 const { OTP: OTP_CONFIG } = require('../../config/env');
 const { AppError } = require('../../utils/errors');
 const logger = require('../../utils/logger');
@@ -18,10 +20,16 @@ const generateOTP = (length = OTP_CONFIG.LENGTH) => {
 /**
  * Créer et sauvegarder un OTP
  */
-const createOTP = async (phoneNumber) => {
+const createOTP = async (email) => {
   try {
-    // Invalider les OTP précédents pour ce numéro de téléphone
-    await otpRepository.invalidateByPhoneNumber(phoneNumber);
+    // Vérifier que l'utilisateur existe
+    const user = await userRepository.findByEmail(email);
+    if (!user) {
+      throw new AppError('Aucun utilisateur trouvé avec cet email', 404);
+    }
+
+    // Invalider les OTP précédents pour cet email
+    await otpRepository.invalidateByEmail(email);
 
     // Générer un nouvel OTP
     const code = generateOTP();
@@ -30,16 +38,26 @@ const createOTP = async (phoneNumber) => {
 
     // Sauvegarder l'OTP
     const otp = await otpRepository.create({
-      phoneNumber,
+      email,
       code,
       expiresAt,
     });
 
-    logger.info(`OTP créé pour ${phoneNumber}`);
+    // Envoyer l'OTP par email
+    try {
+      await emailService.sendOTPEmail(email, code, user.firstName);
+      logger.info(`OTP créé et envoyé par email à ${email}`);
+    } catch (emailError) {
+      logger.error('Erreur lors de l\'envoi de l\'email OTP:', emailError);
+      // On continue même si l'email échoue, l'OTP est créé
+    }
 
     return otp;
   } catch (error) {
     logger.error('Erreur lors de la création de l\'OTP:', error);
+    if (error instanceof AppError) {
+      throw error;
+    }
     throw new AppError('Échec de la création de l\'OTP', 500);
   }
 };
@@ -47,9 +65,9 @@ const createOTP = async (phoneNumber) => {
 /**
  * Vérifier un OTP
  */
-const verifyOTP = async (phoneNumber, code) => {
+const verifyOTP = async (email, code) => {
   try {
-    const otp = await otpRepository.findByPhoneNumberAndCode(phoneNumber, code);
+    const otp = await otpRepository.findByEmailAndCode(email, code);
 
     if (!otp) {
       return { valid: false, message: 'OTP invalide ou expiré' };
@@ -59,7 +77,7 @@ const verifyOTP = async (phoneNumber, code) => {
     otp.isUsed = true;
     await otpRepository.save(otp);
 
-    logger.info(`OTP vérifié pour ${phoneNumber}`);
+    logger.info(`OTP vérifié pour ${email}`);
 
     return { valid: true, message: 'OTP vérifié avec succès' };
   } catch (error) {
@@ -71,9 +89,9 @@ const verifyOTP = async (phoneNumber, code) => {
 /**
  * Vérifier si un OTP existe et est valide
  */
-const checkOTP = async (phoneNumber) => {
+const checkOTP = async (email) => {
   try {
-    const otp = await otpRepository.findValidByPhoneNumber(phoneNumber);
+    const otp = await otpRepository.findValidByEmail(email);
 
     return !!otp;
   } catch (error) {

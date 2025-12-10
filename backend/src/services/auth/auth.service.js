@@ -57,11 +57,18 @@ const verifyRefreshToken = (token) => {
  */
 const register = async (userData) => {
   try {
-    // Vérifier si l'utilisateur existe déjà
-    const existingUser = await userRepository.findByPhoneNumber(userData.phoneNumber);
-
-    if (existingUser) {
+    // Vérifier si l'utilisateur existe déjà par numéro de téléphone
+    const existingUserByPhone = await userRepository.findByPhoneNumber(userData.phoneNumber);
+    if (existingUserByPhone) {
       throw new AppError('Un utilisateur existe déjà avec ce numéro de téléphone', 409);
+    }
+
+    // Vérifier si l'utilisateur existe déjà par email (si email fourni)
+    if (userData.email) {
+      const existingUserByEmail = await userRepository.findByEmail(userData.email);
+      if (existingUserByEmail) {
+        throw new AppError('Un utilisateur existe déjà avec cet email', 409);
+      }
     }
 
     // Créer l'utilisateur
@@ -75,7 +82,7 @@ const register = async (userData) => {
       isVerified: false,
     });
 
-    logger.info(`Utilisateur inscrit: ${user.phoneNumber}`);
+    logger.info(`Utilisateur inscrit: ${user.phoneNumber}${user.email ? ` (${user.email})` : ''}`);
 
     // Générer les tokens
     const token = generateToken(user.id, user.role);
@@ -104,8 +111,20 @@ const register = async (userData) => {
       const messages = Object.values(error.errors).map((e) => e.message).join(', ');
       throw new AppError(messages, 400);
     }
+    // Gérer les erreurs de contrainte unique PostgreSQL
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      const field = error.errors && error.errors[0] ? error.errors[0].path : 'champ';
+      if (field === 'email') {
+        throw new AppError('Un utilisateur existe déjà avec cet email', 409);
+      }
+      if (field === 'phoneNumber') {
+        throw new AppError('Un utilisateur existe déjà avec ce numéro de téléphone', 409);
+      }
+      throw new AppError(`Un utilisateur existe déjà avec ce ${field}`, 409);
+    }
+    // Gérer les erreurs MongoDB (code 11000)
     if (error.code === 11000) {
-      throw new AppError('Un utilisateur existe déjà avec ce numéro de téléphone', 409);
+      throw new AppError('Un utilisateur existe déjà avec ces informations', 409);
     }
     logger.error('Erreur lors de l\'inscription:', error);
     throw new AppError('Échec de l\'inscription de l\'utilisateur', 500);
@@ -205,6 +224,46 @@ const loginWithPassword = async (phoneNumber, password) => {
 };
 
 /**
+ * Connecter un utilisateur avec email (sans mot de passe)
+ */
+const loginWithEmail = async (email) => {
+  try {
+    const user = await userRepository.findByEmail(email);
+
+    if (!user) {
+      throw new AppError('Utilisateur non trouvé', 404);
+    }
+
+    // Générer les tokens
+    const token = generateToken(user.id, user.role);
+    const refreshToken = generateRefreshToken(user.id);
+
+    logger.info(`Utilisateur connecté: ${user.email}`);
+
+    return {
+      user: {
+        id: user.id,
+        phoneNumber: user.phoneNumber,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        language: user.language,
+        role: user.role,
+        isVerified: user.isVerified,
+      },
+      token,
+      refreshToken,
+    };
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    }
+    logger.error('Erreur lors de la connexion:', error);
+    throw new AppError('Échec de la connexion de l\'utilisateur', 500);
+  }
+};
+
+/**
  * Rafraîchir le token d'accès
  */
 const refreshAccessToken = async (refreshToken) => {
@@ -259,6 +318,7 @@ module.exports = {
   register,
   login,
   loginWithPassword,
+  loginWithEmail,
   refreshAccessToken,
   verifyUser,
 };

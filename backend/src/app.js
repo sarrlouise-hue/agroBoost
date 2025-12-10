@@ -337,6 +337,22 @@ const startServer = async () => {
     // Connecter à PostgreSQL
     await connectDB();
 
+    // Vérifier la configuration email
+    const emailService = require('./services/email/email.service');
+    if (!emailService.isEmailConfigured()) {
+      console.log('');
+      console.log('⚠️  ATTENTION: Configuration email non complète');
+      console.log('   Les emails (OTP, bienvenue, réinitialisation) ne seront pas envoyés.');
+      console.log('   Pour activer l\'envoi d\'emails, configurez dans votre .env:');
+      console.log('   - EMAIL_USER');
+      console.log('   - EMAIL_PASSWORD');
+      console.log('   - EMAIL_FROM_EMAIL');
+      console.log('   Voir ENV_VARIABLES.md pour plus de détails.');
+      console.log('');
+    } else {
+      console.log('✅ Configuration email OK');
+    }
+
     // Démarrer le serveur
     const server = app.listen(PORT, () => {
       console.log(`🚀 Serveur démarré sur le port ${PORT} en mode ${NODE_ENV}`);

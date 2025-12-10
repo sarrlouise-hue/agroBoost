@@ -7,15 +7,12 @@ const OTP = sequelize.define('OTP', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
-  phoneNumber: {
+  email: {
     type: DataTypes.STRING,
     allowNull: false,
     validate: {
-      notEmpty: { msg: 'Le numéro de téléphone est requis' },
-      is: {
-        args: [/^[0-9+]+$/],
-        msg: 'Le numéro de téléphone ne doit contenir que des chiffres et +',
-      },
+      notEmpty: { msg: 'L\'email est requis' },
+      isEmail: { msg: 'L\'email doit être une adresse email valide' },
     },
   },
   code: {
@@ -41,7 +38,7 @@ const OTP = sequelize.define('OTP', {
   timestamps: true,
   indexes: [
     {
-      fields: ['phoneNumber', 'code'],
+      fields: ['email', 'code'],
     },
     {
       fields: ['expiresAt'],

@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const passwordResetTokenRepository = require('../../data-access/passwordResetToken.repository');
 const userRepository = require('../../data-access/user.repository');
+const emailService = require('../email/email.service');
 const { AppError } = require('../../utils/errors');
 const logger = require('../../utils/logger');
 
@@ -109,7 +110,16 @@ const resetPassword = async (token, newPassword) => {
     resetToken.isUsed = true;
     await passwordResetTokenRepository.save(resetToken);
 
-    logger.info(`Mot de passe réinitialisé pour l'utilisateur: ${user.phoneNumber}`);
+    // Envoyer l'email de confirmation
+    try {
+      await emailService.sendPasswordResetConfirmationEmail(user);
+      logger.info(`Email de confirmation de réinitialisation envoyé à ${user.email}`);
+    } catch (emailError) {
+      logger.error('Erreur lors de l\'envoi de l\'email de confirmation:', emailError);
+      // On continue même si l'email échoue
+    }
+
+    logger.info(`Mot de passe réinitialisé pour l'utilisateur: ${user.email || user.phoneNumber}`);
 
     return user;
   } catch (error) {

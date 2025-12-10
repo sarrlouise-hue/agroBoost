@@ -10,12 +10,12 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'AGRO BOOST API',
+      title: 'AlloTracteur API',
       version: '1.0.0',
-      description: 'API REST pour la plateforme AGRO BOOST - Réservation de services agricoles au Sénégal',
+      description: 'API REST pour la plateforme AlloTracteur - Réservation de services agricoles au Sénégal',
       contact: {
-        name: 'AGRO BOOST',
-        email: 'infos@agro-boost.com',
+        name: 'AlloTracteur',
+        email: 'support@allotracteur.com',
       },
       license: {
         name: 'ISC',
@@ -120,7 +120,7 @@ const options = {
             email: {
               type: 'string',
               format: 'email',
-              description: 'Adresse email (optionnel)',
+              description: 'Adresse email (requis pour l\'authentification)',
               example: 'amadou@example.com',
             },
             language: {
@@ -202,7 +202,7 @@ const options = {
         },
         RegisterRequest: {
           type: 'object',
-          required: ['phoneNumber', 'firstName', 'lastName'],
+          required: ['phoneNumber', 'firstName', 'lastName', 'email'],
           properties: {
             phoneNumber: {
               type: 'string',
@@ -226,6 +226,7 @@ const options = {
               type: 'string',
               format: 'email',
               example: 'amadou@example.com',
+              description: 'Adresse email (requis pour recevoir le code OTP)',
             },
             language: {
               type: 'string',
@@ -237,17 +238,19 @@ const options = {
         },
         VerifyOTPRequest: {
           type: 'object',
-          required: ['phoneNumber', 'code'],
+          required: ['email', 'code'],
           properties: {
-            phoneNumber: {
+            email: {
               type: 'string',
-              example: '+221771234567',
+              format: 'email',
+              example: 'amadou@example.com',
+              description: 'Adresse email utilisée lors de l\'inscription',
             },
             code: {
               type: 'string',
               pattern: '^[0-9]{6}$',
               example: '123456',
-              description: 'Code OTP à 6 chiffres',
+              description: 'Code OTP à 6 chiffres reçu par email',
             },
           },
         },
@@ -309,12 +312,13 @@ const options = {
         },
         ForgotPasswordRequest: {
           type: 'object',
-          required: ['phoneNumber'],
+          required: ['email'],
           properties: {
-            phoneNumber: {
+            email: {
               type: 'string',
-              example: '+221771234567',
-              description: 'Numéro de téléphone',
+              format: 'email',
+              example: 'amadou@example.com',
+              description: 'Adresse email du compte',
             },
           },
         },

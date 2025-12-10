@@ -31,10 +31,10 @@ const registerSchema = Joi.object({
     }),
   email: Joi.string()
     .email()
-    .optional()
-    .allow(null, '')
+    .required()
     .messages({
       'string.email': 'L\'email doit être une adresse email valide',
+      'any.required': 'L\'email est requis',
     }),
   language: Joi.string()
     .valid('fr', 'wolof')
@@ -46,12 +46,12 @@ const registerSchema = Joi.object({
  * Schéma de validation pour la vérification OTP
  */
 const verifyOTPSchema = Joi.object({
-  phoneNumber: Joi.string()
-    .pattern(/^[0-9+]+$/)
+  email: Joi.string()
+    .email()
     .required()
     .messages({
-      'string.pattern.base': 'Le numéro de téléphone ne doit contenir que des chiffres et +',
-      'any.required': 'Le numéro de téléphone est requis',
+      'string.email': 'L\'email doit être une adresse email valide',
+      'any.required': 'L\'email est requis',
     }),
   code: Joi.string()
     .length(6)
@@ -68,12 +68,12 @@ const verifyOTPSchema = Joi.object({
  * Schéma de validation pour le renvoi d'OTP
  */
 const resendOTPSchema = Joi.object({
-  phoneNumber: Joi.string()
-    .pattern(/^[0-9+]+$/)
+  email: Joi.string()
+    .email()
     .required()
     .messages({
-      'string.pattern.base': 'Le numéro de téléphone ne doit contenir que des chiffres et +',
-      'any.required': 'Le numéro de téléphone est requis',
+      'string.email': 'L\'email doit être une adresse email valide',
+      'any.required': 'L\'email est requis',
     }),
 });
 
@@ -111,12 +111,12 @@ const refreshTokenSchema = Joi.object({
  * Schéma de validation pour la demande de réinitialisation de mot de passe
  */
 const forgotPasswordSchema = Joi.object({
-  phoneNumber: Joi.string()
-    .pattern(/^[0-9+]+$/)
+  email: Joi.string()
+    .email()
     .required()
     .messages({
-      'string.pattern.base': 'Le numéro de téléphone ne doit contenir que des chiffres et +',
-      'any.required': 'Le numéro de téléphone est requis',
+      'string.email': 'L\'email doit être une adresse email valide',
+      'any.required': 'L\'email est requis',
     }),
 });
 

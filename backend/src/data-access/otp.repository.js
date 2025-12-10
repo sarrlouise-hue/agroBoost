@@ -7,12 +7,12 @@ const { Op } = require('sequelize');
  */
 class OTPRepository {
   /**
-   * Trouver un OTP par numéro de téléphone et code (non utilisé)
+   * Trouver un OTP par email et code (non utilisé)
    */
-  async findByPhoneNumberAndCode(phoneNumber, code) {
+  async findByEmailAndCode(email, code) {
     return OTP.findOne({
       where: {
-        phoneNumber,
+        email,
         code,
         isUsed: false,
         expiresAt: {
@@ -24,12 +24,12 @@ class OTPRepository {
   }
 
   /**
-   * Trouver un OTP valide par numéro de téléphone
+   * Trouver un OTP valide par email
    */
-  async findValidByPhoneNumber(phoneNumber) {
+  async findValidByEmail(email) {
     return OTP.findOne({
       where: {
-        phoneNumber,
+        email,
         isUsed: false,
         expiresAt: {
           [Op.gt]: new Date(),
@@ -47,14 +47,14 @@ class OTPRepository {
   }
 
   /**
-   * Invalider tous les OTP précédents pour un numéro de téléphone
+   * Invalider tous les OTP précédents pour un email
    */
-  async invalidateByPhoneNumber(phoneNumber) {
+  async invalidateByEmail(email) {
     return OTP.update(
       { isUsed: true },
       {
         where: {
-          phoneNumber,
+          email,
           isUsed: false,
         },
       }
