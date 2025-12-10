@@ -1,8 +1,8 @@
-# Architecture - AGRO BOOST Backend
+# Architecture - AlloTracteur Backend
 
 ## Vue d'ensemble
 
-Le backend AGRO BOOST est construit avec la stack **PERN** (PostgreSQL, Express, React, Node.js).
+Le backend AlloTracteur est construit avec la stack **PERN** (PostgreSQL, Express, React, Node.js).
 
 ## Structure du Projet
 
@@ -78,6 +78,13 @@ backend/
 │   │   │   └── search.service.js
 │   │   └── file/
 │   │       └── upload.service.js
+│   │   ├── email/
+│   │   │   ├── email.service.js
+│   │   │   └── templates/
+│   │   │       ├── welcome.html
+│   │   │       ├── otp.html
+│   │   │       ├── password-reset-request.html
+│   │   │       └── password-reset-confirmation.html
 │   │
 │   ├── middleware/      # Middlewares Express
 │   │   ├── auth.middleware.js
@@ -163,7 +170,7 @@ Client → Route → Middleware (Auth) → Controller → Service → Repository
   phoneNumber: String (unique, required),
   firstName: String (required),
   lastName: String (required),
-  email: String (optional, unique),
+  email: String (required, unique),
   language: String (enum: ['fr', 'wolof']),
   latitude: Decimal,
   longitude: Decimal,
@@ -181,7 +188,7 @@ Client → Route → Middleware (Auth) → Controller → Service → Repository
 ```javascript
 {
   id: UUID,
-  phoneNumber: String (required),
+  email: String (required, unique),
   code: String (required),
   expiresAt: Date (required),
   isUsed: Boolean,
@@ -189,6 +196,8 @@ Client → Route → Middleware (Auth) → Controller → Service → Repository
   updatedAt: Date
 }
 ```
+
+**Note:** Le système OTP utilise maintenant l'email au lieu du numéro de téléphone. Les codes OTP sont envoyés par email.
 
 ### Provider
 
@@ -352,7 +361,8 @@ Cette couche encapsule toutes les requêtes PostgreSQL et fournit une abstractio
 ### OTP Service
 
 - Génération de codes OTP
-- Création et validation d'OTP
+- Création et validation d'OTP par email
+- Envoi automatique des codes OTP par email
 - Gestion de l'expiration
 
 ### Password Service
@@ -430,7 +440,8 @@ Cette couche encapsule toutes les requêtes PostgreSQL et fournit une abstractio
 
 - JWT avec expiration (7 jours)
 - Refresh tokens (30 jours)
-- OTP pour vérification
+- OTP pour vérification (envoyé par email)
+- Service email pour envoi de templates HTML (bienvenue, OTP, réinitialisation mot de passe)
 - Mots de passe hashés avec bcrypt
 
 ### Protection
@@ -476,4 +487,4 @@ Cette couche encapsule toutes les requêtes PostgreSQL et fournit une abstractio
 
 ---
 
-**Documentation mise à jour le 2024-12-10*
+**Documentation mise à jour le 2025-01-01*

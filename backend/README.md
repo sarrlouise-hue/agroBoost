@@ -173,7 +173,7 @@ Toute la documentation technique est disponible dans le dossier [`doc/`](./doc/)
 Une fois le serveur démarré, accédez à la documentation Swagger interactive :
 
 ```
-http://localhost:5000/api-docs
+http://localhost:3000/api-docs
 ```
 
 Vous pouvez tester tous les endpoints directement depuis le navigateur !
@@ -188,7 +188,7 @@ Une collection Postman est disponible pour tester facilement l'API :
    - Sélectionner le fichier `postman_collection.json` dans le dossier `backend/`
 
 2. **Configurer les variables** :
-   - La collection utilise `{{base_url}}` (par défaut : `http://localhost:5000`)
+   - La collection utilise `{{base_url}}` (par défaut : `http://localhost:3000`)
    - Les tokens sont automatiquement sauvegardés après connexion
 
 3. **Guide d'utilisation** : Voir [`doc/POSTMAN.md`](./doc/POSTMAN.md) pour plus de détails

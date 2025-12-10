@@ -1,11 +1,11 @@
-# Documentation Swagger - AGRO BOOST API
+# Documentation Swagger - AlloTracteur API
 
 ## Accès à la Documentation
 
 Une fois le serveur démarré, la documentation Swagger est accessible à :
 
 ```
-http://localhost:5000/api-docs
+http://localhost:3000/api-docs
 ```
 
 ## Fonctionnalités
@@ -30,7 +30,7 @@ npm run dev
 
 ### 2. Ouvrir dans le navigateur
 ```
-http://localhost:5000/api-docs
+http://localhost:3000/api-docs
 ```
 
 ### 3. Tester un endpoint
@@ -45,7 +45,7 @@ http://localhost:5000/api-docs
 ### Authentification
 - **User** : Modèle complet de l'utilisateur avec tous les champs
 - **RegisterRequest** : Schéma pour l'inscription d'un utilisateur
-- **VerifyOTPRequest** : Schéma pour la vérification OTP
+- **VerifyOTPRequest** : Schéma pour la vérification OTP (utilise l'email)
 - **LoginRequest** : Schéma pour la connexion
 - **RefreshTokenRequest** : Schéma pour le rafraîchissement de token
 - **AuthResponse** : Format de réponse pour l'authentification (avec user, token, refreshToken)
@@ -75,7 +75,7 @@ http://localhost:5000/api-docs
 
 Pour tester les endpoints protégés :
 
-1. Se connecter via `/api/auth/login` ou `/api/auth/register` + `/api/auth/verify-otp`
+1. Se connecter via `/api/auth/login` ou `/api/auth/register` + `/api/auth/verify-otp` (l'OTP est envoyé par email)
 2. Copier le `token` de la réponse
 3. Cliquer sur le bouton "Authorize" en haut à droite de Swagger
 4. Entrer le token JWT dans le champ (format: `Bearer votre-token-ici` ou juste `votre-token-ici`)
@@ -89,7 +89,7 @@ Pour tester les endpoints protégés :
 La documentation Swagger peut être exportée en JSON :
 
 ```
-http://localhost:5000/api-docs.json
+http://localhost:3000/api-docs.json
 ```
 
 Ce fichier peut être importé dans :
@@ -102,7 +102,7 @@ Ce fichier peut être importé dans :
 ### Authentification
 - POST `/api/auth/register` - Inscription
 - POST `/api/auth/verify-otp` - Vérification OTP
-- POST `/api/auth/resend-otp` - Renvoyer OTP
+- POST `/api/auth/resend-otp` - Renvoyer OTP par email
 - POST `/api/auth/login` - Connexion
 - POST `/api/auth/logout` - Déconnexion
 - POST `/api/auth/refresh-token` - Rafraîchir token

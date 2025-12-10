@@ -1,6 +1,6 @@
 # Guide d'utilisation de Postman
 
-Ce guide explique comment utiliser la collection Postman pour tester l'API AGRO BOOST.
+Ce guide explique comment utiliser la collection Postman pour tester l'API AlloTracteur.
 
 ## Installation
 
@@ -10,12 +10,12 @@ Ce guide explique comment utiliser la collection Postman pour tester l'API AGRO 
    - Ouvrir Postman
    - Cliquer sur "Import"
    - Sélectionner le fichier `postman_collection.json` dans le dossier `backend/`
-   - La collection "AGRO BOOST API - Authentification" apparaîtra dans votre workspace
+   - La collection "AlloTracteur API" apparaîtra dans votre workspace
 
 3. **Importer l'environnement (optionnel mais recommandé)** :
    - Cliquer sur "Import"
    - Sélectionner le fichier `postman_environment.json` dans le dossier `backend/`
-   - Sélectionner l'environnement "AGRO BOOST - Local" dans le menu déroulant en haut à droite
+   - Sélectionner l'environnement "AlloTracteur - Local" dans le menu déroulant en haut à droite
 
 ## Configuration
 
@@ -23,7 +23,7 @@ Ce guide explique comment utiliser la collection Postman pour tester l'API AGRO 
 
 La collection utilise des variables pour faciliter les tests :
 
-- `base_url` : URL de base de l'API (par défaut : `http://localhost:5000`)
+- `base_url` : URL de base de l'API (par défaut : `http://localhost:3000`)
 - `access_token` : Token JWT d'accès (sauvegardé automatiquement après connexion)
 - `refresh_token` : Token de rafraîchissement (sauvegardé automatiquement après connexion)
 - `reset_token` : Token de réinitialisation de mot de passe (sauvegardé automatiquement)
@@ -35,13 +35,13 @@ La collection utilise des variables pour faciliter les tests :
 
 **Option 1 : Variables de collection** (si vous n'utilisez pas d'environnement)
 
-1. Cliquer sur la collection "AGRO BOOST API - Authentification"
+1. Cliquer sur la collection "AlloTracteur API"
 2. Aller dans l'onglet "Variables"
-3. Modifier la valeur de `base_url` si nécessaire (ex: `http://localhost:5000`)
+3. Modifier la valeur de `base_url` si nécessaire (ex: `http://localhost:3000`)
 
 **Option 2 : Variables d'environnement** (recommandé)
 
-1. Cliquer sur l'environnement "AGRO BOOST - Local" (en haut à droite)
+1. Cliquer sur l'environnement "AlloTracteur - Local" (en haut à droite)
 2. Cliquer sur l'icône d'édition (œil)
 3. Modifier la valeur de `base_url` si nécessaire
 
@@ -55,20 +55,20 @@ La collection utilise des variables pour faciliter les tests :
 ### 2. Inscription d'un nouvel utilisateur
 
 - Exécuter **"Inscription"**
-- Modifier le `phoneNumber` dans le body si nécessaire
+- Modifier le `email` dans le body si nécessaire (l'email est requis)
 - Le serveur retournera un `token` et `refreshToken`
-- Un OTP sera créé (visible dans les logs du serveur en développement)
+- Un code OTP sera envoyé par email (et visible dans les logs du serveur en développement si l'email n'est pas configuré)
 
 ### 3. Vérifier l'OTP
 
 - Exécuter **"Vérifier OTP"**
-- Utiliser le code OTP généré (visible dans les logs du serveur)
+- Fournir l'`email` et le `code` OTP reçu par email
 - Le compte sera activé (`isVerified: true`)
 
 ### 4. Connexion
 
-- **Option A** : **"Connexion (sans mot de passe)"** - Utilise uniquement le numéro de téléphone
-- **Option B** : **"Connexion (avec mot de passe)"** - Utilise le numéro et le mot de passe
+- **Option A** : **"Connexion (sans mot de passe)"** - Utilise le numéro de téléphone ou l'email
+- **Option B** : **"Connexion (avec mot de passe)"** - Utilise le numéro/email et le mot de passe
 - Les tokens seront automatiquement sauvegardés dans les variables de collection
 
 ### 5. Utiliser les tokens
@@ -172,7 +172,7 @@ La collection inclut un script de test qui :
 ```json
 {
   "success": true,
-  "message": "Utilisateur inscrit avec succès. Veuillez vérifier l'OTP.",
+  "message": "Utilisateur inscrit avec succès. Veuillez vérifier votre email pour le code OTP.",
   "data": {
     "user": {
       "id": "...",
@@ -215,8 +215,8 @@ La collection inclut un script de test qui :
 
 ## Conseils
 
-1. **Variables** : Utilisez des numéros de téléphone différents pour chaque test
-2. **OTP** : En développement, l'OTP est visible dans les logs du serveur
+1. **Variables** : Utilisez des emails différents pour chaque test
+2. **OTP** : L'OTP est envoyé par email. En développement, si l'email n'est pas configuré, l'OTP sera visible dans les logs du serveur
 3. **Tokens** : Les tokens sont automatiquement sauvegardés, pas besoin de les copier manuellement
 4. **Environnement** : Utilisez l'environnement Postman pour facilement basculer entre dev, staging, prod
 5. **Tests** : Les scripts de test sauvegardent automatiquement les tokens dans les variables
@@ -231,8 +231,8 @@ La collection inclut un script de test qui :
 
 ### Erreur 409 (Conflit)
 
-- L'utilisateur existe déjà avec ce numéro de téléphone
-- Utiliser un autre numéro de téléphone
+- L'utilisateur existe déjà avec ce numéro de téléphone ou cet email
+- Utiliser un autre numéro de téléphone ou un autre email
 
 ### Erreur 429 (Trop de requêtes)
 

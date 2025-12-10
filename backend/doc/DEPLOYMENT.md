@@ -1,4 +1,4 @@
-# Guide de Déploiement - AGRO BOOST Backend
+# Guide de Déploiement - AlloTracteur Backend
 
 ## Prérequis
 
@@ -41,9 +41,9 @@ pg_ctl -D /usr/local/var/postgres start
 # Démarrer le service PostgreSQL depuis les Services Windows
 
 # Créer la base de données
-createdb agroboost
+createdb allotracteur
 # ou via psql
-psql -U postgres -c "CREATE DATABASE agroboost;"
+psql -U postgres -c "CREATE DATABASE allotracteur;"
 ```
 
 ### 5. Démarrer le serveur
@@ -83,9 +83,9 @@ sudo systemctl enable postgresql
 ```bash
 # Créer un utilisateur et une base de données
 sudo -u postgres psql
-CREATE USER agroboost_user WITH PASSWORD 'your-secure-password';
-CREATE DATABASE agroboost OWNER agroboost_user;
-GRANT ALL PRIVILEGES ON DATABASE agroboost TO agroboost_user;
+CREATE USER allotracteur_user WITH PASSWORD 'your-secure-password';
+CREATE DATABASE allotracteur OWNER allotracteur_user;
+GRANT ALL PRIVILEGES ON DATABASE allotracteur TO allotracteur_user;
 \q
 ```
 
@@ -106,7 +106,7 @@ cp .env.example .env
 npm install -g pm2
 
 # Démarrer l'application
-pm2 start src/app.js --name agroboost-backend
+pm2 start src/app.js --name allotracteur-backend
 
 # Sauvegarder la configuration
 pm2 save
@@ -118,10 +118,10 @@ pm2 startup
 ```nginx
 server {
     listen 80;
-    server_name api.agroboost.com;
+    server_name api.allotracteur.com;
 
     location / {
-        proxy_pass http://localhost:5000;
+        proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -142,7 +142,7 @@ server {
 #### 2. Créer l'application
 
 ```bash
-heroku create agroboost-backend
+heroku create allotracteur-backend
 ```
 
 #### 3. Ajouter PostgreSQL
@@ -232,7 +232,7 @@ API_URL=<url-api-vercel>
 
 - Vercel déploiera automatiquement à chaque push sur la branche principale
 - Vérifier les logs de déploiement dans le dashboard Vercel
-- L'URL de votre API sera disponible après le déploiement (ex: `https://agroboost.vercel.app`)
+- L'URL de votre API sera disponible après le déploiement (ex: `https://allotracteur.vercel.app`)
 
 #### 6. Vérification
 
@@ -248,14 +248,14 @@ PORT=3000
 
 # PostgreSQL
 # Option 1: Utiliser DATABASE_URL (recommandé)
-DATABASE_URL=postgresql://user:password@host:5432/agroboost
+DATABASE_URL=postgresql://user:password@host:5432/allotracteur
 
 # Option 2: Utiliser les variables individuelles
 DB_HOST=127.0.0.1
 DB_PORT=5432
-DB_USER=agroboost_user
+DB_USER=allotracteur_user
 DB_PASSWORD=your-secure-password
-DB_NAME=agroboost
+DB_NAME=allotracteur
 
 # JWT - Générer des secrets forts !
 JWT_SECRET=generate-strong-secret-here
@@ -266,6 +266,18 @@ JWT_REFRESH_EXPIRES_IN=30d
 # OTP
 OTP_EXPIRES_IN=5m
 OTP_LENGTH=6
+
+# Email (Nodemailer)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=votre-email@gmail.com
+EMAIL_PASSWORD=votre-mot-de-passe-app
+EMAIL_FROM_EMAIL=noreply@allotracteur.com
+EMAIL_FROM_NAME=AlloTracteur
+EMAIL_APP_NAME=AlloTracteur
+EMAIL_SUPPORT_EMAIL=support@allotracteur.com
+EMAIL_FRONTEND_URL=http://localhost:3000
 
 # PayTech Mobile Money
 PAYTECH_API_KEY=your-paytech-api-key
@@ -323,7 +335,7 @@ pm2 logs
 ### Health Check
 
 ```bash
-curl http://localhost:5000/health
+curl http://localhost:3000/health
 ```
 
 ## Backup
@@ -332,23 +344,23 @@ curl http://localhost:5000/health
 
 ```bash
 # Backup local
-pg_dump -U postgres -d agroboost > backup_$(date +%Y%m%d).sql
+pg_dump -U postgres -d allotracteur > backup_$(date +%Y%m%d).sql
 
 # Restore
-psql -U postgres -d agroboost < backup_20240101.sql
+psql -U postgres -d allotracteur < backup_20250101.sql
 
 # Backup avec compression
-pg_dump -U postgres -d agroboost | gzip > backup_$(date +%Y%m%d).sql.gz
+pg_dump -U postgres -d allotracteur | gzip > backup_$(date +%Y%m%d).sql.gz
 
 # Restore depuis backup compressé
-gunzip -c backup_20240101.sql.gz | psql -U postgres -d agroboost
+gunzip -c backup_20250101.sql.gz | psql -U postgres -d allotracteur
 ```
 
 ### Backup automatique (cron)
 
 ```bash
 # Ajouter au crontab
-0 2 * * * pg_dump -U postgres -d agroboost | gzip > /backups/agroboost_$(date +\%Y\%m\%d).sql.gz
+0 2 * * * pg_dump -U postgres -d allotracteur | gzip > /backups/allotracteur_$(date +\%Y\%m\%d).sql.gz
 ```
 
 ## Mises à jour
@@ -367,7 +379,7 @@ npm install
 # En production, utiliser des migrations Sequelize
 
 # 4. Redémarrer l'application
-pm2 restart agroboost-backend
+pm2 restart allotracteur-backend
 
 # Ou avec Heroku
 git push heroku main
@@ -388,7 +400,7 @@ git push heroku main
 
 ```bash
 # Trouver le processus
-lsof -i :5000
+lsof -i :3000
 # Tuer le processus
 kill -9 <PID>
 ```
@@ -420,6 +432,39 @@ kill -9 <PID>
 2. Obtenir vos credentials (CLOUD_NAME, API_KEY, API_SECRET)
 3. Configurer les options d'upload (compression, transformations, etc.)
 
+## Configuration Email (Nodemailer)
+
+L'application utilise Nodemailer pour envoyer des emails (bienvenue, OTP, réinitialisation de mot de passe).
+
+### Configuration Gmail
+
+1. Activer l'authentification à deux facteurs sur votre compte Gmail
+2. Générer un mot de passe d'application :
+   - Aller dans [Paramètres Google](https://myaccount.google.com/apppasswords)
+   - Créer un mot de passe d'application pour "Mail"
+   - Utiliser ce mot de passe dans `EMAIL_PASSWORD`
+
+### Configuration SMTP personnalisé
+
+Pour utiliser un autre fournisseur SMTP (SendGrid, Mailgun, etc.) :
+
+```env
+EMAIL_HOST=smtp.sendgrid.net
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=apikey
+EMAIL_PASSWORD=votre-api-key-sendgrid
+EMAIL_FROM_EMAIL=noreply@allotracteur.com
+EMAIL_FROM_NAME=AlloTracteur
+EMAIL_APP_NAME=AlloTracteur
+EMAIL_SUPPORT_EMAIL=support@allotracteur.com
+EMAIL_FRONTEND_URL=https://votre-frontend.com
+```
+
+### Note importante
+
+Si les credentials email ne sont pas configurés, l'application continuera de fonctionner mais les emails ne seront pas envoyés. Un avertissement sera affiché dans les logs au démarrage.
+
 ---
 
-**Documentation mise à jour le 2024-12-10*
+**Documentation mise à jour le 2025-01-01*

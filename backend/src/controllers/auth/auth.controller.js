@@ -109,20 +109,38 @@ const resendOTP = async (req, res, next) => {
 /**
  * Connecter un utilisateur
  * POST /api/auth/login
+ * Accepte phoneNumber ou email, avec ou sans mot de passe
  */
 const login = async (req, res, next) => {
   try {
-    const { phoneNumber, password } = req.body;
+    const { phoneNumber, email, password } = req.body;
 
-    // Si un mot de passe est fourni, utiliser loginWithPassword
-    if (password) {
-      const result = await authService.loginWithPassword(phoneNumber, password);
+    // Si un email est fourni, utiliser l'email pour la connexion
+    if (email) {
+      // Si un mot de passe est fourni, utiliser loginWithEmailAndPassword
+      if (password) {
+        const result = await authService.loginWithEmailAndPassword(email, password);
+        return success(res, result, 'Connexion réussie');
+      }
+      // Sinon, utiliser la connexion par email (sans mot de passe)
+      const result = await authService.loginWithEmail(email);
       return success(res, result, 'Connexion réussie');
     }
 
-    // Sinon, utiliser la connexion par OTP (sans mot de passe)
-    const result = await authService.login(phoneNumber);
-    return success(res, result, 'Connexion réussie');
+    // Si un numéro de téléphone est fourni
+    if (phoneNumber) {
+      // Si un mot de passe est fourni, utiliser loginWithPassword
+      if (password) {
+        const result = await authService.loginWithPassword(phoneNumber, password);
+        return success(res, result, 'Connexion réussie');
+      }
+      // Sinon, utiliser la connexion par OTP (sans mot de passe)
+      const result = await authService.login(phoneNumber);
+      return success(res, result, 'Connexion réussie');
+    }
+
+    // Si ni email ni phoneNumber n'est fourni
+    return error(res, 'L\'email ou le numéro de téléphone est requis', 400);
   } catch (err) {
     next(err);
   }

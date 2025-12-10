@@ -264,6 +264,58 @@ const loginWithEmail = async (email) => {
 };
 
 /**
+ * Connecter un utilisateur avec email et mot de passe
+ */
+const loginWithEmailAndPassword = async (email, password) => {
+  try {
+    // Trouver l'utilisateur avec le mot de passe
+    const user = await userRepository.findByEmailWithPassword(email);
+
+    if (!user) {
+      throw new AppError('Utilisateur non trouvé', 404);
+    }
+
+    // Vérifier si l'utilisateur a un mot de passe
+    if (!user.password) {
+      throw new AppError('Aucun mot de passe défini. Utilisez la connexion par OTP.', 400);
+    }
+
+    // Vérifier le mot de passe
+    const isPasswordValid = await comparePassword(password, user.password);
+    if (!isPasswordValid) {
+      throw new AppError('Mot de passe incorrect', 401);
+    }
+
+    // Générer les tokens
+    const token = generateToken(user.id, user.role);
+    const refreshToken = generateRefreshToken(user.id);
+
+    logger.info(`Utilisateur connecté avec mot de passe: ${user.email}`);
+
+    return {
+      user: {
+        id: user.id,
+        phoneNumber: user.phoneNumber,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        language: user.language,
+        role: user.role,
+        isVerified: user.isVerified,
+      },
+      token,
+      refreshToken,
+    };
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    }
+    logger.error('Erreur lors de la connexion avec mot de passe:', error);
+    throw new AppError('Échec de la connexion de l\'utilisateur', 500);
+  }
+};
+
+/**
  * Rafraîchir le token d'accès
  */
 const refreshAccessToken = async (refreshToken) => {
@@ -319,6 +371,7 @@ module.exports = {
   login,
   loginWithPassword,
   loginWithEmail,
+  loginWithEmailAndPassword,
   refreshAccessToken,
   verifyUser,
 };

@@ -1,4 +1,4 @@
-# Exemples d'utilisation de l'API - AGRO BOOST
+# Exemples d'utilisation de l'API - AlloTracteur
 
 ## Base URL
 
@@ -37,7 +37,7 @@ curl -X POST http://localhost:3000/api/auth/register \
 ```json
 {
   "success": true,
-  "message": "Utilisateur inscrit avec succès. Veuillez vérifier l'OTP.",
+  "message": "Utilisateur inscrit avec succès. Veuillez vérifier votre email pour le code OTP.",
   "data": {
     "user": {
       "id": "user-id-123",
@@ -57,13 +57,13 @@ curl -X POST http://localhost:3000/api/auth/register \
 
 ### 2. Vérifier OTP
 
-Vérifier le code OTP reçu par SMS et activer le compte.
+Vérifier le code OTP reçu par email et activer le compte.
 
 ```bash
 curl -X POST http://localhost:3000/api/auth/verify-otp \
   -H "Content-Type: application/json" \
   -d '{
-    "phoneNumber": "+221771234567",
+    "email": "amadou@example.com",
     "code": "123456"
   }'
 ```
@@ -102,13 +102,13 @@ curl -X POST http://localhost:3000/api/auth/verify-otp \
 
 ### 3. Renvoyer OTP
 
-Renvoyer un nouveau code OTP.
+Renvoyer un nouveau code OTP par email.
 
 ```bash
 curl -X POST http://localhost:3000/api/auth/resend-otp \
   -H "Content-Type: application/json" \
   -d '{
-    "phoneNumber": "+221771234567"
+    "email": "amadou@example.com"
   }'
 ```
 
@@ -117,7 +117,7 @@ curl -X POST http://localhost:3000/api/auth/resend-otp \
 ```json
 {
   "success": true,
-  "message": "OTP envoyé avec succès",
+  "message": "Code OTP envoyé par email avec succès",
   "data": null
 }
 ```
@@ -486,7 +486,7 @@ curl -X POST http://localhost:3000/api/bookings \
   -H "Content-Type: application/json" \
   -d '{
     "serviceId": "service-id-123",
-    "bookingDate": "2024-12-15",
+    "bookingDate": "2025-01-15",
     "startTime": "08:00",
     "endTime": "17:00",
     "duration": 8,
@@ -505,7 +505,7 @@ curl -X POST http://localhost:3000/api/bookings \
   "data": {
     "id": "booking-id-123",
     "serviceId": "service-id-123",
-    "bookingDate": "2024-12-15",
+    "bookingDate": "2025-01-15",
     "startTime": "08:00",
     "endTime": "17:00",
     "totalPrice": 40000,
@@ -637,6 +637,8 @@ curl -X POST http://localhost:3000/api/payments/webhook/paytech \
 - Le token JWT expire après 7 jours (configurable)
 - Le refresh token expire après 30 jours (configurable)
 - L'OTP expire après 5 minutes (configurable)
+- L'OTP est envoyé par email (pas par SMS)
+- L'email est requis pour l'inscription et l'authentification
 - Le numéro de téléphone doit être au format international avec le préfixe `+`
 - Les réservations vérifient automatiquement la disponibilité (anti-double réservation)
 - Les paiements PayTech nécessitent la configuration des credentials dans les variables d'environnement

@@ -74,6 +74,13 @@ class UserRepository {
   async findByEmail(email) {
     return User.findOne({ where: { email } });
   }
+
+  /**
+   * Trouver un utilisateur par email avec mot de passe (pour authentification)
+   */
+  async findByEmailWithPassword(email) {
+    return User.scope('withPassword').findOne({ where: { email } });
+  }
 }
 
 module.exports = new UserRepository();

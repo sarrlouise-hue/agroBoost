@@ -171,7 +171,7 @@ curl https://votre-projet.vercel.app/health
 1. Ouvrir Postman
 2. Sélectionner l'environnement **"AGRO BOOST - Local"**
 3. Modifier la variable `base_url` :
-   - Ancienne valeur : `http://localhost:5000`
+   - Ancienne valeur : `http://localhost:3000`
    - Nouvelle valeur : `https://votre-projet.vercel.app`
 4. Sauvegarder
 

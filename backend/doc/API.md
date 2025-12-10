@@ -1,9 +1,9 @@
-# Documentation API - AGRO BOOST
+# Documentation API - AlloTracteur
 
 ## Base URL
 
 ```
-http://localhost:5000/api
+http://localhost:3000/api
 ```
 
 ## Authentification
@@ -25,7 +25,7 @@ Vérifier le statut du serveur
 ```json
 {
   "status": "OK",
-  "timestamp": "2024-01-01T00:00:00.000Z",
+  "timestamp": "2025-01-01T00:00:00.000Z",
   "environment": "development"
 }
 ```
@@ -50,12 +50,14 @@ Inscrire un nouvel utilisateur
 }
 ```
 
+**Note:** L'email est requis. Un code OTP sera envoyé par email et un email de bienvenue sera également envoyé.
+
 **Réponse réussie (201):**
 
 ```json
 {
   "success": true,
-  "message": "Utilisateur inscrit avec succès. Veuillez vérifier l'OTP.",
+  "message": "Utilisateur inscrit avec succès. Veuillez vérifier votre email pour le code OTP.",
   "data": {
     "user": {
       "id": "user-id-123",
@@ -84,13 +86,13 @@ Inscrire un nouvel utilisateur
 
 #### POST `/auth/verify-otp`
 
-Vérifier le code OTP et activer le compte
+Vérifier le code OTP reçu par email et activer le compte
 
 **Body:**
 
 ```json
 {
-  "phoneNumber": "+221771234567",
+  "email": "amadou@example.com",
   "code": "123456"
 }
 ```
@@ -129,13 +131,13 @@ Vérifier le code OTP et activer le compte
 
 #### POST `/auth/resend-otp`
 
-Renvoyer un nouveau code OTP
+Renvoyer un nouveau code OTP par email
 
 **Body:**
 
 ```json
 {
-  "phoneNumber": "+221771234567"
+  "email": "amadou@example.com"
 }
 ```
 
@@ -144,7 +146,7 @@ Renvoyer un nouveau code OTP
 ```json
 {
   "success": true,
-  "message": "OTP envoyé avec succès",
+  "message": "Code OTP envoyé par email avec succès",
   "data": null
 }
 ```
@@ -1143,7 +1145,7 @@ Authorization: Bearer votre-token-ici
 ```json
 {
   "serviceId": "service-id-123",
-  "bookingDate": "2024-12-15",
+  "bookingDate": "2025-01-15",
   "startTime": "08:00",
   "endTime": "17:00",
   "duration": 8,
@@ -1166,7 +1168,7 @@ Authorization: Bearer votre-token-ici
     "userId": "user-id-123",
     "serviceId": "service-id-123",
     "providerId": "provider-id-123",
-    "bookingDate": "2024-12-15",
+    "bookingDate": "2025-01-15",
     "startTime": "08:00",
     "endTime": "17:00",
     "duration": 8,
@@ -1403,7 +1405,7 @@ Authorization: Bearer votre-token-ici
     "status": "success",
     "amount": 40000,
     "paymentMethod": "paytech",
-    "paymentDate": "2024-12-15T10:30:00.000Z",
+    "paymentDate": "2025-01-15T10:30:00.000Z",
     "booking": { ... }
   }
 }
@@ -1550,7 +1552,7 @@ Tous les champs sont validés avec Joi :
 - `phoneNumber` : Format international avec `+` (ex: `+221771234567`)
 - `firstName` : 2-50 caractères
 - `lastName` : 2-50 caractères
-- `email` : Format email valide (optionnel)
+- `email` : Format email valide (requis pour l'authentification par OTP)
 - `language` : `fr` ou `wolof` (défaut: `fr`)
 - `code` : 6 chiffres
 - `latitude` : Entre -90 et 90
@@ -1577,7 +1579,7 @@ Tous les champs sont validés avec Joi :
 ### Champs réservation
 
 - `serviceId` : UUID (requis)
-- `bookingDate` : Date ISO (requis, ex: "2024-12-15")
+- `bookingDate` : Date ISO (requis, ex: "2025-01-15")
 - `startTime` : Format HH:MM (requis, ex: "08:00")
 - `endTime` : Format HH:MM (optionnel si duration fournie)
 - `duration` : Nombre entier d'heures (optionnel si endTime fourni, min: 1)
@@ -1604,4 +1606,4 @@ Les images des services sont uploadées via Cloudinary. Les URLs des images uplo
 
 ---
 
-*Documentation mise à jour le 2024-12-10*
+*Documentation mise à jour le 2025-01-01*

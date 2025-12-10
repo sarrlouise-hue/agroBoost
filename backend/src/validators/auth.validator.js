@@ -79,14 +79,20 @@ const resendOTPSchema = Joi.object({
 
 /**
  * Schéma de validation pour la connexion
+ * Accepte phoneNumber OU email (au moins un des deux requis)
  */
 const loginSchema = Joi.object({
   phoneNumber: Joi.string()
     .pattern(/^[0-9+]+$/)
-    .required()
+    .optional()
     .messages({
       'string.pattern.base': 'Le numéro de téléphone ne doit contenir que des chiffres et +',
-      'any.required': 'Le numéro de téléphone est requis',
+    }),
+  email: Joi.string()
+    .email()
+    .optional()
+    .messages({
+      'string.email': 'L\'email doit être une adresse email valide',
     }),
   password: Joi.string()
     .min(6)
@@ -94,6 +100,8 @@ const loginSchema = Joi.object({
     .messages({
       'string.min': 'Le mot de passe doit contenir au moins 6 caractères',
     }),
+}).or('phoneNumber', 'email').messages({
+  'object.missing': 'L\'email ou le numéro de téléphone est requis',
 });
 
 /**

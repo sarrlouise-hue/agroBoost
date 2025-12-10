@@ -15,7 +15,7 @@ Créez un fichier `.env` à la racine du dossier `backend` avec ces variables.
 # Environnement
 # ============================================
 NODE_ENV=development
-PORT=5000
+PORT=3000
 
 # ============================================
 # Base de données PostgreSQL
@@ -123,7 +123,7 @@ EMAIL_SUPPORT_EMAIL=support@allotracteur.com
 
 ### Environnement
 - `NODE_ENV`: Environnement d'exécution (`development`, `production`, `test`)
-- `PORT`: Port sur lequel le serveur écoute (défaut: 5000)
+- `PORT`: Port sur lequel le serveur écoute (défaut: 3000)
 
 ### Base de données PostgreSQL
 - `DATABASE_URL`: URL complète de connexion (prioritaire)

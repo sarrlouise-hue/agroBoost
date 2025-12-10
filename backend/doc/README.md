@@ -1,6 +1,6 @@
-# Documentation - AGRO BOOST Backend
+# Documentation - AlloTracteur Backend
 
-Ce dossier contient toute la documentation technique du backend AGRO BOOST.
+Ce dossier contient toute la documentation technique du backend AlloTracteur.
 
 ## 📚 Fichiers de Documentation
 
@@ -15,7 +15,7 @@ Documentation complète de l'API REST :
 
 **Endpoints disponibles :**
 
-- Authentification (register, login, OTP, etc.)
+- Authentification par email (register, login, OTP par email, etc.)
 - Gestion des utilisateurs (profil, localisation, langue)
 - Gestion des prestataires (inscription, approbation, profil, géolocalisation)
 - Gestion des services agricoles (CRUD complet avec recherche avancée et géographique)
@@ -68,7 +68,7 @@ Exemples d'utilisation avec curl :
 ## 🚀 Démarrage Rapide
 
 1. Lire [ARCHITECTURE.md](./ARCHITECTURE.md) pour comprendre la structure
-2. Consulter [API.md](./API.md) ou utiliser [Swagger](http://localhost:5000/api-docs) pour tester l'API
+2. Consulter [API.md](./API.md) ou utiliser [Swagger](http://localhost:3000/api-docs) pour tester l'API
 3. Suivre [DEPLOYMENT.md](./DEPLOYMENT.md) pour déployer
 
 ## 📖 Documentation Interactive
@@ -87,7 +87,7 @@ Vous pouvez tester tous les endpoints directement depuis votre navigateur !
 
 ### Sprint 1 ✅
 
-- Authentification complète (JWT + OTP)
+- Authentification complète (JWT + OTP par email)
 - Gestion des utilisateurs et prestataires
 - CRUD services agricoles
 
@@ -102,5 +102,5 @@ Vous pouvez tester tous les endpoints directement depuis votre navigateur !
 
 ---
 
-*Documentation maintenue pour AGRO BOOST - MVP*
-*Dernière mise à jour : 2024-12-10*
+*Documentation maintenue pour AlloTracteur - MVP*
+*Dernière mise à jour : 2025-01-01*
