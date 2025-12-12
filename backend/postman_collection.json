@@ -1,0 +1,1096 @@
+{
+  "info": {
+    "name": "AlloTracteur API - Complète",
+    "description": "Collection Postman complète pour tester l'API AlloTracteur (Authentification par email, Users, Providers, Services)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "allotracteur-api"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        },
+        "description": "Vérifier l'état du serveur"
+      },
+      "response": []
+    },
+    {
+      "name": "Authentification",
+      "item": [
+        {
+          "name": "Inscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+221771234567\",\n  \"firstName\": \"Amadou\",\n  \"lastName\": \"Diallo\",\n  \"email\": \"amadou@example.com\",\n  \"language\": \"fr\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Inscrire un nouvel utilisateur. L'email est requis. Un code OTP sera envoyé par email et un email de bienvenue sera également envoyé."
+          },
+          "response": []
+        },
+        {
+          "name": "Vérifier OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"amadou@example.com\",\n  \"code\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "verify-otp"]
+            },
+            "description": "Vérifier le code OTP reçu par email et activer le compte utilisateur. Utilise l'email au lieu du téléphone."
+          },
+          "response": []
+        },
+        {
+          "name": "Renvoyer OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"amadou@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/resend-otp",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "resend-otp"]
+            },
+            "description": "Renvoyer un nouveau code OTP par email. Utilise l'email au lieu du téléphone."
+          },
+          "response": []
+        },
+        {
+          "name": "Connexion (téléphone sans mot de passe)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+221771234567\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Se connecter avec uniquement le numéro de téléphone (sans mot de passe)"
+          },
+          "response": []
+        },
+        {
+          "name": "Connexion (téléphone avec mot de passe)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+221771234567\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Se connecter avec le numéro de téléphone et le mot de passe"
+          },
+          "response": []
+        },
+        {
+          "name": "Connexion (email sans mot de passe)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"amadou@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Se connecter avec uniquement l'email (sans mot de passe)"
+          },
+          "response": []
+        },
+        {
+          "name": "Connexion (email avec mot de passe)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"amadou@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Se connecter avec l'email et le mot de passe"
+          },
+          "response": []
+        },
+        {
+          "name": "Déconnexion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Déconnecter l'utilisateur (nécessite authentification)"
+          },
+          "response": []
+        },
+        {
+          "name": "Rafraîchir Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh-token",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "refresh-token"]
+            },
+            "description": "Rafraîchir le token d'accès avec le refresh token"
+          },
+          "response": []
+        },
+        {
+          "name": "Mot de passe oublié",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"amadou@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/forgot-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "forgot-password"]
+            },
+            "description": "Demander la réinitialisation du mot de passe. Un email avec un lien de réinitialisation sera envoyé. Utilise l'email au lieu du téléphone."
+          },
+          "response": []
+        },
+        {
+          "name": "Réinitialiser mot de passe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{reset_token}}\",\n  \"newPassword\": \"nouveauMotDePasse123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "reset-password"]
+            },
+            "description": "Réinitialiser le mot de passe avec le token reçu par email. Un email de confirmation sera envoyé après la réinitialisation."
+          },
+          "response": []
+        },
+        {
+          "name": "Changer mot de passe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"ancienMotDePasse123\",\n  \"newPassword\": \"nouveauMotDePasse123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "change-password"]
+            },
+            "description": "Changer le mot de passe (nécessite authentification et mot de passe actuel)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints d'authentification"
+    },
+    {
+      "name": "Utilisateurs",
+      "item": [
+        {
+          "name": "Obtenir mon profil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "profile"]
+            },
+            "description": "Récupérer le profil de l'utilisateur connecté"
+          },
+          "response": []
+        },
+        {
+          "name": "Mettre à jour mon profil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Amadou\",\n  \"lastName\": \"Diallo\",\n  \"email\": \"amadou.diallo@example.com\",\n  \"address\": \"Dakar, Sénégal\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "profile"]
+            },
+            "description": "Mettre à jour le profil de l'utilisateur connecté"
+          },
+          "response": []
+        },
+        {
+          "name": "Mettre à jour ma localisation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": 14.7167,\n  \"longitude\": -17.4677,\n  \"address\": \"Dakar, Sénégal\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/location",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "location"]
+            },
+            "description": "Mettre à jour la localisation de l'utilisateur"
+          },
+          "response": []
+        },
+        {
+          "name": "Changer ma langue",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"wolof\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/language",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "language"]
+            },
+            "description": "Changer la langue de l'utilisateur (fr, wolof, english)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtenir tous les utilisateurs (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Obtenir tous les utilisateurs (admin seulement)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints pour la gestion des utilisateurs"
+    },
+    {
+      "name": "Prestataires",
+      "item": [
+        {
+          "name": "S'inscrire comme prestataire",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"businessName\": \"AgriServices SARL\",\n  \"description\": \"Fournisseur de services agricoles divers\",\n  \"documents\": [\"doc1.pdf\", \"doc2.pdf\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/providers/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "providers", "register"]
+            },
+            "description": "S'inscrire comme prestataire (nécessite d'être connecté)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtenir mon profil prestataire",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/providers/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "providers", "profile"]
+            },
+            "description": "Récupérer le profil du prestataire connecté"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtenir un prestataire par ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/providers/{{provider_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "providers", "{{provider_id}}"]
+            },
+            "description": "Récupérer le profil d'un prestataire par son ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Mettre à jour mon profil prestataire",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"businessName\": \"AgriServices SARL - Mise à jour\",\n  \"description\": \"Nouvelle description\",\n  \"documents\": [\"doc1.pdf\", \"doc2.pdf\", \"doc3.pdf\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/providers/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "providers", "profile"]
+            },
+            "description": "Mettre à jour le profil du prestataire connecté"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtenir tous les prestataires",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/providers?page=1&limit=20&isApproved=true&minRating=4.0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "providers"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "isApproved",
+                  "value": "true",
+                  "description": "Filtrer par statut d'approbation"
+                },
+                {
+                  "key": "minRating",
+                  "value": "4.0",
+                  "description": "Note minimale"
+                }
+              ]
+            },
+            "description": "Obtenir tous les prestataires avec filtres optionnels"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtenir les prestataires approuvés",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/providers/approved?page=1&limit=20&minRating=4.0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "providers", "approved"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "minRating",
+                  "value": "4.0"
+                }
+              ]
+            },
+            "description": "Obtenir uniquement les prestataires approuvés"
+          },
+          "response": []
+        },
+        {
+          "name": "Approuver un prestataire (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/providers/{{provider_id}}/approve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "providers", "{{provider_id}}", "approve"]
+            },
+            "description": "Approuver un prestataire (admin seulement)"
+          },
+          "response": []
+        },
+        {
+          "name": "Rejeter un prestataire (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/providers/{{provider_id}}/reject",
+              "host": ["{{base_url}}"],
+              "path": ["api", "providers", "{{provider_id}}", "reject"]
+            },
+            "description": "Rejeter un prestataire (admin seulement)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints pour la gestion des prestataires"
+    },
+    {
+      "name": "Services",
+      "item": [
+        {
+          "name": "Créer un service",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serviceType\": \"tractor\",\n  \"name\": \"Tracteur John Deere\",\n  \"description\": \"Tracteur agricole puissant pour travaux des champs\",\n  \"pricePerHour\": 5000,\n  \"pricePerDay\": 40000,\n  \"images\": [\"image1.jpg\", \"image2.jpg\"],\n  \"availability\": true,\n  \"latitude\": 14.7167,\n  \"longitude\": -17.4677\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/services",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services"]
+            },
+            "description": "Créer un nouveau service (prestataire seulement)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtenir un service par ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/services/{{service_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services", "{{service_id}}"]
+            },
+            "description": "Récupérer un service par son ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtenir tous les services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/services?page=1&limit=20&serviceType=tractor&availability=true&minPrice=1000&maxPrice=10000",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "serviceType",
+                  "value": "tractor",
+                  "description": "tractor, semoir, operator, other"
+                },
+                {
+                  "key": "availability",
+                  "value": "true",
+                  "description": "Filtrer par disponibilité"
+                },
+                {
+                  "key": "minPrice",
+                  "value": "1000",
+                  "description": "Prix minimum"
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "10000",
+                  "description": "Prix maximum"
+                }
+              ]
+            },
+            "description": "Obtenir tous les services avec filtres optionnels"
+          },
+          "response": []
+        },
+        {
+          "name": "Rechercher services par proximité",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/services?latitude=14.7167&longitude=-17.4677&radius=10&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services"],
+              "query": [
+                {
+                  "key": "latitude",
+                  "value": "14.7167",
+                  "description": "Latitude de la position"
+                },
+                {
+                  "key": "longitude",
+                  "value": "-17.4677",
+                  "description": "Longitude de la position"
+                },
+                {
+                  "key": "radius",
+                  "value": "10",
+                  "description": "Rayon de recherche en km"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Rechercher des services par proximité géographique"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtenir mes services",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/services/my-services?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services", "my-services"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Obtenir les services du prestataire connecté"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtenir services d'un prestataire",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/services/provider/{{provider_id}}?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services", "provider", "{{provider_id}}"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Obtenir tous les services d'un prestataire spécifique"
+          },
+          "response": []
+        },
+        {
+          "name": "Mettre à jour un service",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tracteur John Deere - Mise à jour\",\n  \"description\": \"Nouvelle description\",\n  \"pricePerHour\": 6000,\n  \"pricePerDay\": 50000,\n  \"availability\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/services/{{service_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services", "{{service_id}}"]
+            },
+            "description": "Mettre à jour un service (prestataire seulement)"
+          },
+          "response": []
+        },
+        {
+          "name": "Mettre à jour disponibilité",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"availability\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/services/{{service_id}}/availability",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services", "{{service_id}}", "availability"]
+            },
+            "description": "Mettre à jour la disponibilité d'un service (prestataire seulement)"
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer un service",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/services/{{service_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services", "{{service_id}}"]
+            },
+            "description": "Supprimer un service (prestataire seulement)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints pour la gestion des services agricoles"
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reset_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "provider_id",
+      "value": "",
+      "type": "string",
+      "description": "ID du prestataire"
+    },
+    {
+      "key": "service_id",
+      "value": "",
+      "type": "string",
+      "description": "ID du service"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string",
+      "description": "ID de l'utilisateur"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Sauvegarder automatiquement les tokens après connexion",
+          "if (pm.response.code === 200 || pm.response.code === 201) {",
+          "    const responseJson = pm.response.json();",
+          "    if (responseJson.data) {",
+          "        if (responseJson.data.token) {",
+          "            pm.collectionVariables.set('access_token', responseJson.data.token);",
+          "        }",
+          "        if (responseJson.data.refreshToken) {",
+          "            pm.collectionVariables.set('refresh_token', responseJson.data.refreshToken);",
+          "        }",
+          "        // Sauvegarder les IDs depuis les réponses",
+          "        if (responseJson.data.id) {",
+          "            // Si c'est un provider",
+          "            if (responseJson.data.businessName) {",
+          "                pm.collectionVariables.set('provider_id', responseJson.data.id);",
+          "            }",
+          "            // Si c'est un service",
+          "            if (responseJson.data.serviceType) {",
+          "                pm.collectionVariables.set('service_id', responseJson.data.id);",
+          "            }",
+          "            // Si c'est un user",
+          "            if (responseJson.data.phoneNumber && !responseJson.data.businessName) {",
+          "                pm.collectionVariables.set('user_id', responseJson.data.id);",
+          "            }",
+          "        }",
+          "    }",
+          "    // Sauvegarder le reset token depuis forgot-password",
+          "    if (responseJson.data && responseJson.data.resetToken) {",
+          "        pm.collectionVariables.set('reset_token', responseJson.data.resetToken);",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ]
+}
