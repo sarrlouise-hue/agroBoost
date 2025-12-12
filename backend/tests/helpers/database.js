@@ -11,6 +11,7 @@ const connectTestDB = async () => {
     require('../../src/models/PasswordResetToken');
     require('../../src/models/Provider');
     require('../../src/models/Service');
+    require('../../src/models/Maintenance');
     
     // Charger les associations
     require('../../src/models/associations');
@@ -72,7 +73,7 @@ const clearTestDB = async () => {
   try {
     // Utiliser TRUNCATE CASCADE directement en SQL pour un nettoyage rapide et efficace
     // Ordre important : d'abord les tables avec clés étrangères, puis les tables parentes
-    const tables = ['services', 'providers', 'otps', 'password_reset_tokens', 'users'];
+    const tables = ['maintenances', 'services', 'providers', 'otps', 'password_reset_tokens', 'users'];
     
     // Désactiver temporairement les contraintes de clés étrangères
     await sequelize.query('SET session_replication_role = replica;');

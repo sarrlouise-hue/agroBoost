@@ -50,6 +50,14 @@ module.exports = {
     WOLOF: 'wolof',
   },
 
+  // Maintenance status
+  MAINTENANCE_STATUS: {
+    PENDING: 'pending',
+    IN_PROGRESS: 'in_progress',
+    COMPLETED: 'completed',
+    CANCELLED: 'cancelled',
+  },
+
   // Default pagination
   PAGINATION: {
     DEFAULT_PAGE: 1,

@@ -8,6 +8,7 @@ const Provider = require('./Provider');
 const Service = require('./Service');
 const Booking = require('./Booking');
 const Payment = require('./Payment');
+const Maintenance = require('./Maintenance');
 
 // Association User <-> Provider
 Provider.belongsTo(User, {
@@ -105,11 +106,36 @@ Provider.hasMany(Payment, {
   as: 'payments',
 });
 
+// Association Service <-> Maintenance
+Maintenance.belongsTo(Service, {
+  foreignKey: 'serviceId',
+  as: 'service',
+  onDelete: 'CASCADE',
+});
+
+Service.hasMany(Maintenance, {
+  foreignKey: 'serviceId',
+  as: 'maintenances',
+});
+
+// Association User <-> Maintenance (mécanicien)
+Maintenance.belongsTo(User, {
+  foreignKey: 'mechanicId',
+  as: 'mechanic',
+  onDelete: 'RESTRICT',
+});
+
+User.hasMany(Maintenance, {
+  foreignKey: 'mechanicId',
+  as: 'maintenances',
+});
+
 module.exports = {
   User,
   Provider,
   Service,
   Booking,
   Payment,
+  Maintenance,
 };
 

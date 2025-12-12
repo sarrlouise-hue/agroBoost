@@ -583,6 +583,81 @@ const options = {
             },
           },
         },
+        Maintenance: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID unique de la maintenance',
+            },
+            serviceId: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID du service maintenu',
+            },
+            mechanicId: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID du mécanicien assigné',
+            },
+            startDate: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Date de début de la maintenance',
+              example: '2025-01-15T08:00:00Z',
+            },
+            endDate: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Date de fin de la maintenance',
+              example: '2025-01-15T17:00:00Z',
+            },
+            duration: {
+              type: 'integer',
+              minimum: 0,
+              description: 'Durée en heures',
+              example: 8,
+            },
+            description: {
+              type: 'string',
+              description: 'Description de la maintenance',
+              example: 'Révision complète du tracteur',
+            },
+            cost: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              description: 'Coût de la maintenance',
+              example: 50000,
+            },
+            status: {
+              type: 'string',
+              enum: ['pending', 'in_progress', 'completed', 'cancelled'],
+              description: 'Statut de la maintenance',
+              example: 'pending',
+            },
+            notes: {
+              type: 'string',
+              description: 'Notes additionnelles',
+              example: 'Changement d\'huile et filtres',
+            },
+            service: {
+              $ref: '#/components/schemas/Service',
+            },
+            mechanic: {
+              $ref: '#/components/schemas/User',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
         CreateBookingRequest: {
           type: 'object',
           required: ['serviceId', 'bookingDate', 'startTime'],
@@ -1043,6 +1118,10 @@ const options = {
       {
         name: 'Payments',
         description: 'Gestion des paiements PayTech',
+      },
+      {
+        name: 'Maintenances',
+        description: 'Gestion des maintenances et réparations de matériel',
       },
     ],
   },
