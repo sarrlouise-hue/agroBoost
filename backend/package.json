@@ -18,6 +18,7 @@
     "init-db:force": "node -e \"require('dotenv').config(); const {sequelize} = require('./src/config/database'); require('./src/models/User'); require('./src/models/OTP'); require('./src/models/PasswordResetToken'); require('./src/models/Provider'); require('./src/models/Service'); require('./src/models/Booking'); require('./src/models/Payment'); require('./src/models/associations'); sequelize.sync({force: true}).then(() => {console.log('✅ Tables recréées'); process.exit(0);}).catch(e => {console.error('❌ Erreur:', e); process.exit(1);});\"",
     "migrate:otp-email": "node migrations/20250101-change-otp-phone-to-email.js",
     "migrate:maintenances": "node migrations/20250102-create-maintenances-table.js",
+    "seed:admin": "node scripts/seed-admin.js",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix"
   },

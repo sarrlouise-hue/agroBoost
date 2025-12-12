@@ -26,6 +26,57 @@ npm run init-db:force
 
 **⚠️ ATTENTION :** Ce script supprime toutes les données existantes !
 
+### `seed-admin.js` - Création d'un compte administrateur
+
+Crée un compte administrateur dans la base de données.
+
+**Méthode 1 : Avec arguments de ligne de commande (recommandé)**
+
+```bash
+node scripts/seed-admin.js <email> <password> <phoneNumber> [firstName] [lastName]
+```
+
+Exemple :
+
+```bash
+node scripts/seed-admin.js admin@allotracteur.com MotDePasse123 +221771234567 Admin AlloTracteur
+```
+
+**Méthode 2 : Avec npm et arguments**
+
+```bash
+npm run seed:admin -- admin@allotracteur.com MotDePasse123 +221771234567 Admin AlloTracteur
+```
+
+**Méthode 3 : Avec variables d'environnement**
+
+```bash
+ADMIN_EMAIL=admin@allotracteur.com \
+ADMIN_PASSWORD=MotDePasse123 \
+ADMIN_PHONE=+221771234567 \
+ADMIN_FIRST_NAME=Admin \
+ADMIN_LAST_NAME=AlloTracteur \
+npm run seed:admin
+```
+
+> **Note :** Si vous utilisez `npm run seed:admin` sans arguments ni variables d'environnement, le script vous demandera de fournir les paramètres requis.
+
+**Ce script :**
+- Vérifie si un administrateur avec cet email ou ce numéro de téléphone existe déjà
+- Crée un compte administrateur avec le rôle `admin`
+- Hash automatiquement le mot de passe
+- Marque le compte comme vérifié (`isVerified: true`)
+- Affiche les informations de l'administrateur créé
+
+**Paramètres requis :**
+- `email` : Email de l'administrateur (unique)
+- `password` : Mot de passe (sera hashé automatiquement)
+- `phoneNumber` : Numéro de téléphone (unique, format: +221771234567)
+
+**Paramètres optionnels :**
+- `firstName` : Prénom (défaut: "Admin")
+- `lastName` : Nom (défaut: "AlloTracteur")
+
 ## Initialisation automatique en production
 
 Depuis la version mise à jour, les tables sont créées **automatiquement** au premier démarrage de l'application en production si elles n'existent pas.
