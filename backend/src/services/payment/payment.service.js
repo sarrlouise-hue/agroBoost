@@ -5,6 +5,8 @@ const { AppError, ERROR_MESSAGES } = require('../../utils/errors');
 const logger = require('../../utils/logger');
 const Payment = require('../../models/Payment');
 const Booking = require('../../models/Booking');
+const notificationService = require('../notification/notification.service');
+const { NOTIFICATION_TYPES } = require('../../config/constants');
 
 /**
  * Service pour les opérations sur les paiements
@@ -138,6 +140,27 @@ class PaymentService {
             status: Booking.STATUS.CONFIRMED,
           });
           logger.info(`Réservation ${booking.id} confirmée après paiement réussi`);
+        }
+
+        // Notifications paiement réussi
+        try {
+          await notificationService.createNotification(
+            payment.userId,
+            NOTIFICATION_TYPES.PAYMENT,
+            'Paiement réussi',
+            `Votre paiement pour la réservation ${payment.bookingId} a été confirmé.`,
+            { paymentId: payment.id, bookingId: payment.bookingId, amount }
+          );
+
+          await notificationService.createNotification(
+            payment.providerId,
+            NOTIFICATION_TYPES.PAYMENT,
+            'Paiement reçu',
+            'Un paiement a été confirmé pour l\'une de vos réservations.',
+            { paymentId: payment.id, bookingId: payment.bookingId, amount }
+          );
+        } catch (notifyError) {
+          logger.warn('Erreur notification paiement réussi:', notifyError);
         }
       }
 

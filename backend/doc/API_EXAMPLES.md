@@ -220,6 +220,42 @@ curl -X GET http://localhost:3000/api/users/profile \
   -H "Authorization: Bearer votre-token-ici"
 ```
 
+### 1.1. Gestion Admin des Utilisateurs
+
+#### Obtenir tous les utilisateurs avec filtres avancés (admin)
+
+```bash
+curl -X GET "http://localhost:3000/api/users?page=1&limit=20&role=provider&isVerified=true&search=amadou&startDate=2025-01-01&endDate=2025-01-31" \
+  -H "Authorization: Bearer votre-token-admin-ici"
+```
+
+#### Obtenir un utilisateur spécifique (admin)
+
+```bash
+curl -X GET http://localhost:3000/api/users/user-id-123 \
+  -H "Authorization: Bearer votre-token-admin-ici"
+```
+
+#### Modifier un utilisateur (admin)
+
+```bash
+curl -X PUT http://localhost:3000/api/users/user-id-123 \
+  -H "Authorization: Bearer votre-token-admin-ici" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Nouveau prénom",
+    "role": "provider",
+    "isVerified": true
+  }'
+```
+
+#### Supprimer un utilisateur (admin)
+
+```bash
+curl -X DELETE http://localhost:3000/api/users/user-id-123 \
+  -H "Authorization: Bearer votre-token-admin-ici"
+```
+
 **Réponse réussie (200):**
 
 ```json
@@ -282,6 +318,34 @@ curl -X PUT http://localhost:3000/api/users/language \
 ---
 
 ## Gestion des Prestataires
+
+### 1.1. Gestion Admin des Prestataires
+
+#### Obtenir tous les prestataires avec filtres avancés
+
+```bash
+curl -X GET "http://localhost:3000/api/providers?page=1&limit=20&isApproved=true&search=agri&userId=user-id-123&startDate=2025-01-01&endDate=2025-01-31"
+```
+
+#### Modifier un prestataire (admin)
+
+```bash
+curl -X PUT http://localhost:3000/api/providers/provider-id-123 \
+  -H "Authorization: Bearer votre-token-admin-ici" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "businessName": "Nouveau nom",
+    "isApproved": true,
+    "rating": 4.5
+  }'
+```
+
+#### Supprimer un prestataire (admin)
+
+```bash
+curl -X DELETE http://localhost:3000/api/providers/provider-id-123 \
+  -H "Authorization: Bearer votre-token-admin-ici"
+```
 
 ### 1. Inscription prestataire
 
@@ -478,6 +542,22 @@ curl -X PUT http://localhost:3000/api/providers/profile/location \
 
 ## Gestion des Réservations
 
+### 1.1. Gestion Admin des Réservations
+
+#### Obtenir toutes les réservations avec filtres avancés (admin)
+
+```bash
+curl -X GET "http://localhost:3000/api/bookings?page=1&limit=20&status=completed&search=amadou&startDate=2025-01-01&endDate=2025-01-31&bookingDateStart=2025-01-15&bookingDateEnd=2025-01-20" \
+  -H "Authorization: Bearer votre-token-admin-ici"
+```
+
+#### Supprimer une réservation (admin)
+
+```bash
+curl -X DELETE http://localhost:3000/api/bookings/booking-id-123 \
+  -H "Authorization: Bearer votre-token-admin-ici"
+```
+
 ### 1. Créer une réservation
 
 ```bash
@@ -622,6 +702,188 @@ curl -X POST http://localhost:3000/api/payments/webhook/paytech \
 
 ---
 
+## Gestion des Avis
+
+### 1. Créer un avis
+
+```bash
+curl -X POST http://localhost:3000/api/reviews \
+  -H "Authorization: Bearer votre-token-ici" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "bookingId": "booking-id-123",
+    "rating": 5,
+    "comment": "Excellent service, très professionnel"
+  }'
+```
+
+**Réponse réussie (201):**
+
+```json
+{
+  "success": true,
+  "message": "Avis créé avec succès",
+  "data": {
+    "id": "review-id-123",
+    "bookingId": "booking-id-123",
+    "userId": "user-id-123",
+    "providerId": "provider-id-123",
+    "serviceId": "service-id-123",
+    "rating": 5,
+    "comment": "Excellent service, très professionnel",
+    "createdAt": "2025-01-15T10:00:00.000Z"
+  }
+}
+```
+
+### 2. Obtenir les avis d'un service
+
+```bash
+curl -X GET "http://localhost:3000/api/reviews/service/service-id-123?page=1&limit=20"
+```
+
+### 3. Obtenir les avis d'un prestataire
+
+```bash
+curl -X GET "http://localhost:3000/api/reviews/provider/provider-id-123?page=1&limit=20"
+```
+
+### 4. Modifier un avis
+
+```bash
+curl -X PUT http://localhost:3000/api/reviews/review-id-123 \
+  -H "Authorization: Bearer votre-token-ici" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "rating": 4,
+    "comment": "Service correct mais peut être amélioré"
+  }'
+```
+
+### 5. Supprimer un avis
+
+```bash
+# Utilisateur normal : peut supprimer seulement ses propres avis
+curl -X DELETE http://localhost:3000/api/reviews/review-id-123 \
+  -H "Authorization: Bearer votre-token-ici"
+
+# Admin : peut supprimer n'importe quel avis
+curl -X DELETE http://localhost:3000/api/reviews/review-id-123 \
+  -H "Authorization: Bearer votre-token-admin-ici"
+```
+
+---
+
+## Gestion des Notifications
+
+### 1. Obtenir les notifications
+
+```bash
+curl -X GET "http://localhost:3000/api/notifications?page=1&limit=20&isRead=false" \
+  -H "Authorization: Bearer votre-token-ici"
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Notifications récupérées avec succès",
+  "data": [
+    {
+      "id": "notification-id-123",
+      "type": "booking",
+      "title": "Nouvelle réservation",
+      "message": "Vous avez reçu une nouvelle réservation pour votre service",
+      "isRead": false,
+      "metadata": {
+        "bookingId": "booking-id-123"
+      },
+      "createdAt": "2025-01-15T10:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 15,
+    "totalPages": 1
+  }
+}
+```
+
+### 2. Marquer une notification comme lue
+
+```bash
+curl -X PATCH http://localhost:3000/api/notifications/notification-id-123/read \
+  -H "Authorization: Bearer votre-token-ici"
+```
+
+### 3. Marquer toutes les notifications comme lues
+
+```bash
+curl -X PATCH http://localhost:3000/api/notifications/read-all \
+  -H "Authorization: Bearer votre-token-ici"
+```
+
+### 4. Obtenir toutes les notifications (admin)
+
+```bash
+curl -X GET "http://localhost:3000/api/notifications/all?page=1&limit=20&userId=user-id-123&type=booking&isRead=false&startDate=2025-01-01&endDate=2025-01-31" \
+  -H "Authorization: Bearer votre-token-admin-ici"
+```
+
+### 5. Obtenir une notification spécifique (admin)
+
+```bash
+curl -X GET http://localhost:3000/api/notifications/notification-id-123 \
+  -H "Authorization: Bearer votre-token-admin-ici"
+```
+
+### 6. Supprimer une notification (admin)
+
+```bash
+curl -X DELETE http://localhost:3000/api/notifications/notification-id-123 \
+  -H "Authorization: Bearer votre-token-admin-ici"
+```
+
+---
+
+## Historique Utilisateur
+
+### 1. Historique des réservations
+
+```bash
+curl -X GET "http://localhost:3000/api/users/bookings?status=completed&page=1&limit=20" \
+  -H "Authorization: Bearer votre-token-ici"
+```
+
+### 2. Historique des avis donnés
+
+```bash
+curl -X GET "http://localhost:3000/api/users/reviews?page=1&limit=20" \
+  -H "Authorization: Bearer votre-token-ici"
+```
+
+---
+
+## Historique Prestataire
+
+### 1. Historique des réservations reçues
+
+```bash
+curl -X GET "http://localhost:3000/api/providers/bookings?status=completed&page=1&limit=20" \
+  -H "Authorization: Bearer votre-token-ici"
+```
+
+### 2. Historique des avis reçus
+
+```bash
+curl -X GET "http://localhost:3000/api/providers/reviews?page=1&limit=20" \
+  -H "Authorization: Bearer votre-token-ici"
+```
+
+---
+
 ## Codes d'erreur
 
 - `400` - Erreur de validation ou requête invalide
@@ -643,3 +905,9 @@ curl -X POST http://localhost:3000/api/payments/webhook/paytech \
 - Les réservations vérifient automatiquement la disponibilité (anti-double réservation)
 - Les paiements PayTech nécessitent la configuration des credentials dans les variables d'environnement
 - Les images sont uploadées via Cloudinary (configuration requise)
+- **Avis** : Un avis ne peut être créé que pour une réservation terminée (`status: completed`)
+- **Avis** : Un seul avis par réservation (pas de doublon)
+- **Avis** : La note moyenne du prestataire est automatiquement recalculée après création/modification/suppression d'un avis
+- **Notifications** : Les notifications sont créées automatiquement lors des événements (réservation, paiement, avis)
+- **Notifications** : Les types de notifications disponibles : `booking`, `payment`, `review`, `system`
+- **Historique** : Les endpoints d'historique permettent de filtrer par statut et paginer les résultats

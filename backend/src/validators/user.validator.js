@@ -71,6 +71,58 @@ const updateLanguageSchema = Joi.object({
 });
 
 /**
+ * Schéma de validation pour la mise à jour d'un utilisateur par admin
+ */
+const updateUserByAdminSchema = Joi.object({
+  firstName: Joi.string()
+    .min(2)
+    .max(50)
+    .optional()
+    .messages({
+      'string.min': 'Le prénom doit contenir au moins 2 caractères',
+      'string.max': 'Le prénom ne doit pas dépasser 50 caractères',
+    }),
+  lastName: Joi.string()
+    .min(2)
+    .max(50)
+    .optional()
+    .messages({
+      'string.min': 'Le nom doit contenir au moins 2 caractères',
+      'string.max': 'Le nom ne doit pas dépasser 50 caractères',
+    }),
+  email: Joi.string()
+    .email()
+    .optional()
+    .allow(null, '')
+    .messages({
+      'string.email': 'L\'email doit être une adresse email valide',
+    }),
+  phoneNumber: Joi.string()
+    .pattern(/^\+[1-9]\d{1,14}$/)
+    .optional()
+    .messages({
+      'string.pattern.base': 'Le numéro de téléphone doit être au format international avec le préfixe +',
+    }),
+  role: Joi.string()
+    .valid('user', 'provider', 'admin')
+    .optional()
+    .messages({
+      'any.only': 'Le rôle doit être "user", "provider" ou "admin"',
+    }),
+  isVerified: Joi.boolean()
+    .optional(),
+  address: Joi.string()
+    .optional()
+    .allow(null, ''),
+  language: Joi.string()
+    .valid('fr', 'wolof')
+    .optional()
+    .messages({
+      'any.only': 'La langue doit être "fr" ou "wolof"',
+    }),
+});
+
+/**
  * Valider les données de la requête
  */
 const validate = (schema) => {
@@ -96,6 +148,7 @@ module.exports = {
   updateProfileSchema,
   updateLocationSchema,
   updateLanguageSchema,
+  updateUserByAdminSchema,
   validate,
 };
 

@@ -78,7 +78,7 @@ class ProviderService {
   }
 
   /**
-   * Obtenir tous les prestataires avec pagination
+   * Obtenir tous les prestataires avec pagination et filtres avancés
    */
   async getAllProviders(options = {}) {
     const {
@@ -86,6 +86,10 @@ class ProviderService {
       limit = PAGINATION.DEFAULT_LIMIT,
       isApproved = null,
       minRating = null,
+      search = null,
+      userId = null,
+      startDate = null,
+      endDate = null,
     } = options;
 
     const { count, rows } = await providerRepository.findAll({
@@ -93,6 +97,10 @@ class ProviderService {
       limit,
       isApproved,
       minRating,
+      search,
+      userId,
+      startDate,
+      endDate,
     });
 
     return {
@@ -104,6 +112,43 @@ class ProviderService {
         totalPages: Math.ceil(count / limit),
       },
     };
+  }
+
+  /**
+   * Mettre à jour un prestataire par ID (admin seulement)
+   */
+  async updateProviderById(providerId, updateData) {
+    const allowedFields = ['businessName', 'description', 'documents', 'isApproved', 'rating'];
+    const filteredData = {};
+    
+    for (const field of allowedFields) {
+      if (updateData[field] !== undefined) {
+        filteredData[field] = updateData[field];
+      }
+    }
+
+    const provider = await providerRepository.updateById(providerId, filteredData);
+    if (!provider) {
+      throw new AppError(ERROR_MESSAGES.NOT_FOUND, 404);
+    }
+    return provider;
+  }
+
+  /**
+   * Supprimer un prestataire (admin seulement)
+   */
+  async deleteProviderById(providerId) {
+    const provider = await providerRepository.findById(providerId);
+    if (!provider) {
+      throw new AppError(ERROR_MESSAGES.NOT_FOUND, 404);
+    }
+
+    const deleted = await providerRepository.deleteById(providerId);
+    if (!deleted) {
+      throw new AppError('Erreur lors de la suppression du prestataire', 500);
+    }
+
+    return { deleted: true, providerId };
   }
 
   /**

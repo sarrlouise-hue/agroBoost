@@ -294,6 +294,42 @@ Client → Route → Middleware (Auth) → Controller → Service → Repository
 }
 ```
 
+### Review *(prévu – Sprint S3 « Avis & Notes »)*
+
+Ces champs suivent le plan général AgroBoost et seront introduits lors de l’implémentation du module d’avis.
+
+```javascript
+{
+  id: UUID,
+  bookingId: UUID,     // Réservation liée
+  userId: UUID,        // Auteur de l'avis
+  providerId: UUID,    // Prestataire concerné
+  serviceId: UUID,     // Service concerné
+  rating: Integer (1-5),
+  comment: Text,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### Notification *(prévu – Sprint S3 « Notifications »)*
+
+Le backend utilise déjà des types de notification dans `constants.js` (`BOOKING`, `PAYMENT`, `REVIEW`, `SYSTEM`). La persistance et l’envoi multi‑canaux seront ajoutés dans S3.
+
+```javascript
+{
+  id: UUID,
+  userId: UUID,
+  type: Enum ['booking', 'payment', 'review', 'system'],
+  title: String,
+  message: Text,
+  isRead: Boolean,
+  metadata: JSONB (optionnel),
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
 ## Relations entre Modèles
 
 - **User** `hasOne` **Provider** (via `userId`)
@@ -312,6 +348,15 @@ Client → Route → Middleware (Auth) → Controller → Service → Repository
 - **Payment** `belongsTo` **User** (via `userId`)
 - **Provider** `hasMany` **Payment** (via `providerId`)
 - **Payment** `belongsTo` **Provider** (via `providerId`)
+
+Relations supplémentaires prévues pour S3 (non encore implémentées dans le code) :
+
+- **Booking** `hasOne` **Review` (via `bookingId`)
+- **Review** `belongsTo` **Booking` (via `bookingId`)
+- **User** `hasMany` **Review` (via `userId`)
+- **Provider** `hasMany` **Review` (via `providerId`)
+- **Service** `hasMany` **Review` (via `serviceId`)
+- **User** `hasMany` **Notification` (via `userId`)
 
 ## Couche Data-Access (Repositories)
 

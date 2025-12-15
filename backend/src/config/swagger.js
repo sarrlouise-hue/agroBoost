@@ -583,6 +583,98 @@ const options = {
             },
           },
         },
+        Review: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'ID unique de l\'avis',
+            },
+            bookingId: {
+              type: 'string',
+              description: 'ID de la réservation associée',
+            },
+            userId: {
+              type: 'string',
+              description: 'ID de l\'utilisateur (auteur de l\'avis)',
+            },
+            providerId: {
+              type: 'string',
+              description: 'ID du prestataire concerné',
+            },
+            serviceId: {
+              type: 'string',
+              description: 'ID du service concerné',
+            },
+            rating: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 5,
+              description: 'Note de 1 à 5',
+              example: 5,
+            },
+            comment: {
+              type: 'string',
+              description: 'Commentaire libre',
+              example: 'Très bon service, je recommande.',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
+        Notification: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'ID unique de la notification',
+            },
+            userId: {
+              type: 'string',
+              description: 'ID de l\'utilisateur cible',
+            },
+            type: {
+              type: 'string',
+              enum: ['booking', 'payment', 'review', 'system'],
+              description: 'Type de notification',
+              example: 'booking',
+            },
+            title: {
+              type: 'string',
+              description: 'Titre court de la notification',
+              example: 'Réservation confirmée',
+            },
+            message: {
+              type: 'string',
+              description: 'Message détaillé',
+              example: 'Votre réservation a été confirmée.',
+            },
+            isRead: {
+              type: 'boolean',
+              description: 'Indique si la notification a été lue',
+              example: false,
+            },
+            metadata: {
+              type: 'object',
+              additionalProperties: true,
+              description: 'Métadonnées supplémentaires (IDs, montants, etc.)',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
         Maintenance: {
           type: 'object',
           properties: {
@@ -926,6 +1018,130 @@ const options = {
             },
           },
         },
+        UpdateProviderByAdminRequest: {
+          type: 'object',
+          properties: {
+            businessName: {
+              type: 'string',
+              minLength: 2,
+              maxLength: 100,
+              example: 'Nouveau nom',
+            },
+            description: {
+              type: 'string',
+              example: 'Nouvelle description',
+            },
+            documents: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              example: ['nouveau-doc.pdf'],
+            },
+            isApproved: {
+              type: 'boolean',
+              example: true,
+              description: 'Statut d\'approbation (admin seulement)',
+            },
+            rating: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              maximum: 5,
+              example: 4.5,
+              description: 'Note moyenne (admin seulement)',
+            },
+          },
+        },
+        UpdateUserByAdminRequest: {
+          type: 'object',
+          properties: {
+            firstName: {
+              type: 'string',
+              minLength: 2,
+              maxLength: 50,
+              example: 'Nouveau prénom',
+            },
+            lastName: {
+              type: 'string',
+              minLength: 2,
+              maxLength: 50,
+              example: 'Nouveau nom',
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              example: 'nouveau@example.com',
+            },
+            phoneNumber: {
+              type: 'string',
+              pattern: '^\\+[1-9]\\d{1,14}$',
+              example: '+221771234568',
+              description: 'Numéro de téléphone au format international',
+            },
+            role: {
+              type: 'string',
+              enum: ['user', 'provider', 'admin'],
+              example: 'provider',
+              description: 'Rôle de l\'utilisateur (admin seulement)',
+            },
+            isVerified: {
+              type: 'boolean',
+              example: true,
+              description: 'Statut de vérification (admin seulement)',
+            },
+            address: {
+              type: 'string',
+              example: 'Nouvelle adresse',
+            },
+            language: {
+              type: 'string',
+              enum: ['fr', 'wolof'],
+              example: 'wolof',
+            },
+          },
+        },
+        CreateReviewRequest: {
+          type: 'object',
+          required: ['bookingId', 'rating'],
+          properties: {
+            bookingId: {
+              type: 'string',
+              format: 'uuid',
+              example: 'booking-id-123',
+              description: 'ID de la réservation terminée',
+            },
+            rating: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 5,
+              example: 5,
+              description: 'Note de 1 à 5',
+            },
+            comment: {
+              type: 'string',
+              example: 'Excellent service, très professionnel',
+              description: 'Commentaire libre (optionnel)',
+            },
+          },
+        },
+        UpdateReviewRequest: {
+          type: 'object',
+          properties: {
+            rating: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 5,
+              example: 4,
+              description: 'Note de 1 à 5',
+            },
+            comment: {
+              type: 'string',
+              example: 'Service correct mais peut être amélioré',
+              description: 'Commentaire libre',
+            },
+          },
+        },
         CreateServiceRequest: {
           type: 'object',
           required: ['serviceType', 'name'],
@@ -1122,6 +1338,18 @@ const options = {
       {
         name: 'Maintenances',
         description: 'Gestion des maintenances et réparations de matériel',
+      },
+      {
+        name: 'Reviews',
+        description: 'Gestion des avis et évaluations',
+      },
+      {
+        name: 'Notifications',
+        description: 'Gestion des notifications utilisateur',
+      },
+      {
+        name: 'Admin',
+        description: 'Endpoints d\'administration (admin seulement) - Gestion complète des utilisateurs, prestataires, réservations, avis et notifications',
       },
     ],
   },

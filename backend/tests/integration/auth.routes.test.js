@@ -112,6 +112,19 @@ jest.mock('../../src/models/Service', () => {
   return mockModel;
 });
 
+// Mock partiel du service OTP pour éviter la dépendance forte à la base et à l'email
+jest.mock('../../src/services/auth/otp.service', () => {
+  const actual = jest.requireActual('../../src/services/auth/otp.service');
+  return {
+    ...actual,
+    createOTP: jest.fn().mockResolvedValue({
+      id: 'otp-id-123',
+      email: 'amadou@example.com',
+      code: '123456',
+    }),
+  };
+});
+
 const request = require('supertest');
 const express = require('express');
 const routes = require('../../src/routes');
@@ -152,7 +165,7 @@ describe('Routes d\'authentification', () => {
       OTP.update = jest.fn().mockResolvedValue([1]); // Sequelize retourne [nombre de lignes affectées]
       OTP.create = jest.fn().mockResolvedValue({
         id: 'otp-id-123',
-        phoneNumber: userData.phoneNumber,
+        email: userData.email,
         code: '123456',
         expiresAt: new Date(),
         isUsed: false,
@@ -186,12 +199,12 @@ describe('Routes d\'authentification', () => {
 
   describe('POST /api/auth/verify-otp', () => {
     it('devrait vérifier un OTP valide', async () => {
-      const phoneNumber = '+221771234567';
+      const email = 'amadou@example.com';
       const code = '123456';
 
       const mockOTP = {
         id: 'otp-id-123',
-        phoneNumber,
+        email,
         code,
         expiresAt: new Date(Date.now() + 5 * 60 * 1000),
         isUsed: false,
@@ -200,10 +213,10 @@ describe('Routes d\'authentification', () => {
 
       const mockUser = {
         id: 'user-id-123',
-        phoneNumber,
+        phoneNumber: '+221771234567',
         firstName: 'Amadou',
         lastName: 'Diallo',
-        email: 'amadou@example.com',
+        email,
         language: 'fr',
         role: 'user',
         isVerified: false,
@@ -216,7 +229,7 @@ describe('Routes d\'authentification', () => {
 
       const response = await request(app)
         .post('/api/auth/verify-otp')
-        .send({ phoneNumber, code })
+        .send({ email, code })
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -224,14 +237,14 @@ describe('Routes d\'authentification', () => {
     });
 
     it('devrait échouer avec un OTP invalide', async () => {
-      const phoneNumber = '+221771234567';
+      const email = 'amadou@example.com';
       const code = '000000';
 
       OTP.findOne = jest.fn().mockResolvedValue(null);
 
       const response = await request(app)
         .post('/api/auth/verify-otp')
-        .send({ phoneNumber, code })
+        .send({ email, code })
         .expect(400);
 
       expect(response.body.success).toBe(false);
@@ -281,12 +294,12 @@ describe('Routes d\'authentification', () => {
 
   describe('POST /api/auth/resend-otp', () => {
     it('devrait renvoyer un OTP', async () => {
-      const phoneNumber = '+221771234567';
+      const email = 'amadou@example.com';
 
       OTP.update = jest.fn().mockResolvedValue([1]); // Sequelize retourne [nombre de lignes affectées]
       OTP.create = jest.fn().mockResolvedValue({
         id: 'otp-id-123',
-        phoneNumber,
+        email,
         code: '123456',
         expiresAt: new Date(),
         isUsed: false,
@@ -294,7 +307,7 @@ describe('Routes d\'authentification', () => {
 
       const response = await request(app)
         .post('/api/auth/resend-otp')
-        .send({ phoneNumber })
+        .send({ email })
         .expect(200);
 
       expect(response.body.success).toBe(true);

@@ -73,7 +73,7 @@ class BookingRepository {
   }
 
   /**
-   * Trouver toutes les réservations avec filtres
+   * Trouver toutes les réservations avec filtres avancés
    */
   async findAll(options = {}) {
     const {
@@ -83,6 +83,11 @@ class BookingRepository {
       providerId = null,
       serviceId = null,
       status = null,
+      search = null,
+      startDate = null,
+      endDate = null,
+      bookingDateStart = null,
+      bookingDateEnd = null,
     } = options;
 
     const where = {};
@@ -91,17 +96,51 @@ class BookingRepository {
     if (providerId) where.providerId = providerId;
     if (serviceId) where.serviceId = serviceId;
     if (status) where.status = status;
+    if (startDate || endDate) {
+      where.createdAt = {};
+      if (startDate) where.createdAt[Op.gte] = new Date(startDate);
+      if (endDate) where.createdAt[Op.lte] = new Date(endDate);
+    }
+    if (bookingDateStart || bookingDateEnd) {
+      where.bookingDate = {};
+      if (bookingDateStart) where.bookingDate[Op.gte] = bookingDateStart;
+      if (bookingDateEnd) where.bookingDate[Op.lte] = bookingDateEnd;
+    }
+
+    const includeOptions = [
+      {
+        association: 'user',
+        attributes: { exclude: ['password'] },
+        where: search
+          ? {
+              [Op.or]: [
+                { firstName: { [Op.iLike]: `%${search}%` } },
+                { lastName: { [Op.iLike]: `%${search}%` } },
+                { email: { [Op.iLike]: `%${search}%` } },
+                { phoneNumber: { [Op.iLike]: `%${search}%` } },
+              ],
+            }
+          : undefined,
+        required: !!search,
+      },
+      { association: 'service' },
+      {
+        association: 'provider',
+        include: [
+          {
+            association: 'user',
+            attributes: { exclude: ['password'] },
+          },
+        ],
+      },
+      { association: 'payment' },
+    ];
 
     const offset = (page - 1) * limit;
 
     return Booking.findAndCountAll({
       where,
-      include: [
-        { association: 'user', attributes: { exclude: ['password'] } },
-        { association: 'service' },
-        { association: 'provider', include: [{ association: 'user', attributes: { exclude: ['password'] } }] },
-        { association: 'payment' },
-      ],
+      include: includeOptions,
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['createdAt', 'DESC']],

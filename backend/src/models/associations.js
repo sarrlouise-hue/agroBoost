@@ -9,6 +9,8 @@ const Service = require('./Service');
 const Booking = require('./Booking');
 const Payment = require('./Payment');
 const Maintenance = require('./Maintenance');
+const Review = require('./Review');
+const Notification = require('./Notification');
 
 // Association User <-> Provider
 Provider.belongsTo(User, {
@@ -106,6 +108,66 @@ Provider.hasMany(Payment, {
   as: 'payments',
 });
 
+// Association Booking <-> Review
+Review.belongsTo(Booking, {
+  foreignKey: 'bookingId',
+  as: 'booking',
+  onDelete: 'CASCADE',
+});
+
+Booking.hasOne(Review, {
+  foreignKey: 'bookingId',
+  as: 'review',
+});
+
+// Association User <-> Review
+Review.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+  onDelete: 'CASCADE',
+});
+
+User.hasMany(Review, {
+  foreignKey: 'userId',
+  as: 'reviews',
+});
+
+// Association Provider <-> Review
+Review.belongsTo(Provider, {
+  foreignKey: 'providerId',
+  as: 'provider',
+  onDelete: 'CASCADE',
+});
+
+Provider.hasMany(Review, {
+  foreignKey: 'providerId',
+  as: 'reviews',
+});
+
+// Association Service <-> Review
+Review.belongsTo(Service, {
+  foreignKey: 'serviceId',
+  as: 'service',
+  onDelete: 'CASCADE',
+});
+
+Service.hasMany(Review, {
+  foreignKey: 'serviceId',
+  as: 'reviews',
+});
+
+// Association User <-> Notification
+Notification.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+  onDelete: 'CASCADE',
+});
+
+User.hasMany(Notification, {
+  foreignKey: 'userId',
+  as: 'notifications',
+});
+
 // Association Service <-> Maintenance
 Maintenance.belongsTo(Service, {
   foreignKey: 'serviceId',
@@ -137,5 +199,7 @@ module.exports = {
   Booking,
   Payment,
   Maintenance,
+  Review,
+  Notification,
 };
 

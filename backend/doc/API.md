@@ -454,6 +454,240 @@ Authorization: Bearer votre-token-admin-ici
 
 ---
 
+### GET `/users/:id`
+
+Obtenir un utilisateur spécifique par ID (admin seulement).
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-admin-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Utilisateur récupéré avec succès",
+  "data": {
+    "id": "user-id-123",
+    "phoneNumber": "+221771234567",
+    "firstName": "Amadou",
+    "lastName": "Diallo",
+    "email": "amadou@example.com",
+    "role": "user",
+    "isVerified": true,
+    ...
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+- `403` - Accès interdit (admin seulement)
+- `404` - Utilisateur non trouvé
+
+---
+
+### PUT `/users/:id`
+
+Mettre à jour un utilisateur (admin seulement).
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-admin-ici
+```
+
+**Body:**
+
+```json
+{
+  "firstName": "Nouveau prénom",
+  "lastName": "Nouveau nom",
+  "email": "nouveau@example.com",
+  "phoneNumber": "+221771234568",
+  "role": "provider",
+  "isVerified": true,
+  "address": "Nouvelle adresse",
+  "language": "wolof"
+}
+```
+
+**Champs modifiables :** `firstName`, `lastName`, `email`, `phoneNumber`, `role`, `isVerified`, `address`, `language`
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Utilisateur mis à jour avec succès",
+  "data": { ... }
+}
+```
+
+**Erreurs possibles:**
+
+- `400` - Erreur de validation
+- `401` - Non autorisé
+- `403` - Accès interdit (admin seulement)
+- `404` - Utilisateur non trouvé
+
+---
+
+### DELETE `/users/:id`
+
+Supprimer un utilisateur (admin seulement).
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-admin-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Utilisateur supprimé avec succès",
+  "data": {
+    "deleted": true,
+    "userId": "user-id-123"
+  }
+}
+```
+
+**Note:** La suppression est en cascade. Tous les éléments associés (Provider, Bookings, Payments, Reviews, Notifications) seront également supprimés.
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+- `403` - Accès interdit (admin seulement)
+- `404` - Utilisateur non trouvé
+
+---
+
+### GET `/users/bookings`
+
+Obtenir l'historique des réservations de l'utilisateur connecté.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Query Parameters:**
+
+- `page` (optionnel) : Numéro de page (défaut: 1)
+- `limit` (optionnel) : Nombre d'éléments par page (défaut: 20)
+- `status` (optionnel) : Filtrer par statut (`pending`, `confirmed`, `completed`, `cancelled`)
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Historique des réservations récupéré avec succès",
+  "data": [
+    {
+      "id": "booking-id-123",
+      "serviceId": "service-id-123",
+      "providerId": "provider-id-123",
+      "bookingDate": "2025-01-15",
+      "startTime": "08:00",
+      "endTime": "17:00",
+      "totalPrice": 40000,
+      "status": "completed",
+      "service": { ... },
+      "provider": { ... }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 15,
+    "totalPages": 1
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+
+---
+
+### GET `/users/reviews`
+
+Obtenir l'historique des avis donnés par l'utilisateur connecté.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Query Parameters:**
+
+- `page` (optionnel) : Numéro de page (défaut: 1)
+- `limit` (optionnel) : Nombre d'éléments par page (défaut: 20)
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Historique des avis récupéré avec succès",
+  "data": [
+    {
+      "id": "review-id-123",
+      "bookingId": "booking-id-123",
+      "serviceId": "service-id-123",
+      "providerId": "provider-id-123",
+      "rating": 5,
+      "comment": "Excellent service",
+      "service": { ... },
+      "provider": { ... },
+      "booking": { ... }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 8,
+    "totalPages": 1
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+
+---
+
+Obtenir l'historique des avis laissés par l'utilisateur connecté.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Query params (optionnels):**
+
+- `page`, `limit` – pagination
+
+**Réponse réussie (200):**
+
+Retourne une liste paginée d'avis (schéma `Review`) avec pagination.
+
+---
+
 ## 9. Gestion des Prestataires
 
 ### POST `/providers/register`
@@ -604,10 +838,14 @@ Obtenir tous les prestataires
 
 **Query Parameters:**
 
-- `page` (optionnel) : Numéro de page
-- `limit` (optionnel) : Nombre d'éléments par page
+- `page` (optionnel) : Numéro de page (défaut: 1)
+- `limit` (optionnel) : Nombre d'éléments par page (défaut: 20)
 - `isApproved` (optionnel) : Filtrer par statut d'approbation (true/false)
 - `minRating` (optionnel) : Note minimale
+- `search` (optionnel) : Recherche dans nom d'entreprise, description, nom/prénom/email utilisateur
+- `userId` (optionnel) : Filtrer par ID utilisateur (admin seulement)
+- `startDate` (optionnel) : Date de début pour filtrer par date de création (format: YYYY-MM-DD)
+- `endDate` (optionnel) : Date de fin pour filtrer par date de création (format: YYYY-MM-DD)
 
 **Réponse réussie (200):**
 
@@ -619,6 +857,82 @@ Obtenir tous les prestataires
   "pagination": { ... }
 }
 ```
+
+---
+
+### PUT `/providers/:id`
+
+Mettre à jour un prestataire (admin seulement)
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-admin-ici
+```
+
+**Body:**
+
+```json
+{
+  "businessName": "Nouveau nom",
+  "description": "Nouvelle description",
+  "documents": ["nouveau-doc.pdf"],
+  "isApproved": true,
+  "rating": 4.5
+}
+```
+
+**Champs modifiables :** `businessName`, `description`, `documents`, `isApproved`, `rating`
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Prestataire mis à jour avec succès",
+  "data": { ... }
+}
+```
+
+**Erreurs possibles:**
+
+- `400` - Erreur de validation
+- `401` - Non autorisé
+- `403` - Accès interdit (admin seulement)
+- `404` - Prestataire non trouvé
+
+---
+
+### DELETE `/providers/:id`
+
+Supprimer un prestataire (admin seulement)
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-admin-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Prestataire supprimé avec succès",
+  "data": {
+    "deleted": true,
+    "providerId": "provider-id-123"
+  }
+}
+```
+
+**Note:** La suppression est en cascade. Tous les services et réservations associés seront également supprimés.
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+- `403` - Accès interdit (admin seulement)
+- `404` - Prestataire non trouvé
 
 ---
 
@@ -701,6 +1015,108 @@ Authorization: Bearer votre-token-admin-ici
 
 ---
 
+### GET `/providers/bookings`
+
+Obtenir l'historique des réservations reçues par le prestataire connecté.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Query Parameters:**
+
+- `page` (optionnel) : Numéro de page (défaut: 1)
+- `limit` (optionnel) : Nombre d'éléments par page (défaut: 20)
+- `status` (optionnel) : Filtrer par statut (`pending`, `confirmed`, `completed`, `cancelled`)
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Historique des réservations récupéré avec succès",
+  "data": [
+    {
+      "id": "booking-id-123",
+      "userId": "user-id-123",
+      "serviceId": "service-id-123",
+      "bookingDate": "2025-01-15",
+      "startTime": "08:00",
+      "endTime": "17:00",
+      "totalPrice": 40000,
+      "status": "completed",
+      "user": { ... },
+      "service": { ... }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 45,
+    "totalPages": 3
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+- `403` - Accès interdit (prestataire ou admin seulement)
+
+---
+
+### GET `/providers/reviews`
+
+Obtenir l'historique des avis reçus par le prestataire connecté.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Query Parameters:**
+
+- `page` (optionnel) : Numéro de page (défaut: 1)
+- `limit` (optionnel) : Nombre d'éléments par page (défaut: 20)
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Historique des avis récupéré avec succès",
+  "data": [
+    {
+      "id": "review-id-123",
+      "bookingId": "booking-id-123",
+      "userId": "user-id-123",
+      "serviceId": "service-id-123",
+      "rating": 5,
+      "comment": "Excellent service",
+      "user": { ... },
+      "service": { ... },
+      "booking": { ... }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 32,
+    "totalPages": 2
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+- `403` - Accès interdit (prestataire ou admin seulement)
+
+---
+
 ### PUT `/providers/profile/location`
 
 Mettre à jour la géolocalisation du prestataire
@@ -742,6 +1158,48 @@ Authorization: Bearer votre-token-ici
 - `403` - Accès interdit (prestataire seulement)
 
 ---
+
+### GET `/providers/bookings`
+
+Obtenir les réservations reçues par le prestataire connecté.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Query params (optionnels):**
+
+- `page`, `limit` – pagination
+- `status` – filtrer par statut de réservation
+
+**Réponse réussie (200):**
+
+Retourne une liste paginée de réservations (`Booking`) pour le prestataire.
+
+---
+
+### GET `/providers/reviews`
+
+Obtenir les avis reçus par le prestataire connecté.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Query params (optionnels):**
+
+- `page`, `limit` – pagination
+
+**Réponse réussie (200):**
+
+Retourne une liste paginée d'avis (`Review`) pour le prestataire.
+
+---
+
 
 ## 10. Gestion des Services Agricoles
 
@@ -806,6 +1264,447 @@ Authorization: Bearer votre-token-ici
 - `400` - Erreur de validation (au moins un prix requis)
 - `401` - Non autorisé
 - `403` - Accès interdit (prestataire seulement) ou prestataire non approuvé
+
+---
+
+## 16. Gestion des Avis
+
+### POST `/reviews`
+
+Créer un avis pour une réservation terminée (utilisateur connecté).
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Body:**
+
+```json
+{
+  "bookingId": "booking-id-123",
+  "rating": 5,
+  "comment": "Très bon service"
+}
+```
+
+**Réponse réussie (201):**
+
+```json
+{
+  "success": true,
+  "message": "Avis créé avec succès",
+  "data": {
+    "id": "review-id-123",
+    "bookingId": "booking-id-123",
+    "userId": "user-id-123",
+    "providerId": "provider-id-123",
+    "serviceId": "service-id-123",
+    "rating": 5,
+    "comment": "Très bon service",
+    "booking": { ... },
+    "service": { ... },
+    "provider": { ... }
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `400` - Erreur de validation, réservation non terminée, ou avis déjà existant pour cette réservation
+- `401` - Non autorisé
+- `404` - Réservation non trouvée
+
+**Note:** La note moyenne du prestataire est automatiquement recalculée après la création d'un avis.
+
+---
+
+### GET `/reviews/service/:serviceId`
+
+Lister les avis d'un service donné (public).
+
+**Query Parameters:**
+
+- `page` (optionnel) : Numéro de page (défaut: 1)
+- `limit` (optionnel) : Nombre d'éléments par page (défaut: 20)
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Avis du service récupérés avec succès",
+  "data": [
+    {
+      "id": "review-id-123",
+      "userId": "user-id-123",
+      "rating": 5,
+      "comment": "Excellent service",
+      "user": {
+        "firstName": "Amadou",
+        "lastName": "Diallo"
+      },
+      "createdAt": "2025-01-15T10:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 12,
+    "totalPages": 1
+  }
+}
+```
+
+---
+
+### GET `/reviews/provider/:providerId`
+
+Lister les avis d'un prestataire donné (public).
+
+**Query Parameters:**
+
+- `page` (optionnel) : Numéro de page (défaut: 1)
+- `limit` (optionnel) : Nombre d'éléments par page (défaut: 20)
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Avis du prestataire récupérés avec succès",
+  "data": [
+    {
+      "id": "review-id-123",
+      "userId": "user-id-123",
+      "serviceId": "service-id-123",
+      "rating": 5,
+      "comment": "Excellent service",
+      "user": {
+        "firstName": "Amadou",
+        "lastName": "Diallo"
+      },
+      "service": {
+        "name": "Tracteur John Deere"
+      },
+      "createdAt": "2025-01-15T10:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 25,
+    "totalPages": 2
+  }
+}
+```
+
+---
+
+### PUT `/reviews/:id`
+
+Mettre à jour un avis existant de l'utilisateur connecté.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Body:**
+
+```json
+{
+  "rating": 4,
+  "comment": "Service correct mais peut être amélioré"
+}
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Avis mis à jour avec succès",
+  "data": {
+    "id": "review-id-123",
+    "rating": 4,
+    "comment": "Service correct mais peut être amélioré",
+    ...
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `400` - Erreur de validation
+- `401` - Non autorisé
+- `403` - Accès interdit (vous n'êtes pas l'auteur de cet avis)
+- `404` - Avis non trouvé
+
+**Note:** La note moyenne du prestataire est automatiquement recalculée après la mise à jour.
+
+---
+
+### DELETE `/reviews/:id`
+
+Supprimer un avis.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Avis supprimé avec succès",
+  "data": null
+}
+```
+
+**Règles d'autorisation:**
+
+- **Utilisateur normal** : Peut supprimer seulement ses propres avis
+- **Admin** : Peut supprimer n'importe quel avis
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+- `403` - Accès interdit (utilisateur normal ne peut pas supprimer l'avis d'un autre)
+- `404` - Avis non trouvé
+
+**Note:** La note moyenne du prestataire est automatiquement recalculée après la suppression.
+
+---
+
+## 17. Gestion des Notifications
+
+### GET `/notifications`
+
+Récupérer les notifications de l'utilisateur connecté.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Query Parameters:**
+
+- `page` (optionnel) : Numéro de page (défaut: 1)
+- `limit` (optionnel) : Nombre d'éléments par page (défaut: 20)
+- `isRead` (optionnel) : Filtrer par notifications lues (`true`) ou non lues (`false`)
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Notifications récupérées avec succès",
+  "data": [
+    {
+      "id": "notification-id-123",
+      "type": "booking",
+      "title": "Nouvelle réservation",
+      "message": "Vous avez reçu une nouvelle réservation pour votre service",
+      "isRead": false,
+      "metadata": {
+        "bookingId": "booking-id-123",
+        "serviceId": "service-id-123"
+      },
+      "createdAt": "2025-01-15T10:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 15,
+    "totalPages": 1
+  }
+}
+```
+
+**Types de notifications disponibles:**
+
+- `booking` - Notifications liées aux réservations (création, confirmation, annulation, complétion)
+- `payment` - Notifications liées aux paiements (paiement réussi, échec)
+- `review` - Notifications liées aux avis (nouvel avis reçu)
+- `system` - Notifications système
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+
+---
+
+### PATCH `/notifications/:id/read`
+
+Marquer une notification spécifique comme lue.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Notification marquée comme lue",
+  "data": {
+    "id": "notification-id-123",
+    "isRead": true,
+    ...
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+- `403` - Accès interdit (notification n'appartient pas à l'utilisateur)
+- `404` - Notification non trouvée
+
+---
+
+### PATCH `/notifications/read-all`
+
+Marquer toutes les notifications de l'utilisateur connecté comme lues.
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Toutes les notifications ont été marquées comme lues",
+  "data": {
+    "updatedCount": 15
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+
+---
+
+### GET `/notifications/all`
+
+Obtenir toutes les notifications (admin seulement)
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-admin-ici
+```
+
+**Query Parameters:**
+
+- `page` (optionnel) : Numéro de page (défaut: 1)
+- `limit` (optionnel) : Nombre d'éléments par page (défaut: 20)
+- `userId` (optionnel) : Filtrer par ID utilisateur
+- `type` (optionnel) : Filtrer par type (`booking`, `payment`, `review`, `system`)
+- `isRead` (optionnel) : Filtrer par statut de lecture (`true`/`false`)
+- `startDate` (optionnel) : Date de début pour filtrer par date de création (format: YYYY-MM-DD)
+- `endDate` (optionnel) : Date de fin pour filtrer par date de création (format: YYYY-MM-DD)
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Notifications récupérées avec succès",
+  "data": [ ... ],
+  "pagination": { ... }
+}
+```
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+- `403` - Accès interdit (admin seulement)
+
+---
+
+### GET `/notifications/:id`
+
+Obtenir une notification spécifique par ID (admin seulement)
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-admin-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Notification récupérée avec succès",
+  "data": {
+    "id": "notification-id-123",
+    "userId": "user-id-123",
+    "type": "booking",
+    "title": "Nouvelle réservation",
+    "message": "Vous avez reçu une nouvelle réservation",
+    "isRead": false,
+    "metadata": { ... },
+    "createdAt": "2025-01-15T10:00:00.000Z"
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+- `403` - Accès interdit (admin seulement)
+- `404` - Notification non trouvée
+
+---
+
+### DELETE `/notifications/:id`
+
+Supprimer une notification (admin seulement)
+
+**Headers:**
+
+```
+Authorization: Bearer votre-token-admin-ici
+```
+
+**Réponse réussie (200):**
+
+```json
+{
+  "success": true,
+  "message": "Notification supprimée avec succès",
+  "data": {
+    "deleted": true,
+    "notificationId": "notification-id-123"
+  }
+}
+```
+
+**Erreurs possibles:**
+
+- `401` - Non autorisé
+- `403` - Accès interdit (admin seulement)
+- `404` - Notification non trouvée
 
 ---
 
@@ -1200,12 +2099,19 @@ Authorization: Bearer votre-token-ici
 
 **Query Parameters:**
 
-- `page` (optionnel) : Numéro de page
-- `limit` (optionnel) : Nombre d'éléments par page
+- `page` (optionnel) : Numéro de page (défaut: 1)
+- `limit` (optionnel) : Nombre d'éléments par page (défaut: 20)
 - `status` (optionnel) : Filtrer par statut (`pending`, `confirmed`, `completed`, `cancelled`)
 - `userId` (optionnel) : Filtrer par utilisateur (admin seulement)
 - `providerId` (optionnel) : Filtrer par prestataire
 - `serviceId` (optionnel) : Filtrer par service
+- `search` (optionnel) : Recherche dans nom/prénom/email/téléphone de l'utilisateur
+- `startDate` (optionnel) : Date de début pour filtrer par date de création (format: YYYY-MM-DD)
+- `endDate` (optionnel) : Date de fin pour filtrer par date de création (format: YYYY-MM-DD)
+- `bookingDateStart` (optionnel) : Date de début pour filtrer par date de réservation (format: YYYY-MM-DD)
+- `bookingDateEnd` (optionnel) : Date de fin pour filtrer par date de réservation (format: YYYY-MM-DD)
+
+**Note:** Les utilisateurs normaux voient seulement leurs propres réservations. Les admins peuvent voir toutes les réservations.
 
 **Réponse réussie (200):**
 
@@ -1606,4 +2512,4 @@ Les images des services sont uploadées via Cloudinary. Les URLs des images uplo
 
 ---
 
-*Documentation mise à jour le 2025-01-01*
+*Documentation mise à jour le 2025-01-15*

@@ -112,6 +112,13 @@ La collection utilise des variables pour faciliter les tests :
 - **"Mettre à jour localisation"** - Mettre à jour la position géographique
 - **"Changer langue"** - Changer la langue de l'interface (fr/wolof)
 
+### 11.1. Gestion admin des utilisateurs
+
+- **"Liste utilisateurs (admin)"** - Obtenir tous les utilisateurs avec filtres avancés (role, isVerified, search, dateRange)
+- **"Voir utilisateur (admin)"** - Obtenir un utilisateur spécifique par ID
+- **"Modifier utilisateur (admin)"** - Modifier un utilisateur (inclut role, isVerified)
+- **"Supprimer utilisateur (admin)"** - Supprimer un utilisateur (suppression en cascade)
+
 ### 12. Géolocalisation prestataire
 
 - **"Mettre à jour géolocalisation prestataire"** - Mettre à jour les coordonnées GPS du prestataire
@@ -124,11 +131,12 @@ La collection utilise des variables pour faciliter les tests :
 ### 14. Gestion des réservations
 
 - **"Créer réservation"** - Créer une nouvelle réservation (avec vérification de disponibilité)
-- **"Obtenir réservations"** - Liste des réservations avec filtres
+- **"Obtenir réservations"** - Liste des réservations avec filtres avancés (search, dateRange, bookingDateRange)
 - **"Obtenir réservation"** - Détails d'une réservation
 - **"Confirmer réservation"** - Confirmer une réservation (provider)
 - **"Annuler réservation"** - Annuler une réservation
 - **"Terminer réservation"** - Marquer une réservation comme terminée (provider)
+- **"Supprimer réservation (admin)"** - Supprimer une réservation (admin seulement)
 
 ### 15. Gestion des paiements
 
@@ -137,15 +145,44 @@ La collection utilise des variables pour faciliter les tests :
 - **"Vérifier statut paiement"** - Vérifier le statut auprès de PayTech
 - **"Obtenir paiements"** - Liste des paiements avec filtres
 
+### 16. Historique utilisateur
+
+- **"Historique réservations utilisateur"** - Obtenir toutes les réservations de l'utilisateur connecté
+- **"Historique avis utilisateur"** - Obtenir tous les avis donnés par l'utilisateur connecté
+
+### 17. Historique prestataire
+
+- **"Historique réservations prestataire"** - Obtenir toutes les réservations reçues par le prestataire connecté
+- **"Historique avis prestataire"** - Obtenir tous les avis reçus par le prestataire connecté
+
+### 18. Gestion des avis
+
+- **"Créer avis"** - Créer un avis pour une réservation terminée
+- **"Avis d'un service"** - Obtenir les avis d'un service spécifique
+- **"Avis d'un prestataire"** - Obtenir les avis d'un prestataire spécifique
+- **"Modifier avis"** - Modifier un avis existant
+- **"Supprimer avis"** - Supprimer un avis (utilisateur normal : seulement ses propres avis, admin : n'importe quel avis)
+
+### 19. Gestion des notifications
+
+- **"Obtenir notifications"** - Liste des notifications de l'utilisateur connecté (avec filtres)
+- **"Obtenir toutes notifications (admin)"** - Liste toutes les notifications avec filtres avancés (admin)
+- **"Voir notification (admin)"** - Obtenir une notification spécifique par ID (admin)
+- **"Marquer notification comme lue"** - Marquer une notification spécifique comme lue
+- **"Marquer toutes notifications comme lues"** - Marquer toutes les notifications comme lues
+- **"Supprimer notification (admin)"** - Supprimer une notification (admin seulement)
+
 ### 12. Gestion des prestataires
 
 - **"Inscription prestataire"** - Devenir prestataire (nécessite d'être utilisateur)
 - **"Obtenir profil prestataire"** - Récupérer le profil prestataire
 - **"Mettre à jour profil prestataire"** - Modifier les informations du prestataire
-- **"Liste prestataires"** - Obtenir tous les prestataires avec filtres
+- **"Liste prestataires"** - Obtenir tous les prestataires avec filtres avancés (search, userId, dateRange)
 - **"Prestataires approuvés"** - Obtenir uniquement les prestataires approuvés
 - **"Approuver prestataire"** - Approuver un prestataire (admin seulement)
 - **"Rejeter prestataire"** - Rejeter un prestataire (admin seulement)
+- **"Modifier prestataire (admin)"** - Modifier un prestataire (inclut isApproved, rating)
+- **"Supprimer prestataire (admin)"** - Supprimer un prestataire (suppression en cascade)
 
 ### 13. Gestion des services agricoles
 

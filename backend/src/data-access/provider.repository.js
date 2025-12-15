@@ -48,7 +48,7 @@ class ProviderRepository {
   }
 
   /**
-   * Trouver tous les prestataires avec pagination
+   * Trouver tous les prestataires avec pagination et filtres avancés
    */
   async findAll(options = {}) {
     const {
@@ -56,6 +56,10 @@ class ProviderRepository {
       limit = 20,
       isApproved = null,
       minRating = null,
+      search = null,
+      userId = null,
+      startDate = null,
+      endDate = null,
     } = options;
 
     const where = {};
@@ -65,15 +69,54 @@ class ProviderRepository {
     if (minRating !== null) {
       where.rating = { [Op.gte]: minRating };
     }
+    if (userId) {
+      where.userId = userId;
+    }
+    if (startDate || endDate) {
+      where.createdAt = {};
+      if (startDate) {
+        where.createdAt[Op.gte] = new Date(startDate);
+      }
+      if (endDate) {
+        where.createdAt[Op.lte] = new Date(endDate);
+      }
+    }
+
+    const includeOptions = [
+      {
+        association: 'user',
+        attributes: { exclude: ['password'] },
+        where: search
+          ? {
+              [Op.or]: [
+                { firstName: { [Op.iLike]: `%${search}%` } },
+                { lastName: { [Op.iLike]: `%${search}%` } },
+                { email: { [Op.iLike]: `%${search}%` } },
+                { phoneNumber: { [Op.iLike]: `%${search}%` } },
+              ],
+            }
+          : undefined,
+        required: !!search,
+      },
+    ];
+
+    // Si recherche dans businessName ou description
+    if (search && !where.userId) {
+      where[Op.or] = [
+        { businessName: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
+      ];
+    }
 
     const offset = (page - 1) * limit;
 
     return Provider.findAndCountAll({
       where,
-      include: [{ association: 'user', attributes: { exclude: ['password'] } }],
+      include: includeOptions,
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['createdAt', 'DESC']],
+      distinct: true,
     });
   }
 

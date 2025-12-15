@@ -45,7 +45,12 @@ const connectTestDB = async () => {
     console.error('❌ Erreur de connexion à la base de données de test:', error);
     // Ne pas faire échouer les tests si la base de données n'est pas disponible
     // Les tests d'intégration nécessitent une vraie base de données
-    if (error.message.includes('password must be a string') || error.message.includes('SASL')) {
+    if (
+      error.message.includes('password must be a string') ||
+      error.message.includes('SASL') ||
+      error.message.includes('server does not support SSL') ||
+      error.message.includes('does not support SSL')
+    ) {
       console.warn('⚠️  Base de données de test non configurée. Les tests d\'intégration seront ignorés.');
       throw new Error('DATABASE_NOT_CONFIGURED');
     }

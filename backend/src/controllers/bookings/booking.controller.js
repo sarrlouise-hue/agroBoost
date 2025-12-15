@@ -42,6 +42,11 @@ const getAllBookings = async (req, res, next) => {
       providerId,
       serviceId,
       status,
+      search,
+      startDate,
+      endDate,
+      bookingDateStart,
+      bookingDateEnd,
     } = req.query;
 
     // Si l'utilisateur n'est pas admin, filtrer par son ID
@@ -52,6 +57,11 @@ const getAllBookings = async (req, res, next) => {
       providerId,
       serviceId,
       status,
+      search,
+      startDate,
+      endDate,
+      bookingDateStart,
+      bookingDateEnd,
     };
 
     const result = await bookingService.getAllBookings(options);
@@ -61,6 +71,20 @@ const getAllBookings = async (req, res, next) => {
       result.pagination,
       'Réservations récupérées avec succès'
     );
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Supprimer une réservation (admin seulement)
+ * DELETE /api/bookings/:id
+ */
+const deleteBooking = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await bookingService.deleteBooking(id);
+    return success(res, result, 'Réservation supprimée avec succès');
   } catch (err) {
     next(err);
   }
@@ -118,5 +142,6 @@ module.exports = {
   confirmBooking,
   cancelBooking,
   completeBooking,
+  deleteBooking,
 };
 

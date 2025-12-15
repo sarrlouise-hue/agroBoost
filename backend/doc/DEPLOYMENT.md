@@ -467,4 +467,4 @@ Si les credentials email ne sont pas configurés, l'application continuera de fo
 
 ---
 
-**Documentation mise à jour le 2025-01-01*
+**Documentation mise à jour le 2025-01-15*

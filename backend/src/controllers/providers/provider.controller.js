@@ -1,4 +1,6 @@
 const providerService = require('../../services/provider/provider.service');
+const bookingService = require('../../services/booking/booking.service');
+const reviewService = require('../../services/review/review.service');
 const { success, paginated } = require('../../utils/response');
 
 /**
@@ -64,12 +66,16 @@ const updateProfile = async (req, res, next) => {
  */
 const getAllProviders = async (req, res, next) => {
   try {
-    const { page, limit, isApproved, minRating } = req.query;
+    const { page, limit, isApproved, minRating, search, userId, startDate, endDate } = req.query;
     const result = await providerService.getAllProviders({
       page,
       limit,
       isApproved: isApproved !== undefined ? isApproved === 'true' : null,
       minRating: minRating ? parseFloat(minRating) : null,
+      search,
+      userId,
+      startDate,
+      endDate,
     });
     return paginated(
       res,
@@ -77,6 +83,34 @@ const getAllProviders = async (req, res, next) => {
       result.pagination,
       'Prestataires récupérés avec succès'
     );
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Mettre à jour un prestataire par ID (admin seulement)
+ * PUT /api/providers/:id
+ */
+const updateProviderById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updatedProvider = await providerService.updateProviderById(id, req.body);
+    return success(res, updatedProvider, 'Prestataire mis à jour avec succès');
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Supprimer un prestataire (admin seulement)
+ * DELETE /api/providers/:id
+ */
+const deleteProviderById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await providerService.deleteProviderById(id);
+    return success(res, result, 'Prestataire supprimé avec succès');
   } catch (err) {
     next(err);
   }
@@ -148,15 +182,66 @@ const updateLocation = async (req, res, next) => {
   }
 };
 
+/**
+ * Réservations reçues par le prestataire connecté
+ * GET /api/providers/bookings
+ */
+const getMyBookings = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const { page, limit, status } = req.query;
+    const provider = await providerService.getProfileByUserId(userId);
+    const result = await bookingService.getAllBookings({
+      page,
+      limit,
+      providerId: provider.id,
+      status,
+    });
+    return paginated(
+      res,
+      result.bookings,
+      result.pagination,
+      'Réservations du prestataire récupérées avec succès'
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Avis reçus par le prestataire connecté
+ * GET /api/providers/reviews
+ */
+const getMyReviews = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const { page, limit } = req.query;
+    const provider = await providerService.getProfileByUserId(userId);
+    const result = await reviewService.getProviderReviews(provider.id, { page, limit });
+    return paginated(
+      res,
+      result.reviews,
+      result.pagination,
+      'Avis du prestataire récupérés avec succès'
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   registerProvider,
   getProfile,
   getProfileById,
   updateProfile,
+  updateProviderById,
   getAllProviders,
   getApprovedProviders,
   approveProvider,
   rejectProvider,
+  deleteProviderById,
   updateLocation,
+  getMyBookings,
+  getMyReviews,
 };
 

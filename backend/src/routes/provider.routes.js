@@ -175,6 +175,28 @@ router.put('/profile', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), val
  *           type: number
  *           format: float
  *         description: Note minimale
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Recherche dans nom d'entreprise, description, nom/prénom/email utilisateur
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         description: Filtrer par ID utilisateur (admin seulement)
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Date de début pour filtrer par date de création
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Date de fin pour filtrer par date de création
  *     responses:
  *       200:
  *         description: Prestataires récupérés avec succès
@@ -220,12 +242,13 @@ router.get('/', providerController.getAllProviders);
  */
 router.get('/approved', providerController.getApprovedProviders);
 
+// Routes spécifiques AVANT les routes avec :id pour éviter les conflits
 /**
  * @swagger
  * /api/providers/{id}/approve:
  *   put:
  *     summary: Approuver un prestataire (admin seulement)
- *     tags: [Providers]
+ *     tags: [Providers, Admin]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -256,7 +279,7 @@ router.put('/:id/approve', authenticate, authorize(ROLES.ADMIN), providerControl
  * /api/providers/{id}/reject:
  *   put:
  *     summary: Rejeter un prestataire (admin seulement)
- *     tags: [Providers]
+ *     tags: [Providers, Admin]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -281,6 +304,81 @@ router.put('/:id/approve', authenticate, authorize(ROLES.ADMIN), providerControl
  *         $ref: '#/components/responses/NotFoundError'
  */
 router.put('/:id/reject', authenticate, authorize(ROLES.ADMIN), providerController.rejectProvider);
+
+/**
+ * @swagger
+ * /api/providers/{id}:
+ *   put:
+ *     summary: Mettre à jour un prestataire (admin seulement)
+ *     tags: [Providers, Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du prestataire
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               businessName:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               documents:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               isApproved:
+ *                 type: boolean
+ *               rating:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Prestataire mis à jour avec succès
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
+ */
+router.put('/:id', authenticate, authorize(ROLES.ADMIN), providerController.updateProviderById);
+
+/**
+ * @swagger
+ * /api/providers/{id}:
+ *   delete:
+ *     summary: Supprimer un prestataire (admin seulement)
+ *     tags: [Providers, Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du prestataire
+ *     responses:
+ *       200:
+ *         description: Prestataire supprimé avec succès
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
+ */
+router.delete('/:id', authenticate, authorize(ROLES.ADMIN), providerController.deleteProviderById);
 
 /**
  * @swagger
@@ -340,6 +438,22 @@ router.put(
   authenticate,
   authorize(ROLES.PROVIDER, ROLES.ADMIN),
   providerController.updateLocation
+);
+
+// Réservations reçues par le prestataire connecté
+router.get(
+  '/bookings',
+  authenticate,
+  authorize(ROLES.PROVIDER, ROLES.ADMIN),
+  providerController.getMyBookings
+);
+
+// Avis reçus par le prestataire connecté
+router.get(
+  '/reviews',
+  authenticate,
+  authorize(ROLES.PROVIDER, ROLES.ADMIN),
+  providerController.getMyReviews
 );
 
 module.exports = router;

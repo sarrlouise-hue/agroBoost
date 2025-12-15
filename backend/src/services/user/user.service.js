@@ -82,28 +82,78 @@ class UserService {
    * Obtenir tous les utilisateurs (pour admin)
    */
   async getAllUsers(options = {}) {
-    const { page = PAGINATION.DEFAULT_PAGE, limit = PAGINATION.DEFAULT_LIMIT } = options;
-    
-    // Pour l'instant, on utilise une méthode simple
-    // On pourrait créer une méthode findAll dans le repository si nécessaire
-    const User = require('../../models/User');
-    const offset = (page - 1) * limit;
-    
-    const { count, rows } = await User.findAndCountAll({
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      order: [['createdAt', 'DESC']],
-    });
+    return userRepository.findAll(options);
+  }
 
-    return {
-      users: rows,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total: count,
-        totalPages: Math.ceil(count / limit),
-      },
-    };
+  /**
+   * Obtenir un utilisateur par ID (pour admin)
+   */
+  async getUserById(userId) {
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new AppError(ERROR_MESSAGES.NOT_FOUND, 404);
+    }
+    // Exclure le mot de passe
+    const userData = user.toJSON();
+    delete userData.password;
+    return userData;
+  }
+
+  /**
+   * Mettre à jour un utilisateur (pour admin)
+   */
+  async updateUserById(userId, updateData) {
+    const allowedFields = ['firstName', 'lastName', 'email', 'phoneNumber', 'role', 'isVerified', 'address', 'language'];
+    const filteredData = {};
+    
+    for (const field of allowedFields) {
+      if (updateData[field] !== undefined) {
+        filteredData[field] = updateData[field];
+      }
+    }
+
+    // Validation du rôle si fourni
+    if (filteredData.role) {
+      const { ROLES } = require('../../config/constants');
+      if (!Object.values(ROLES).includes(filteredData.role)) {
+        throw new AppError('Rôle invalide', 400);
+      }
+    }
+
+    // Validation de la langue si fournie
+    if (filteredData.language) {
+      const { LANGUAGES } = require('../../config/constants');
+      if (!Object.values(LANGUAGES).includes(filteredData.language)) {
+        throw new AppError('Langue non supportée', 400);
+      }
+    }
+
+    const user = await userRepository.updateById(userId, filteredData);
+    if (!user) {
+      throw new AppError(ERROR_MESSAGES.NOT_FOUND, 404);
+    }
+    
+    // Exclure le mot de passe
+    const userData = user.toJSON();
+    delete userData.password;
+    return userData;
+  }
+
+  /**
+   * Supprimer un utilisateur (pour admin)
+   */
+  async deleteUserById(userId) {
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new AppError(ERROR_MESSAGES.NOT_FOUND, 404);
+    }
+
+    const deleted = await userRepository.deleteById(userId);
+    if (!deleted) {
+      throw new AppError('Erreur lors de la suppression de l\'utilisateur', 500);
+    }
+
+    return { deleted: true, userId };
   }
 }
 

@@ -9,6 +9,8 @@ const serviceRoutes = require('./service.routes');
 const bookingRoutes = require('./booking.routes');
 const paymentRoutes = require('./payment.routes');
 const maintenanceRoutes = require('./maintenance.routes');
+const reviewRoutes = require('./review.routes');
+const notificationRoutes = require('./notification.routes');
 
 // Mount routes
 router.use('/auth', authRoutes);
@@ -18,5 +20,7 @@ router.use('/services', serviceRoutes);
 router.use('/bookings', bookingRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/maintenances', maintenanceRoutes);
+router.use('/reviews', reviewRoutes);
+router.use('/notifications', notificationRoutes);
 
 module.exports = router;

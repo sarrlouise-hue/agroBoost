@@ -97,6 +97,9 @@ const connectDB = async () => {
     require('../models/Service');
     require('../models/Booking');
     require('../models/Payment');
+    require('../models/Maintenance');
+    require('../models/Review');
+    require('../models/Notification');
     
     // Charger les associations entre modèles
     require('../models/associations');
@@ -104,8 +107,27 @@ const connectDB = async () => {
     // Synchroniser les modèles
     if (process.env.NODE_ENV === 'development') {
       // En développement, utiliser alter pour mettre à jour les tables
-      await sequelize.sync({ alter: true });
-      console.log('✅ Modèles synchronisés avec la base de données (développement).');
+      try {
+        await sequelize.sync({ alter: true });
+        console.log('✅ Modèles synchronisés avec la base de données (développement).');
+      } catch (syncError) {
+        // Gérer spécifiquement l'erreur de conversion ENUM pour maintenances.status
+        if (syncError.message && syncError.message.includes('cannot be cast automatically to type enum_maintenances_status')) {
+          console.warn('⚠️  Erreur de conversion ENUM pour maintenances.status');
+          console.log('💡 Exécutez la migration: node migrations/20250103-convert-maintenances-status-to-enum.js');
+          console.log('   Ou modifiez manuellement la colonne status en ENUM dans PostgreSQL');
+          // Essayer de continuer sans alter pour les autres tables
+          try {
+            await sequelize.sync({ alter: false });
+            console.log('✅ Autres tables synchronisées (sans alter).');
+          } catch (fallbackError) {
+            console.error('❌ Erreur lors de la synchronisation de secours:', fallbackError.message);
+            throw syncError; // Relancer l'erreur originale
+          }
+        } else {
+          throw syncError;
+        }
+      }
     } else {
       // En production, créer les tables seulement si elles n'existent pas
       try {

@@ -93,6 +93,35 @@ router.post(
  *         schema:
  *           type: string
  *         description: Filtrer par service
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Recherche dans nom/prénom/email/téléphone de l'utilisateur
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Date de début pour filtrer par date de création
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Date de fin pour filtrer par date de création
+ *       - in: query
+ *         name: bookingDateStart
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Date de début pour filtrer par date de réservation
+ *       - in: query
+ *         name: bookingDateEnd
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Date de fin pour filtrer par date de réservation
  *     responses:
  *       200:
  *         description: Réservations récupérées avec succès
@@ -274,6 +303,34 @@ router.put(
   authorize(ROLES.PROVIDER, ROLES.ADMIN),
   bookingController.completeBooking
 );
+
+/**
+ * @swagger
+ * /api/bookings/{id}:
+ *   delete:
+ *     summary: Supprimer une réservation (admin seulement)
+ *     tags: [Bookings, Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: ID de la réservation
+ *     responses:
+ *       200:
+ *         description: Réservation supprimée avec succès
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
+ */
+router.delete('/:id', authenticate, authorize(ROLES.ADMIN), bookingController.deleteBooking);
 
 module.exports = router;
 

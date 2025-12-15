@@ -4,6 +4,8 @@ const providerRepository = require('../../data-access/provider.repository');
 const { AppError, ERROR_MESSAGES } = require('../../utils/errors');
 const logger = require('../../utils/logger');
 const Booking = require('../../models/Booking');
+const notificationService = require('../notification/notification.service');
+const { NOTIFICATION_TYPES, PAGINATION } = require('../../config/constants');
 
 /**
  * Service pour les opérations sur les réservations
@@ -88,6 +90,27 @@ class BookingService {
 
     logger.info(`Réservation créée: ${booking.id} pour le service ${serviceId}`);
 
+    // Notifications: utilisateur + prestataire
+    try {
+      await notificationService.createNotification(
+        userId,
+        NOTIFICATION_TYPES.BOOKING,
+        'Réservation créée',
+        `Votre réservation pour le service ${service.name} a été créée.`,
+        { bookingId: booking.id, serviceId, providerId: service.providerId }
+      );
+
+      await notificationService.createNotification(
+        provider.userId,
+        NOTIFICATION_TYPES.BOOKING,
+        'Nouvelle réservation',
+        `Vous avez reçu une nouvelle réservation pour le service ${service.name}.`,
+        { bookingId: booking.id, serviceId, userId }
+      );
+    } catch (notifyError) {
+      logger.warn('Erreur lors de la création des notifications de réservation:', notifyError);
+    }
+
     return booking;
   }
 
@@ -142,18 +165,44 @@ class BookingService {
   }
 
   /**
-   * Obtenir toutes les réservations avec filtres
+   * Obtenir toutes les réservations avec filtres avancés
    */
   async getAllBookings(options = {}) {
-    const { count, rows } = await bookingRepository.findAll(options);
+    const {
+      page = PAGINATION.DEFAULT_PAGE,
+      limit = PAGINATION.DEFAULT_LIMIT,
+      userId = null,
+      providerId = null,
+      serviceId = null,
+      status = null,
+      search = null,
+      startDate = null,
+      endDate = null,
+      bookingDateStart = null,
+      bookingDateEnd = null,
+    } = options;
+
+    const { count, rows } = await bookingRepository.findAll({
+      page,
+      limit,
+      userId,
+      providerId,
+      serviceId,
+      status,
+      search,
+      startDate,
+      endDate,
+      bookingDateStart,
+      bookingDateEnd,
+    });
 
     return {
       bookings: rows,
       pagination: {
-        page: parseInt(options.page || 1),
-        limit: parseInt(options.limit || 20),
+        page: parseInt(page),
+        limit: parseInt(limit),
         total: count,
-        totalPages: Math.ceil(count / (options.limit || 20)),
+        totalPages: Math.ceil(count / limit),
       },
     };
   }
@@ -175,9 +224,24 @@ class BookingService {
       throw new AppError('Cette réservation ne peut pas être confirmée', 400);
     }
 
-    return bookingRepository.updateById(bookingId, {
+    const updated = await bookingRepository.updateById(bookingId, {
       status: Booking.STATUS.CONFIRMED,
     });
+
+    // Notifications
+    try {
+      await notificationService.createNotification(
+        booking.userId,
+        NOTIFICATION_TYPES.BOOKING,
+        'Réservation confirmée',
+        'Votre réservation a été confirmée par le prestataire.',
+        { bookingId: booking.id, providerId: booking.providerId }
+      );
+    } catch (notifyError) {
+      logger.warn('Erreur notification confirmation réservation:', notifyError);
+    }
+
+    return updated;
   }
 
   /**
@@ -198,9 +262,27 @@ class BookingService {
       throw new AppError('Cette réservation ne peut pas être annulée', 400);
     }
 
-    return bookingRepository.updateById(bookingId, {
+    const updated = await bookingRepository.updateById(bookingId, {
       status: Booking.STATUS.CANCELLED,
     });
+
+    // Notifications
+    try {
+      const targetUserIds = new Set([booking.userId, booking.providerId]);
+      targetUserIds.forEach(async (targetId) => {
+        await notificationService.createNotification(
+          targetId,
+          NOTIFICATION_TYPES.BOOKING,
+          'Réservation annulée',
+          'Une réservation a été annulée.',
+          { bookingId: booking.id }
+        );
+      });
+    } catch (notifyError) {
+      logger.warn('Erreur notification annulation réservation:', notifyError);
+    }
+
+    return updated;
   }
 
   /**
@@ -220,9 +302,41 @@ class BookingService {
       throw new AppError('Cette réservation doit être confirmée avant d\'être terminée', 400);
     }
 
-    return bookingRepository.updateById(bookingId, {
+    const updated = await bookingRepository.updateById(bookingId, {
       status: Booking.STATUS.COMPLETED,
     });
+
+    // Notifications
+    try {
+      await notificationService.createNotification(
+        booking.userId,
+        NOTIFICATION_TYPES.BOOKING,
+        'Réservation terminée',
+        'Votre réservation a été marquée comme terminée. Vous pouvez maintenant laisser un avis.',
+        { bookingId: booking.id, providerId: booking.providerId }
+      );
+    } catch (notifyError) {
+      logger.warn('Erreur notification fin de réservation:', notifyError);
+    }
+
+    return updated;
+  }
+
+  /**
+   * Supprimer une réservation (admin seulement)
+   */
+  async deleteBooking(bookingId) {
+    const booking = await bookingRepository.findById(bookingId);
+    if (!booking) {
+      throw new AppError(ERROR_MESSAGES.NOT_FOUND, 404);
+    }
+
+    const deleted = await bookingRepository.deleteById(bookingId);
+    if (!deleted) {
+      throw new AppError('Erreur lors de la suppression de la réservation', 500);
+    }
+
+    return { deleted: true, bookingId };
   }
 }
 
