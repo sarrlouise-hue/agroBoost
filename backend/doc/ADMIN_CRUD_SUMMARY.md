@@ -10,9 +10,15 @@ Ce document résume toutes les fonctionnalités CRUD admin ajoutées au backend 
 
 ### Endpoints Admin
 
+- **GET `/api/admin/dashboard`** - Statistiques du tableau de bord
+  - Retourne : total utilisateurs, prestataires, services, réservations en attente, revenu mensuel, activité récente.
+
 - **GET `/api/users`** - Liste tous les utilisateurs avec filtres avancés
   - Filtres : `role`, `isVerified`, `search`, `startDate`, `endDate`
   - Pagination : `page`, `limit`
+
+- **POST `/api/users`** - Créer un utilisateur (Admin)
+  - Permet de créer directement un admin, prestataire ou utilisateur avec mot de passe défini.
 
 - **GET `/api/users/:id`** - Voir un utilisateur spécifique
   - Retourne les détails complets d'un utilisateur (sans mot de passe)

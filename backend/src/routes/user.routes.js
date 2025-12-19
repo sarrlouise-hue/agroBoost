@@ -1,15 +1,16 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const userController = require('../controllers/users/user.controller');
-const { authenticate, authorize } = require('../middleware/auth.middleware');
+const userController = require("../controllers/users/user.controller");
+const { authenticate, authorize } = require("../middleware/auth.middleware");
 const {
-  updateProfileSchema,
-  updateLocationSchema,
-  updateLanguageSchema,
-  updateUserByAdminSchema,
-  validate,
-} = require('../validators/user.validator');
-const { ROLES } = require('../config/constants');
+	updateProfileSchema,
+	updateLocationSchema,
+	updateLanguageSchema,
+	updateUserByAdminSchema,
+	createUserByAdminSchema,
+	validate,
+} = require("../validators/user.validator");
+const { ROLES } = require("../config/constants");
 
 /**
  * @swagger
@@ -38,7 +39,7 @@ const { ROLES } = require('../config/constants');
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.get('/profile', authenticate, userController.getProfile);
+router.get("/profile", authenticate, userController.getProfile);
 
 /**
  * @swagger
@@ -66,7 +67,12 @@ router.get('/profile', authenticate, userController.getProfile);
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.put('/profile', authenticate, validate(updateProfileSchema), userController.updateProfile);
+router.put(
+	"/profile",
+	authenticate,
+	validate(updateProfileSchema),
+	userController.updateProfile
+);
 
 /**
  * @swagger
@@ -94,7 +100,12 @@ router.put('/profile', authenticate, validate(updateProfileSchema), userControll
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.put('/location', authenticate, validate(updateLocationSchema), userController.updateLocation);
+router.put(
+	"/location",
+	authenticate,
+	validate(updateLocationSchema),
+	userController.updateLocation
+);
 
 /**
  * @swagger
@@ -122,13 +133,69 @@ router.put('/location', authenticate, validate(updateLocationSchema), userContro
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.put('/language', authenticate, validate(updateLanguageSchema), userController.updateLanguage);
+router.put(
+	"/language",
+	authenticate,
+	validate(updateLanguageSchema),
+	userController.updateLanguage
+);
 
 // Historique des réservations de l'utilisateur connecté (AVANT les routes avec :id)
-router.get('/bookings', authenticate, userController.getMyBookings);
+router.get("/bookings", authenticate, userController.getMyBookings);
 
 // Historique des avis de l'utilisateur connecté (AVANT les routes avec :id)
-router.get('/reviews', authenticate, userController.getMyReviews);
+router.get("/reviews", authenticate, userController.getMyReviews);
+
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     summary: Créer un utilisateur (admin seulement)
+ *     tags: [Users, Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - phoneNumber
+ *               - password
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [user, provider, admin]
+ *     responses:
+ *       201:
+ *         description: Utilisateur créé avec succès
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
+ */
+router.post(
+	"/",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	validate(createUserByAdminSchema),
+	userController.createUser
+);
 
 /**
  * @swagger
@@ -191,7 +258,12 @@ router.get('/reviews', authenticate, userController.getMyReviews);
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  */
-router.get('/', authenticate, authorize(ROLES.ADMIN), userController.getAllUsers);
+router.get(
+	"/",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	userController.getAllUsers
+);
 
 /**
  * @swagger
@@ -229,7 +301,12 @@ router.get('/', authenticate, authorize(ROLES.ADMIN), userController.getAllUsers
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/:id', authenticate, authorize(ROLES.ADMIN), userController.getUserById);
+router.get(
+	"/:id",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	userController.getUserById
+);
 
 /**
  * @swagger
@@ -283,7 +360,13 @@ router.get('/:id', authenticate, authorize(ROLES.ADMIN), userController.getUserB
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put('/:id', authenticate, authorize(ROLES.ADMIN), validate(updateUserByAdminSchema), userController.updateUserById);
+router.put(
+	"/:id",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	validate(updateUserByAdminSchema),
+	userController.updateUserById
+);
 
 /**
  * @swagger
@@ -310,7 +393,11 @@ router.put('/:id', authenticate, authorize(ROLES.ADMIN), validate(updateUserByAd
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.delete('/:id', authenticate, authorize(ROLES.ADMIN), userController.deleteUserById);
+router.delete(
+	"/:id",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	userController.deleteUserById
+);
 
 module.exports = router;
-

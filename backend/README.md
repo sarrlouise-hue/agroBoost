@@ -1,6 +1,6 @@
-# AGRO BOOST - Backend API
+# ALLO TRACTEUR - Backend API
 
-Backend API pour l'application AGRO BOOST - Plateforme de réservation de services agricoles au Sénégal.
+Backend API pour l'application ALLO TRACTEUR - Plateforme de réservation de services agricoles au Sénégal.
 
 ## 🎯 Phase Actuelle : Authentification
 
@@ -80,7 +80,7 @@ backend/
 │   ├── validators/      # Validateurs Joi (auth)
 │   ├── utils/           # Utilitaires (logger, response, errors)
 │   └── app.js           # Point d'entrée
-└── package.json
+83: └── package.json
 ```
 
 ## 🔐 API Endpoints - Authentification
@@ -206,4 +206,4 @@ Une collection Postman est disponible pour tester facilement l'API :
 
 ---
 
-*Développé pour AGRO BOOST - MVP - Phase 1 : Authentification*
+*Développé pour ALLO TRACTEUR - MVP - Phase 1 : Authentification*

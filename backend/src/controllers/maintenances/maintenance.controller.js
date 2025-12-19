@@ -1,17 +1,17 @@
-const maintenanceService = require('../../services/maintenance/maintenance.service');
-const { success, paginated } = require('../../utils/response');
+const maintenanceService = require("../../services/maintenance/maintenance.service");
+const { success, paginated } = require("../../utils/response");
 
 /**
  * Créer une maintenance
  * POST /api/maintenances
  */
 const createMaintenance = async (req, res, next) => {
-  try {
-    const maintenance = await maintenanceService.createMaintenance(req.body);
-    return success(res, maintenance, 'Maintenance créée avec succès', 201);
-  } catch (err) {
-    next(err);
-  }
+	try {
+		const maintenance = await maintenanceService.createMaintenance(req.body);
+		return success(res, maintenance, "Maintenance créée avec succès", 201);
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -19,13 +19,13 @@ const createMaintenance = async (req, res, next) => {
  * GET /api/maintenances/:id
  */
 const getMaintenanceById = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const maintenance = await maintenanceService.getMaintenanceById(id);
-    return success(res, maintenance, 'Maintenance récupérée avec succès');
-  } catch (err) {
-    next(err);
-  }
+	try {
+		const { id } = req.params;
+		const maintenance = await maintenanceService.getMaintenanceById(id);
+		return success(res, maintenance, "Maintenance récupérée avec succès");
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -33,37 +33,30 @@ const getMaintenanceById = async (req, res, next) => {
  * GET /api/maintenances
  */
 const getAllMaintenances = async (req, res, next) => {
-  try {
-    const {
-      page,
-      limit,
-      serviceId,
-      mechanicId,
-      status,
-      startDate,
-      endDate,
-    } = req.query;
+	try {
+		const { page, limit, serviceId, mechanicId, status, startDate, endDate } =
+			req.query;
 
-    const options = {
-      page: parseInt(page) || 1,
-      limit: parseInt(limit) || 20,
-      ...(serviceId && { serviceId }),
-      ...(mechanicId && { mechanicId }),
-      ...(status && { status }),
-      ...(startDate && { startDate }),
-      ...(endDate && { endDate }),
-    };
+		const options = {
+			page: parseInt(page) || 1,
+			limit: parseInt(limit) || 20,
+			...(serviceId && { serviceId }),
+			...(mechanicId && { mechanicId }),
+			...(status && { status }),
+			...(startDate && { startDate }),
+			...(endDate && { endDate }),
+		};
 
-    const result = await maintenanceService.getAllMaintenances(options);
-    return paginated(
-      res,
-      result.maintenances,
-      result.pagination,
-      'Maintenances récupérées avec succès'
-    );
-  } catch (err) {
-    next(err);
-  }
+		const result = await maintenanceService.getAllMaintenances(options);
+		return paginated(
+			res,
+			result.maintenances,
+			result.pagination,
+			"Maintenances récupérées avec succès"
+		);
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -71,13 +64,16 @@ const getAllMaintenances = async (req, res, next) => {
  * PUT /api/maintenances/:id
  */
 const updateMaintenance = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const maintenance = await maintenanceService.updateMaintenance(id, req.body);
-    return success(res, maintenance, 'Maintenance mise à jour avec succès');
-  } catch (err) {
-    next(err);
-  }
+	try {
+		const { id } = req.params;
+		const maintenance = await maintenanceService.updateMaintenance(
+			id,
+			req.body
+		);
+		return success(res, maintenance, "Maintenance mise à jour avec succès");
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -85,13 +81,13 @@ const updateMaintenance = async (req, res, next) => {
  * DELETE /api/maintenances/:id
  */
 const deleteMaintenance = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    await maintenanceService.deleteMaintenance(id);
-    return success(res, null, 'Maintenance supprimée avec succès');
-  } catch (err) {
-    next(err);
-  }
+	try {
+		const { id } = req.params;
+		await maintenanceService.deleteMaintenance(id);
+		return success(res, null, "Maintenance supprimée avec succès");
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -99,26 +95,29 @@ const deleteMaintenance = async (req, res, next) => {
  * GET /api/maintenances/service/:serviceId
  */
 const getMaintenancesByService = async (req, res, next) => {
-  try {
-    const { serviceId } = req.params;
-    const { page, limit, status } = req.query;
+	try {
+		const { serviceId } = req.params;
+		const { page, limit, status } = req.query;
 
-    const options = {
-      page: parseInt(page) || 1,
-      limit: parseInt(limit) || 20,
-      ...(status && { status }),
-    };
+		const options = {
+			page: parseInt(page) || 1,
+			limit: parseInt(limit) || 20,
+			...(status && { status }),
+		};
 
-    const result = await maintenanceService.getMaintenancesByService(serviceId, options);
-    return paginated(
-      res,
-      result.maintenances,
-      result.pagination,
-      'Maintenances du service récupérées avec succès'
-    );
-  } catch (err) {
-    next(err);
-  }
+		const result = await maintenanceService.getMaintenancesByService(
+			serviceId,
+			options
+		);
+		return paginated(
+			res,
+			result.maintenances,
+			result.pagination,
+			"Maintenances du service récupérées avec succès"
+		);
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -126,26 +125,29 @@ const getMaintenancesByService = async (req, res, next) => {
  * GET /api/maintenances/mechanic/:mechanicId
  */
 const getMaintenancesByMechanic = async (req, res, next) => {
-  try {
-    const { mechanicId } = req.params;
-    const { page, limit, status } = req.query;
+	try {
+		const { mechanicId } = req.params;
+		const { page, limit, status } = req.query;
 
-    const options = {
-      page: parseInt(page) || 1,
-      limit: parseInt(limit) || 20,
-      ...(status && { status }),
-    };
+		const options = {
+			page: parseInt(page) || 1,
+			limit: parseInt(limit) || 20,
+			...(status && { status }),
+		};
 
-    const result = await maintenanceService.getMaintenancesByMechanic(mechanicId, options);
-    return paginated(
-      res,
-      result.maintenances,
-      result.pagination,
-      'Maintenances du mécanicien récupérées avec succès'
-    );
-  } catch (err) {
-    next(err);
-  }
+		const result = await maintenanceService.getMaintenancesByMechanic(
+			mechanicId,
+			options
+		);
+		return paginated(
+			res,
+			result.maintenances,
+			result.pagination,
+			"Maintenances du mécanicien récupérées avec succès"
+		);
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -153,13 +155,13 @@ const getMaintenancesByMechanic = async (req, res, next) => {
  * POST /api/maintenances/:id/start
  */
 const startMaintenance = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const maintenance = await maintenanceService.startMaintenance(id);
-    return success(res, maintenance, 'Maintenance démarrée avec succès');
-  } catch (err) {
-    next(err);
-  }
+	try {
+		const { id } = req.params;
+		const maintenance = await maintenanceService.startMaintenance(id);
+		return success(res, maintenance, "Maintenance démarrée avec succès");
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -167,31 +169,48 @@ const startMaintenance = async (req, res, next) => {
  * POST /api/maintenances/:id/complete
  */
 const completeMaintenance = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { endDate, duration, cost, notes } = req.body;
-    const maintenance = await maintenanceService.completeMaintenance(
-      id,
-      endDate,
-      duration,
-      cost,
-      notes
-    );
-    return success(res, maintenance, 'Maintenance complétée avec succès');
-  } catch (err) {
-    next(err);
-  }
+	try {
+		const { id } = req.params;
+		const { endDate, duration, cost, notes } = req.body;
+		const maintenance = await maintenanceService.completeMaintenance(
+			id,
+			endDate,
+			duration,
+			cost,
+			notes
+		);
+		return success(res, maintenance, "Maintenance complétée avec succès");
+	} catch (err) {
+		next(err);
+	}
+};
+
+/**
+ * Obtenir les statistiques de maintenance
+ * GET /api/maintenances/stats/reports
+ */
+const getMaintenanceStats = async (req, res, next) => {
+	try {
+		const stats = await maintenanceService.getMaintenanceStats();
+		return success(
+			res,
+			stats,
+			"Statistiques de maintenance récupérées avec succès"
+		);
+	} catch (err) {
+		next(err);
+	}
 };
 
 module.exports = {
-  createMaintenance,
-  getMaintenanceById,
-  getAllMaintenances,
-  updateMaintenance,
-  deleteMaintenance,
-  getMaintenancesByService,
-  getMaintenancesByMechanic,
-  startMaintenance,
-  completeMaintenance,
+	createMaintenance,
+	getMaintenanceById,
+	getAllMaintenances,
+	updateMaintenance,
+	deleteMaintenance,
+	getMaintenancesByService,
+	getMaintenancesByMechanic,
+	startMaintenance,
+	completeMaintenance,
+	getMaintenanceStats,
 };
-

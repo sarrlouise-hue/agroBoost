@@ -2418,6 +2418,78 @@ Webhook PayTech (pas d'authentification requise)
 - `500` - Erreur interne du serveur
 
 ---
+---
+
+## 10. Administration
+
+### GET `/admin/dashboard`
+
+Obtenir les statistiques globales du tableau de bord.
+
+**Headers:**
+`Authorization: Bearer <admin_token>`
+
+**Réponse (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "totalUsers": 150,
+    "totalProviders": 20,
+    "totalServices": 45,
+    "pending": 5,
+    "monthlyRevenue": 1500000,
+    "recentActivities": [
+       { "type": "NEW_BOOKING", "message": "...", "date": "..." }
+    ]
+  }
+}
+```
+
+### POST `/users` (Admin Création)
+
+Créer un utilisateur manuellement (Admin seulement).
+
+**Headers:**
+`Authorization: Bearer <admin_token>`
+
+**Body:**
+```json
+{
+  "firstName": "Moussa",
+  "lastName": "Diop",
+  "phoneNumber": "+221770000000",
+  "password": "password123",
+  "role": "admin",
+  "isVerified": true
+}
+```
+
+---
+
+## 11. Maintenance
+
+### GET `/maintenances/stats/reports`
+
+Obtenir les rapports statistiques des maintenances.
+
+**Headers:**
+`Authorization: Bearer <admin_token>`
+
+**Réponse (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "costByMonth": [
+        { "month": "2025-01-01...", "totalCost": 50000 }
+    ],
+    "countByType": [
+        { "serviceType": "tractor", "count": 10 }
+    ]
+  }
+}
+```
 
 ## Format des Réponses
 

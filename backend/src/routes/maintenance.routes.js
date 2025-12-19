@@ -1,13 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const maintenanceController = require('../controllers/maintenances/maintenance.controller');
-const { authenticate, authorize } = require('../middleware/auth.middleware');
+const maintenanceController = require("../controllers/maintenances/maintenance.controller");
+const { authenticate, authorize } = require("../middleware/auth.middleware");
 const {
-  validateCreateMaintenance,
-  validateUpdateMaintenance,
-  validateCompleteMaintenance,
-} = require('../validators/maintenance.validator');
-const { ROLES } = require('../config/constants');
+	validateCreateMaintenance,
+	validateUpdateMaintenance,
+	validateCompleteMaintenance,
+} = require("../validators/maintenance.validator");
+const { ROLES } = require("../config/constants");
 
 /**
  * @swagger
@@ -66,11 +66,11 @@ const { ROLES } = require('../config/constants');
  *         $ref: '#/components/responses/UnauthorizedError'
  */
 router.post(
-  '/',
-  authenticate,
-  authorize(ROLES.PROVIDER, ROLES.ADMIN),
-  validateCreateMaintenance,
-  maintenanceController.createMaintenance
+	"/",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	validateCreateMaintenance,
+	maintenanceController.createMaintenance
 );
 
 /**
@@ -130,7 +130,28 @@ router.post(
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.get('/', authenticate, maintenanceController.getAllMaintenances);
+router.get("/", authenticate, maintenanceController.getAllMaintenances);
+
+/**
+ * @swagger
+ * /api/maintenances/stats/reports:
+ *   get:
+ *     summary: Obtenir les statistiques des maintenances
+ *     tags: [Maintenances]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Statistiques récupérées avec succès
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ */
+router.get(
+	"/stats/reports",
+	authenticate,
+	authorize(ROLES.ADMIN, ROLES.PROVIDER),
+	maintenanceController.getMaintenanceStats
+);
 
 /**
  * @swagger
@@ -156,7 +177,7 @@ router.get('/', authenticate, maintenanceController.getAllMaintenances);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/:id', authenticate, maintenanceController.getMaintenanceById);
+router.get("/:id", authenticate, maintenanceController.getMaintenanceById);
 
 /**
  * @swagger
@@ -212,11 +233,11 @@ router.get('/:id', authenticate, maintenanceController.getMaintenanceById);
  *         $ref: '#/components/responses/NotFoundError'
  */
 router.put(
-  '/:id',
-  authenticate,
-  authorize(ROLES.PROVIDER, ROLES.ADMIN),
-  validateUpdateMaintenance,
-  maintenanceController.updateMaintenance
+	"/:id",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	validateUpdateMaintenance,
+	maintenanceController.updateMaintenance
 );
 
 /**
@@ -246,10 +267,10 @@ router.put(
  *         $ref: '#/components/responses/NotFoundError'
  */
 router.delete(
-  '/:id',
-  authenticate,
-  authorize(ROLES.PROVIDER, ROLES.ADMIN),
-  maintenanceController.deleteMaintenance
+	"/:id",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	maintenanceController.deleteMaintenance
 );
 
 /**
@@ -291,7 +312,11 @@ router.delete(
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/service/:serviceId', authenticate, maintenanceController.getMaintenancesByService);
+router.get(
+	"/service/:serviceId",
+	authenticate,
+	maintenanceController.getMaintenancesByService
+);
 
 /**
  * @swagger
@@ -332,7 +357,11 @@ router.get('/service/:serviceId', authenticate, maintenanceController.getMainten
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/mechanic/:mechanicId', authenticate, maintenanceController.getMaintenancesByMechanic);
+router.get(
+	"/mechanic/:mechanicId",
+	authenticate,
+	maintenanceController.getMaintenancesByMechanic
+);
 
 /**
  * @swagger
@@ -361,10 +390,10 @@ router.get('/mechanic/:mechanicId', authenticate, maintenanceController.getMaint
  *         $ref: '#/components/responses/NotFoundError'
  */
 router.post(
-  '/:id/start',
-  authenticate,
-  authorize(ROLES.PROVIDER, ROLES.ADMIN),
-  maintenanceController.startMaintenance
+	"/:id/start",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	maintenanceController.startMaintenance
 );
 
 /**
@@ -409,12 +438,11 @@ router.post(
  *         $ref: '#/components/responses/NotFoundError'
  */
 router.post(
-  '/:id/complete',
-  authenticate,
-  authorize(ROLES.PROVIDER, ROLES.ADMIN),
-  validateCompleteMaintenance,
-  maintenanceController.completeMaintenance
+	"/:id/complete",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	validateCompleteMaintenance,
+	maintenanceController.completeMaintenance
 );
 
 module.exports = router;
-
