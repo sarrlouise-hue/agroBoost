@@ -1,14 +1,14 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const notificationController = require('../controllers/notifications/notification.controller');
-const { authenticate, authorize } = require('../middleware/auth.middleware');
-const { ROLES } = require('../config/constants');
+const notificationController = require("../controllers/notifications/notification.controller");
+const { authenticate, authorize } = require("../middleware/auth.middleware");
+const { ROLES } = require("../config/constants");
 
 /**
  * @swagger
  * /api/notifications:
  *   get:
- *     summary: Récupérer les notifications de l'utilisateur connecté
+ *     summary: Récupérer les notifications de l'utilisateur connecté (All Roles)
  *     tags: [Notifications]
  *     security:
  *       - bearerAuth: []
@@ -40,13 +40,13 @@ const { ROLES } = require('../config/constants');
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.get('/', authenticate, notificationController.getMyNotifications);
+router.get("/", authenticate, notificationController.getMyNotifications);
 
 /**
  * @swagger
  * /api/notifications/read-all:
  *   patch:
- *     summary: Marquer toutes les notifications comme lues
+ *     summary: Marquer toutes les notifications comme lues (All Roles)
  *     tags: [Notifications]
  *     security:
  *       - bearerAuth: []
@@ -56,13 +56,13 @@ router.get('/', authenticate, notificationController.getMyNotifications);
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.patch('/read-all', authenticate, notificationController.markAllAsRead);
+router.patch("/read-all", authenticate, notificationController.markAllAsRead);
 
 /**
  * @swagger
  * /api/notifications/all:
  *   get:
- *     summary: Obtenir toutes les notifications (admin seulement)
+ *     summary: Obtenir toutes les notifications (Admin)
  *     tags: [Notifications, Admin]
  *     security:
  *       - bearerAuth: []
@@ -119,13 +119,18 @@ router.patch('/read-all', authenticate, notificationController.markAllAsRead);
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  */
-router.get('/all', authenticate, authorize(ROLES.ADMIN), notificationController.getAllNotifications);
+router.get(
+	"/all",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	notificationController.getAllNotifications
+);
 
 /**
  * @swagger
  * /api/notifications/{id}/read:
  *   patch:
- *     summary: Marquer une notification comme lue
+ *     summary: Marquer une notification comme lue (All Roles)
  *     tags: [Notifications]
  *     security:
  *       - bearerAuth: []
@@ -144,13 +149,13 @@ router.get('/all', authenticate, authorize(ROLES.ADMIN), notificationController.
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.patch('/:id/read', authenticate, notificationController.markAsRead);
+router.patch("/:id/read", authenticate, notificationController.markAsRead);
 
 /**
  * @swagger
  * /api/notifications/{id}:
  *   get:
- *     summary: Obtenir une notification spécifique (admin seulement)
+ *     summary: Obtenir une notification spécifique (Admin)
  *     tags: [Notifications, Admin]
  *     security:
  *       - bearerAuth: []
@@ -182,7 +187,7 @@ router.patch('/:id/read', authenticate, notificationController.markAsRead);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  *   delete:
- *     summary: Supprimer une notification (admin seulement)
+ *     summary: Supprimer une notification (Admin)
  *     tags: [Notifications, Admin]
  *     security:
  *       - bearerAuth: []
@@ -203,9 +208,17 @@ router.patch('/:id/read', authenticate, notificationController.markAsRead);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/:id', authenticate, authorize(ROLES.ADMIN), notificationController.getNotificationById);
-router.delete('/:id', authenticate, authorize(ROLES.ADMIN), notificationController.deleteNotification);
+router.get(
+	"/:id",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	notificationController.getNotificationById
+);
+router.delete(
+	"/:id",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	notificationController.deleteNotification
+);
 
 module.exports = router;
-
-

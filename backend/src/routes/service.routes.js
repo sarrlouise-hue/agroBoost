@@ -1,20 +1,20 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const serviceController = require('../controllers/services/service.controller');
-const { authenticate, authorize } = require('../middleware/auth.middleware');
+const serviceController = require("../controllers/services/service.controller");
+const { authenticate, authorize } = require("../middleware/auth.middleware");
 const {
-  createServiceSchema,
-  updateServiceSchema,
-  updateAvailabilitySchema,
-  validate,
-} = require('../validators/service.validator');
-const { ROLES } = require('../config/constants');
+	createServiceSchema,
+	updateServiceSchema,
+	updateAvailabilitySchema,
+	validate,
+} = require("../validators/service.validator");
+const { ROLES } = require("../config/constants");
 
 /**
  * @swagger
  * /api/services:
  *   post:
- *     summary: Créer un nouveau service (prestataire seulement)
+ *     summary: Créer un nouveau service (Provider/Admin)
  *     tags: [Services]
  *     security:
  *       - bearerAuth: []
@@ -47,7 +47,13 @@ const { ROLES } = require('../config/constants');
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  */
-router.post('/', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), validate(createServiceSchema), serviceController.createService);
+router.post(
+	"/",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	validate(createServiceSchema),
+	serviceController.createService
+);
 
 /**
  * @swagger
@@ -117,13 +123,13 @@ router.post('/', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), validate(
  *             schema:
  *               $ref: '#/components/schemas/PaginatedResponse'
  */
-router.get('/', serviceController.getAllServices);
+router.get("/", serviceController.getAllServices);
 
 /**
  * @swagger
  * /api/services/my-services:
  *   get:
- *     summary: Obtenir les services du prestataire connecté
+ *     summary: Obtenir les services du prestataire connecté (Provider/Admin)
  *     tags: [Services]
  *     security:
  *       - bearerAuth: []
@@ -152,7 +158,12 @@ router.get('/', serviceController.getAllServices);
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  */
-router.get('/my-services', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), serviceController.getMyServices);
+router.get(
+	"/my-services",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	serviceController.getMyServices
+);
 
 /**
  * @swagger
@@ -187,7 +198,7 @@ router.get('/my-services', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN),
  *             schema:
  *               $ref: '#/components/schemas/PaginatedResponse'
  */
-router.get('/provider/:providerId', serviceController.getServicesByProvider);
+router.get("/provider/:providerId", serviceController.getServicesByProvider);
 
 /**
  * @swagger
@@ -221,13 +232,13 @@ router.get('/provider/:providerId', serviceController.getServicesByProvider);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/:id', serviceController.getServiceById);
+router.get("/:id", serviceController.getServiceById);
 
 /**
  * @swagger
  * /api/services/{id}:
  *   put:
- *     summary: Mettre à jour un service (prestataire seulement)
+ *     summary: Mettre à jour un service (Provider/Admin)
  *     tags: [Services]
  *     security:
  *       - bearerAuth: []
@@ -260,13 +271,19 @@ router.get('/:id', serviceController.getServiceById);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put('/:id', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), validate(updateServiceSchema), serviceController.updateService);
+router.put(
+	"/:id",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	validate(updateServiceSchema),
+	serviceController.updateService
+);
 
 /**
  * @swagger
  * /api/services/{id}:
  *   delete:
- *     summary: Supprimer un service (prestataire seulement)
+ *     summary: Supprimer un service (Provider/Admin)
  *     tags: [Services]
  *     security:
  *       - bearerAuth: []
@@ -291,13 +308,18 @@ router.put('/:id', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), validat
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.delete('/:id', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), serviceController.deleteService);
+router.delete(
+	"/:id",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	serviceController.deleteService
+);
 
 /**
  * @swagger
  * /api/services/{id}/availability:
  *   put:
- *     summary: Mettre à jour la disponibilité d'un service (prestataire seulement)
+ *     summary: Mettre à jour la disponibilité d'un service (Provider/Admin)
  *     tags: [Services]
  *     security:
  *       - bearerAuth: []
@@ -330,7 +352,13 @@ router.delete('/:id', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), serv
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put('/:id/availability', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), validate(updateAvailabilitySchema), serviceController.updateAvailability);
+router.put(
+	"/:id/availability",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	validate(updateAvailabilitySchema),
+	serviceController.updateAvailability
+);
 
 /**
  * @swagger
@@ -428,7 +456,7 @@ router.put('/:id/availability', authenticate, authorize(ROLES.PROVIDER, ROLES.AD
  *                 total: 50
  *                 totalPages: 3
  */
-router.get('/search', serviceController.searchServices);
+router.get("/search", serviceController.searchServices);
 
 /**
  * @swagger
@@ -500,7 +528,6 @@ router.get('/search', serviceController.searchServices);
  *       400:
  *         description: Coordonnées GPS requises
  */
-router.get('/nearby', serviceController.getNearbyServices);
+router.get("/nearby", serviceController.getNearbyServices);
 
 module.exports = router;
-

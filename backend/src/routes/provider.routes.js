@@ -1,19 +1,19 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const providerController = require('../controllers/providers/provider.controller');
-const { authenticate, authorize } = require('../middleware/auth.middleware');
+const providerController = require("../controllers/providers/provider.controller");
+const { authenticate, authorize } = require("../middleware/auth.middleware");
 const {
-  registerProviderSchema,
-  updateProviderSchema,
-  validate,
-} = require('../validators/provider.validator');
-const { ROLES } = require('../config/constants');
+	registerProviderSchema,
+	updateProviderSchema,
+	validate,
+} = require("../validators/provider.validator");
+const { ROLES } = require("../config/constants");
 
 /**
  * @swagger
  * /api/providers/register:
  *   post:
- *     summary: Inscription d'un prestataire
+ *     summary: Inscription d'un prestataire (User)
  *     tags: [Providers]
  *     security:
  *       - bearerAuth: []
@@ -46,13 +46,18 @@ const { ROLES } = require('../config/constants');
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.post('/register', authenticate, validate(registerProviderSchema), providerController.registerProvider);
+router.post(
+	"/register",
+	authenticate,
+	validate(registerProviderSchema),
+	providerController.registerProvider
+);
 
 /**
  * @swagger
  * /api/providers/profile:
  *   get:
- *     summary: Obtenir le profil du prestataire connecté
+ *     summary: Obtenir le profil du prestataire connecté (Provider/Admin)
  *     tags: [Providers]
  *     security:
  *       - bearerAuth: []
@@ -79,7 +84,12 @@ router.post('/register', authenticate, validate(registerProviderSchema), provide
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/profile', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), providerController.getProfile);
+router.get(
+	"/profile",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	providerController.getProfile
+);
 
 /**
  * @swagger
@@ -113,13 +123,13 @@ router.get('/profile', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), pro
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/:id', providerController.getProfileById);
+router.get("/:id", providerController.getProfileById);
 
 /**
  * @swagger
  * /api/providers/profile:
  *   put:
- *     summary: Mettre à jour le profil du prestataire connecté
+ *     summary: Mettre à jour le profil du prestataire connecté (Provider/Admin)
  *     tags: [Providers]
  *     security:
  *       - bearerAuth: []
@@ -143,7 +153,13 @@ router.get('/:id', providerController.getProfileById);
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  */
-router.put('/profile', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), validate(updateProviderSchema), providerController.updateProfile);
+router.put(
+	"/profile",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	validate(updateProviderSchema),
+	providerController.updateProfile
+);
 
 /**
  * @swagger
@@ -205,7 +221,7 @@ router.put('/profile', authenticate, authorize(ROLES.PROVIDER, ROLES.ADMIN), val
  *             schema:
  *               $ref: '#/components/schemas/PaginatedResponse'
  */
-router.get('/', providerController.getAllProviders);
+router.get("/", providerController.getAllProviders);
 
 /**
  * @swagger
@@ -240,14 +256,14 @@ router.get('/', providerController.getAllProviders);
  *             schema:
  *               $ref: '#/components/schemas/PaginatedResponse'
  */
-router.get('/approved', providerController.getApprovedProviders);
+router.get("/approved", providerController.getApprovedProviders);
 
 // Routes spécifiques AVANT les routes avec :id pour éviter les conflits
 /**
  * @swagger
  * /api/providers/{id}/approve:
  *   put:
- *     summary: Approuver un prestataire (admin seulement)
+ *     summary: Approuver un prestataire (Admin)
  *     tags: [Providers, Admin]
  *     security:
  *       - bearerAuth: []
@@ -272,13 +288,18 @@ router.get('/approved', providerController.getApprovedProviders);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put('/:id/approve', authenticate, authorize(ROLES.ADMIN), providerController.approveProvider);
+router.put(
+	"/:id/approve",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	providerController.approveProvider
+);
 
 /**
  * @swagger
  * /api/providers/{id}/reject:
  *   put:
- *     summary: Rejeter un prestataire (admin seulement)
+ *     summary: Rejeter un prestataire (Admin)
  *     tags: [Providers, Admin]
  *     security:
  *       - bearerAuth: []
@@ -303,7 +324,12 @@ router.put('/:id/approve', authenticate, authorize(ROLES.ADMIN), providerControl
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put('/:id/reject', authenticate, authorize(ROLES.ADMIN), providerController.rejectProvider);
+router.put(
+	"/:id/reject",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	providerController.rejectProvider
+);
 
 /**
  * @swagger
@@ -351,7 +377,12 @@ router.put('/:id/reject', authenticate, authorize(ROLES.ADMIN), providerControll
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put('/:id', authenticate, authorize(ROLES.ADMIN), providerController.updateProviderById);
+router.put(
+	"/:id",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	providerController.updateProviderById
+);
 
 /**
  * @swagger
@@ -378,7 +409,12 @@ router.put('/:id', authenticate, authorize(ROLES.ADMIN), providerController.upda
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.delete('/:id', authenticate, authorize(ROLES.ADMIN), providerController.deleteProviderById);
+router.delete(
+	"/:id",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	providerController.deleteProviderById
+);
 
 /**
  * @swagger
@@ -434,27 +470,26 @@ router.delete('/:id', authenticate, authorize(ROLES.ADMIN), providerController.d
  *         $ref: '#/components/responses/ForbiddenError'
  */
 router.put(
-  '/profile/location',
-  authenticate,
-  authorize(ROLES.PROVIDER, ROLES.ADMIN),
-  providerController.updateLocation
+	"/profile/location",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	providerController.updateLocation
 );
 
 // Réservations reçues par le prestataire connecté
 router.get(
-  '/bookings',
-  authenticate,
-  authorize(ROLES.PROVIDER, ROLES.ADMIN),
-  providerController.getMyBookings
+	"/bookings",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	providerController.getMyBookings
 );
 
 // Avis reçus par le prestataire connecté
 router.get(
-  '/reviews',
-  authenticate,
-  authorize(ROLES.PROVIDER, ROLES.ADMIN),
-  providerController.getMyReviews
+	"/reviews",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	providerController.getMyReviews
 );
 
 module.exports = router;
-

@@ -46,7 +46,7 @@ const getDashboardStats = async (req, res, next) => {
 			// e) Monthly Revenue
 			Payment.sum("amount", {
 				where: {
-					status: "completed", // Adjust payment status
+					status: "success", // Correct status from Payment model
 					createdAt: {
 						[Op.between]: [startOfMonth, endOfMonth],
 					},

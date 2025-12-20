@@ -16,7 +16,7 @@ const { ROLES } = require("../config/constants");
  * @swagger
  * /api/users/profile:
  *   get:
- *     summary: Obtenir le profil de l'utilisateur connecté
+ *     summary: Obtenir le profil de l'utilisateur connecté (All Roles)
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -45,7 +45,7 @@ router.get("/profile", authenticate, userController.getProfile);
  * @swagger
  * /api/users/profile:
  *   put:
- *     summary: Mettre à jour le profil de l'utilisateur connecté
+ *     summary: Mettre à jour le profil de l'utilisateur connecté (All Roles)
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -78,7 +78,7 @@ router.put(
  * @swagger
  * /api/users/location:
  *   put:
- *     summary: Mettre à jour la localisation de l'utilisateur
+ *     summary: Mettre à jour la localisation de l'utilisateur (All Roles)
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -111,7 +111,7 @@ router.put(
  * @swagger
  * /api/users/language:
  *   put:
- *     summary: Changer la langue de l'utilisateur
+ *     summary: Changer la langue de l'utilisateur (All Roles)
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -150,7 +150,7 @@ router.get("/reviews", authenticate, userController.getMyReviews);
  * @swagger
  * /api/users:
  *   post:
- *     summary: Créer un utilisateur (admin seulement)
+ *     summary: Créer un utilisateur (Admin)
  *     tags: [Users, Admin]
  *     security:
  *       - bearerAuth: []
@@ -178,7 +178,7 @@ router.get("/reviews", authenticate, userController.getMyReviews);
  *                 type: string
  *               role:
  *                 type: string
- *                 enum: [user, provider, admin]
+ *                 enum: [user, provider, admin, mechanic]
  *     responses:
  *       201:
  *         description: Utilisateur créé avec succès
@@ -201,7 +201,7 @@ router.post(
  * @swagger
  * /api/users:
  *   get:
- *     summary: Obtenir tous les utilisateurs (admin seulement)
+ *     summary: Obtenir tous les utilisateurs (Admin)
  *     tags: [Users, Admin]
  *     security:
  *       - bearerAuth: []
@@ -222,7 +222,7 @@ router.post(
  *         name: role
  *         schema:
  *           type: string
- *           enum: [user, provider, admin]
+ *           enum: [user, provider, admin, mechanic]
  *         description: Filtrer par rôle
  *       - in: query
  *         name: isVerified
@@ -269,7 +269,7 @@ router.get(
  * @swagger
  * /api/users/{id}:
  *   get:
- *     summary: Obtenir un utilisateur par ID (admin seulement)
+ *     summary: Obtenir un utilisateur par ID (Admin)
  *     tags: [Users, Admin]
  *     security:
  *       - bearerAuth: []
@@ -312,7 +312,7 @@ router.get(
  * @swagger
  * /api/users/{id}:
  *   put:
- *     summary: Mettre à jour un utilisateur (admin seulement)
+ *     summary: Mettre à jour un utilisateur (Admin)
  *     tags: [Users, Admin]
  *     security:
  *       - bearerAuth: []
@@ -340,7 +340,7 @@ router.get(
  *                 type: string
  *               role:
  *                 type: string
- *                 enum: [user, provider, admin]
+ *                 enum: [user, provider, admin, mechanic]
  *               isVerified:
  *                 type: boolean
  *               address:
@@ -372,7 +372,7 @@ router.put(
  * @swagger
  * /api/users/{id}:
  *   delete:
- *     summary: Supprimer un utilisateur (admin seulement)
+ *     summary: Supprimer un utilisateur (Admin)
  *     tags: [Users, Admin]
  *     security:
  *       - bearerAuth: []

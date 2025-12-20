@@ -3,7 +3,7 @@ const serviceRepository = require("../../data-access/service.repository");
 const userRepository = require("../../data-access/user.repository");
 const { AppError, ERROR_MESSAGES } = require("../../utils/errors");
 const logger = require("../../utils/logger");
-const { MAINTENANCE_STATUS } = require("../../config/constants");
+const { MAINTENANCE_STATUS, ROLES } = require("../../config/constants");
 
 /**
  * Service pour les opérations sur les maintenances
@@ -34,6 +34,10 @@ class MaintenanceService {
 		const mechanic = await userRepository.findById(mechanicId);
 		if (!mechanic) {
 			throw new AppError("Mécanicien non trouvé", 404);
+		}
+
+		if (mechanic.role !== ROLES.MECHANIC) {
+			throw new AppError("L'utilisateur spécifié n'est pas un mécanicien", 400);
 		}
 
 		// Calculer la durée si endDate est fournie mais pas duration
@@ -118,6 +122,12 @@ class MaintenanceService {
 			const mechanic = await userRepository.findById(mechanicId);
 			if (!mechanic) {
 				throw new AppError("Mécanicien non trouvé", 404);
+			}
+			if (mechanic.role !== ROLES.MECHANIC) {
+				throw new AppError(
+					"L'utilisateur spécifié n'est pas un mécanicien",
+					400
+				);
 			}
 		}
 

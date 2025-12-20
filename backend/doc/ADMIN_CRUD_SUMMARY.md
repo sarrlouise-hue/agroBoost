@@ -18,7 +18,7 @@ Ce document résume toutes les fonctionnalités CRUD admin ajoutées au backend 
   - Pagination : `page`, `limit`
 
 - **POST `/api/users`** - Créer un utilisateur (Admin)
-  - Permet de créer directement un admin, prestataire ou utilisateur avec mot de passe défini.
+  - Permet de créer directement un admin, prestataire, mécanicien ou utilisateur avec mot de passe défini.
 
 - **GET `/api/users/:id`** - Voir un utilisateur spécifique
   - Retourne les détails complets d'un utilisateur (sans mot de passe)
@@ -105,6 +105,35 @@ Ce document résume toutes les fonctionnalités CRUD admin ajoutées au backend 
 
 ---
 
+## 7. Maintenances (Admin & Mechanics)
+
+### Endpoints
+
+- **GET `/api/maintenances`** - Liste toutes les maintenances
+  - Filtres : `serviceId`, `mechanicId`, `status`, `startDate`, `endDate`
+  - Pagination : `page`, `limit`
+  - Accessible par : Admin, Provider, Mechanic (pour voir les leurs)
+
+- **POST `/api/maintenances`** - Créer une maintenance
+  - Accessible par : Admin, Provider
+  - **règle :** L'utilisateur assigné (`mechanicId`) DOIT avoir le rôle `mechanic`.
+
+- **PUT `/api/maintenances/:id`** - Mettre à jour une maintenance
+  - Accessible par : Admin, Provider
+  - **règle :** L'utilisateur assigné (`mechanicId`) DOIT avoir le rôle `mechanic`.
+
+- **POST `/api/maintenances/:id/start`** - Démarrer une maintenance
+  - Accessible par : Admin, Provider, **Mechanic**
+
+- **POST `/api/maintenances/:id/complete`** - Compléter une maintenance
+  - Accessible par : Admin, Provider, **Mechanic**
+
+- **DELETE `/api/maintenances/:id`** - Supprimer une maintenance
+  - Accessible par : Admin, Provider
+  - **règle :** Impossible de supprimer une maintenance en cours.
+
+---
+
 ## Filtres Avancés Disponibles
 
 ### Filtres Communs
@@ -118,7 +147,7 @@ Ce document résume toutes les fonctionnalités CRUD admin ajoutées au backend 
 ### Filtres Spécifiques
 
 #### Users
-- `role` : `user`, `provider`, `admin`
+- `role` : `user`, `provider`, `admin`, `mechanic`
 - `isVerified` : `true`/`false`
 
 #### Providers

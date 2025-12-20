@@ -13,7 +13,7 @@ const { ROLES } = require("../config/constants");
  * @swagger
  * /api/maintenances:
  *   post:
- *     summary: Créer une maintenance
+ *     summary: Créer une maintenance (Provider/Admin)
  *     tags: [Maintenances]
  *     security:
  *       - bearerAuth: []
@@ -136,7 +136,7 @@ router.get("/", authenticate, maintenanceController.getAllMaintenances);
  * @swagger
  * /api/maintenances/stats/reports:
  *   get:
- *     summary: Obtenir les statistiques des maintenances
+ *     summary: Obtenir les statistiques des maintenances (Provider/Admin)
  *     tags: [Maintenances]
  *     security:
  *       - bearerAuth: []
@@ -183,7 +183,7 @@ router.get("/:id", authenticate, maintenanceController.getMaintenanceById);
  * @swagger
  * /api/maintenances/{id}:
  *   put:
- *     summary: Mettre à jour une maintenance
+ *     summary: Mettre à jour une maintenance (Provider/Admin)
  *     tags: [Maintenances]
  *     security:
  *       - bearerAuth: []
@@ -244,7 +244,7 @@ router.put(
  * @swagger
  * /api/maintenances/{id}:
  *   delete:
- *     summary: Supprimer une maintenance
+ *     summary: Supprimer une maintenance (Provider/Admin)
  *     tags: [Maintenances]
  *     security:
  *       - bearerAuth: []
@@ -367,7 +367,7 @@ router.get(
  * @swagger
  * /api/maintenances/{id}/start:
  *   post:
- *     summary: Démarrer une maintenance
+ *     summary: Démarrer une maintenance (Mechanic/Admin/Provider)
  *     tags: [Maintenances]
  *     security:
  *       - bearerAuth: []
@@ -392,7 +392,7 @@ router.get(
 router.post(
 	"/:id/start",
 	authenticate,
-	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	authorize(ROLES.PROVIDER, ROLES.ADMIN, ROLES.MECHANIC),
 	maintenanceController.startMaintenance
 );
 
@@ -400,7 +400,7 @@ router.post(
  * @swagger
  * /api/maintenances/{id}/complete:
  *   post:
- *     summary: Compléter une maintenance
+ *     summary: Compléter une maintenance (Mechanic/Admin/Provider)
  *     tags: [Maintenances]
  *     security:
  *       - bearerAuth: []
@@ -440,7 +440,7 @@ router.post(
 router.post(
 	"/:id/complete",
 	authenticate,
-	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	authorize(ROLES.PROVIDER, ROLES.ADMIN, ROLES.MECHANIC),
 	validateCompleteMaintenance,
 	maintenanceController.completeMaintenance
 );

@@ -1,12 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const bookingController = require('../controllers/bookings/booking.controller');
-const { authenticate, authorize } = require('../middleware/auth.middleware');
+const bookingController = require("../controllers/bookings/booking.controller");
+const { authenticate, authorize } = require("../middleware/auth.middleware");
 const {
-  createBookingSchema,
-  validate,
-} = require('../validators/booking.validator');
-const { ROLES } = require('../config/constants');
+	createBookingSchema,
+	validate,
+} = require("../validators/booking.validator");
+const { ROLES } = require("../config/constants");
 
 /**
  * @swagger
@@ -45,10 +45,10 @@ const { ROLES } = require('../config/constants');
  *         description: Conflit de disponibilité (double réservation)
  */
 router.post(
-  '/',
-  authenticate,
-  validate(createBookingSchema),
-  bookingController.createBooking
+	"/",
+	authenticate,
+	validate(createBookingSchema),
+	bookingController.createBooking
 );
 
 /**
@@ -132,7 +132,7 @@ router.post(
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.get('/', authenticate, bookingController.getAllBookings);
+router.get("/", authenticate, bookingController.getAllBookings);
 
 /**
  * @swagger
@@ -169,13 +169,13 @@ router.get('/', authenticate, bookingController.getAllBookings);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/:id', authenticate, bookingController.getBookingById);
+router.get("/:id", authenticate, bookingController.getBookingById);
 
 /**
  * @swagger
  * /api/bookings/{id}/confirm:
  *   put:
- *     summary: Confirmer une réservation (provider)
+ *     summary: Confirmer une réservation (Provider/Admin)
  *     tags: [Bookings]
  *     security:
  *       - bearerAuth: []
@@ -211,17 +211,17 @@ router.get('/:id', authenticate, bookingController.getBookingById);
  *         $ref: '#/components/responses/NotFoundError'
  */
 router.put(
-  '/:id/confirm',
-  authenticate,
-  authorize(ROLES.PROVIDER, ROLES.ADMIN),
-  bookingController.confirmBooking
+	"/:id/confirm",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	bookingController.confirmBooking
 );
 
 /**
  * @swagger
  * /api/bookings/{id}/cancel:
  *   put:
- *     summary: Annuler une réservation (utilisateur ou prestataire)
+ *     summary: Annuler une réservation (User/Provider/Admin)
  *     tags: [Bookings]
  *     security:
  *       - bearerAuth: []
@@ -256,13 +256,13 @@ router.put(
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put('/:id/cancel', authenticate, bookingController.cancelBooking);
+router.put("/:id/cancel", authenticate, bookingController.cancelBooking);
 
 /**
  * @swagger
  * /api/bookings/{id}/complete:
  *   put:
- *     summary: Marquer une réservation comme terminée (provider)
+ *     summary: Marquer une réservation comme terminée (Provider/Admin)
  *     tags: [Bookings]
  *     security:
  *       - bearerAuth: []
@@ -298,10 +298,10 @@ router.put('/:id/cancel', authenticate, bookingController.cancelBooking);
  *         $ref: '#/components/responses/NotFoundError'
  */
 router.put(
-  '/:id/complete',
-  authenticate,
-  authorize(ROLES.PROVIDER, ROLES.ADMIN),
-  bookingController.completeBooking
+	"/:id/complete",
+	authenticate,
+	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	bookingController.completeBooking
 );
 
 /**
@@ -330,7 +330,11 @@ router.put(
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.delete('/:id', authenticate, authorize(ROLES.ADMIN), bookingController.deleteBooking);
+router.delete(
+	"/:id",
+	authenticate,
+	authorize(ROLES.ADMIN),
+	bookingController.deleteBooking
+);
 
 module.exports = router;
-

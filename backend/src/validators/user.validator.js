@@ -65,9 +65,12 @@ const updateUserByAdminSchema = Joi.object({
 			"string.pattern.base":
 				"Le numéro de téléphone doit être au format international avec le préfixe +",
 		}),
-	role: Joi.string().valid("user", "provider", "admin").optional().messages({
-		"any.only": 'Le rôle doit être "user", "provider" ou "admin"',
-	}),
+	role: Joi.string()
+		.valid("user", "provider", "admin", "mechanic")
+		.optional()
+		.messages({
+			"any.only": 'Le rôle doit être "user", "provider", "admin" ou "mechanic"',
+		}),
 	isVerified: Joi.boolean().optional(),
 	address: Joi.string().optional().allow(null, ""),
 	language: Joi.string().valid("fr", "wolof").optional().messages({
@@ -121,9 +124,12 @@ const createUserByAdminSchema = Joi.object({
 		"string.min": "Le mot de passe doit contenir au moins 6 caractères",
 		"any.required": "Le mot de passe est requis",
 	}),
-	role: Joi.string().valid("user", "provider", "admin").optional().messages({
-		"any.only": 'Le rôle doit être "user", "provider" ou "admin"',
-	}),
+	role: Joi.string()
+		.valid("user", "provider", "admin", "mechanic")
+		.optional()
+		.messages({
+			"any.only": 'Le rôle doit être "user", "provider", "admin" ou "mechanic"',
+		}),
 	isVerified: Joi.boolean().optional(),
 	address: Joi.string().optional().allow(null, ""),
 	language: Joi.string().valid("fr", "wolof").optional().messages({

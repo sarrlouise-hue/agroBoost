@@ -1,12 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const reviewController = require('../controllers/reviews/review.controller');
-const { authenticate } = require('../middleware/auth.middleware');
+const reviewController = require("../controllers/reviews/review.controller");
+const { authenticate } = require("../middleware/auth.middleware");
 const {
-  createReviewSchema,
-  updateReviewSchema,
-  validate,
-} = require('../validators/review.validator');
+	createReviewSchema,
+	updateReviewSchema,
+	validate,
+} = require("../validators/review.validator");
 
 /**
  * @swagger
@@ -41,7 +41,12 @@ const {
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.post('/', authenticate, validate(createReviewSchema), reviewController.createReview);
+router.post(
+	"/",
+	authenticate,
+	validate(createReviewSchema),
+	reviewController.createReview
+);
 
 /**
  * @swagger
@@ -74,7 +79,7 @@ router.post('/', authenticate, validate(createReviewSchema), reviewController.cr
  *             schema:
  *               $ref: '#/components/schemas/PaginatedResponse'
  */
-router.get('/service/:serviceId', reviewController.getServiceReviews);
+router.get("/service/:serviceId", reviewController.getServiceReviews);
 
 /**
  * @swagger
@@ -107,7 +112,7 @@ router.get('/service/:serviceId', reviewController.getServiceReviews);
  *             schema:
  *               $ref: '#/components/schemas/PaginatedResponse'
  */
-router.get('/provider/:providerId', reviewController.getProviderReviews);
+router.get("/provider/:providerId", reviewController.getProviderReviews);
 
 /**
  * @swagger
@@ -142,7 +147,7 @@ router.get('/provider/:providerId', reviewController.getProviderReviews);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  *   delete:
- *     summary: Supprimer un avis (utilisateur normal : seulement ses propres avis, admin : n'importe quel avis)
+ *     summary: Supprimer un avis (User/Admin)
  *     tags: [Reviews, Admin]
  *     security:
  *       - bearerAuth: []
@@ -163,9 +168,12 @@ router.get('/provider/:providerId', reviewController.getProviderReviews);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put('/:id', authenticate, validate(updateReviewSchema), reviewController.updateReview);
-router.delete('/:id', authenticate, reviewController.deleteReview);
+router.put(
+	"/:id",
+	authenticate,
+	validate(updateReviewSchema),
+	reviewController.updateReview
+);
+router.delete("/:id", authenticate, reviewController.deleteReview);
 
 module.exports = router;
-
-

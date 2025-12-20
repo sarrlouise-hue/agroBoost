@@ -1,17 +1,17 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const paymentController = require('../controllers/payments/payment.controller');
-const { authenticate } = require('../middleware/auth.middleware');
+const paymentController = require("../controllers/payments/payment.controller");
+const { authenticate } = require("../middleware/auth.middleware");
 const {
-  initiatePaymentSchema,
-  validate,
-} = require('../validators/payment.validator');
+	initiatePaymentSchema,
+	validate,
+} = require("../validators/payment.validator");
 
 /**
  * @swagger
  * /api/payments/initiate:
  *   post:
- *     summary: Initialiser un paiement PayTech
+ *     summary: Initialiser un paiement PayTech (User/Provider/Admin)
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
@@ -57,10 +57,10 @@ const {
  *         $ref: '#/components/responses/NotFoundError'
  */
 router.post(
-  '/initiate',
-  authenticate,
-  validate(initiatePaymentSchema),
-  paymentController.initiatePayment
+	"/initiate",
+	authenticate,
+	validate(initiatePaymentSchema),
+	paymentController.initiatePayment
 );
 
 /**
@@ -100,13 +100,13 @@ router.post(
  *       404:
  *         description: Paiement non trouvé
  */
-router.post('/webhook/paytech', paymentController.handlePayTechWebhook);
+router.post("/webhook/paytech", paymentController.handlePayTechWebhook);
 
 /**
  * @swagger
  * /api/payments/{id}:
  *   get:
- *     summary: Obtenir un paiement par ID
+ *     summary: Obtenir un paiement par ID (User/Provider/Admin)
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
@@ -137,13 +137,13 @@ router.post('/webhook/paytech', paymentController.handlePayTechWebhook);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/:id', authenticate, paymentController.getPaymentById);
+router.get("/:id", authenticate, paymentController.getPaymentById);
 
 /**
  * @swagger
  * /api/payments/{id}/status:
  *   get:
- *     summary: Vérifier le statut d'un paiement (vérifie également auprès de PayTech)
+ *     summary: Vérifier le statut d'un paiement (User/Provider/Admin)
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
@@ -174,13 +174,13 @@ router.get('/:id', authenticate, paymentController.getPaymentById);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/:id/status', authenticate, paymentController.checkPaymentStatus);
+router.get("/:id/status", authenticate, paymentController.checkPaymentStatus);
 
 /**
  * @swagger
  * /api/payments:
  *   get:
- *     summary: Obtenir tous les paiements
+ *     summary: Obtenir tous les paiements (User/Provider/Admin)
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
@@ -223,7 +223,6 @@ router.get('/:id/status', authenticate, paymentController.checkPaymentStatus);
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.get('/', authenticate, paymentController.getAllPayments);
+router.get("/", authenticate, paymentController.getAllPayments);
 
 module.exports = router;
-
