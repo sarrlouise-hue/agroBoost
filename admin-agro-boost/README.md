@@ -50,6 +50,13 @@ npm run build
 
 ### Déploiement sur Vercel
 
+Le projet inclut un fichier `vercel.json` configuré pour :
+- ✅ **Rewrites** : Support du routing React (SPA)
+- ✅ **Cache optimisé** : Assets statiques cachés pendant 1 an
+- ✅ **Build automatique** : Configuration Vite intégrée
+
+**Étapes de déploiement** :
+
 1. Connectez votre repository GitHub à Vercel
 2. Configurez la variable d'environnement :
    - `VITE_API_BASE_URL` = URL de votre backend en production
