@@ -1,16 +1,73 @@
-# React + Vite
+# Admin Panel - ALLO TRACTEUR
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Panel d'administration pour la plateforme ALLO TRACTEUR.
 
-Currently, two official plugins are available:
+## 🚀 Démarrage rapide
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Prérequis
+- Node.js >= 18.0.0
+- npm >= 9.0.0
 
-## React Compiler
+### Installation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Installer les dépendances :
+```bash
+npm install
+```
 
-## Expanding the ESLint configuration
+2. Configurer les variables d'environnement :
+```bash
+cp .env.example .env
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+3. Modifier le fichier `.env` avec l'URL de votre backend :
+```bash
+VITE_API_BASE_URL=http://localhost:3000/api
+```
+
+### Développement
+
+Lancer le serveur de développement :
+```bash
+npm run dev
+```
+
+L'application sera accessible sur `http://localhost:5173`
+
+### Build de production
+
+```bash
+npm run build
+```
+
+## 🔧 Configuration
+
+### Variables d'environnement
+
+- `VITE_API_BASE_URL` : URL de base de l'API backend
+  - Développement : `http://localhost:3000/api`
+  - Production : `https://votre-backend.vercel.app/api`
+
+### Déploiement sur Vercel
+
+1. Connectez votre repository GitHub à Vercel
+2. Configurez la variable d'environnement :
+   - `VITE_API_BASE_URL` = URL de votre backend en production
+3. Déployez !
+
+## 📝 Connexion
+
+Pour vous connecter au panel admin, utilisez un compte avec le rôle `admin`.
+
+**Compte par défaut** (si vous avez exécuté le script seed) :
+- Téléphone : `771234567`
+- Mot de passe : `Admin123!`
+
+## 🛠️ Technologies utilisées
+
+- React 19.2.0
+- React Router DOM 7.9.6
+- Material-UI 7.3.5
+- Axios 1.13.2
+- Recharts 3.6.0
+- Vite 7.2.4
