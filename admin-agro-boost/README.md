@@ -59,8 +59,8 @@ npm run build
 
 Pour vous connecter au panel admin, utilisez un compte avec le rôle `admin`.
 
-**Compte par défaut** (si vous avez exécuté le script seed) :
-- Téléphone : `771234567`
+**Compte admin disponible** :
+- Téléphone : `+221771234567`
 - Mot de passe : `Admin123!`
 
 ## 🛠️ Technologies utilisées
