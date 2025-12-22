@@ -1,0 +1,33 @@
+{
+	"name": "agroboost-monorepo",
+	"version": "1.0.0",
+	"description": "ALLO TRACTEUR - Plateforme de réservation de services agricoles (Backend + Admin Panel)",
+	"private": true,
+	"scripts": {
+		"dev": "concurrently \"npm run dev:backend\" \"npm run dev:admin\" --names \"BACKEND,ADMIN\" --prefix-colors \"cyan,magenta\"",
+		"dev:backend": "cd backend && npm run dev",
+		"dev:admin": "cd admin-agro-boost && npm run dev",
+		"install:all": "npm install && cd backend && npm install && cd ../admin-agro-boost && npm install",
+		"build:admin": "cd admin-agro-boost && npm run build",
+		"start:backend": "cd backend && npm start",
+		"lint:backend": "cd backend && npm run lint",
+		"lint:admin": "cd admin-agro-boost && npm run lint",
+		"test:backend": "cd backend && npm test"
+	},
+	"keywords": [
+		"agriculture",
+		"senegal",
+		"monorepo",
+		"backend",
+		"admin-panel"
+	],
+	"author": "ALLO TRACTEUR",
+	"license": "ISC",
+	"devDependencies": {
+		"concurrently": "^8.2.2"
+	},
+	"engines": {
+		"node": ">=18.0.0",
+		"npm": ">=9.0.0"
+	}
+}
