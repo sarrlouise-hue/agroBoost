@@ -1,0 +1,22 @@
+COMPTES MÉCANICIENS CRÉÉS (OU À CRÉER VIA SCRIPT):
+
+1. Jean Mecanicien
+   Email: jean.mecanicien@agroboost.com
+   Password: password123
+   Role: mechanic
+
+2. Paul Reparateur
+   Email: paul.reparateur@agroboost.com
+   Password: password123
+   Role: mechanic
+
+POUR UTILISER DANS POST /api/maintenances:
+1. Récupérer l'ID de ces utilisateurs via GET /api/users (Admin) ou via la base de données.
+2. Utiliser cet ID dans le champ "mechanicId".
+
+NOTE SUR POST /api/services:
+La route est bien définie dans backend/src/routes/service.routes.js.
+Si vous avez une erreur 404, vérifiez :
+- L'URL exacte : http://localhost:3000/api/services
+- Que le serveur a bien redémarré.
+- Que vous êtes authentifié en tant que Provider ou Admin (Bearer Token).

@@ -12,6 +12,33 @@ Tous les endpoints d'authentification sont publics et ne nécessitent pas de tok
 
 ---
 
+## Rôle Mécanicien
+
+Le système inclut un rôle `mechanic` pour les utilisateurs chargés de la maintenance.
+
+### Création de Mécaniciens
+Les mécaniciens sont des utilisateurs standard avec le rôle `mechanic`.
+Ils peuvent être créés via :
+1. L'endpoint d'inscription standard (`POST /api/auth/register`) en spécifiant `role: "mechanic"` (si autorisé ou via admin).
+2. L'endpoint de création d'utilisateur Admin (`POST /api/users`) avec `role: "mechanic"`.
+3. Le script de seed : `node scripts/create-mechanics.js`.
+
+### Utilisation dans les Maintenances
+Lors de la création d'une maintenance (`POST /api/maintenances`), le champ `mechanicId` est **obligatoire**. Ce champ doit correspondre à l'UUID d'un utilisateur existant ayant le rôle `mechanic`.
+
+Exemple de body pour `POST /api/maintenances`:
+```json
+{
+  "serviceId": "uuid-du-service",
+  "mechanicId": "uuid-du-mecanicien",
+  "startDate": "2024-01-01T10:00:00Z",
+  "description": "Révision moteur",
+  "cost": 50000
+}
+```
+
+---
+
 ## Endpoints
 
 ### 1. Health Check
@@ -36,7 +63,7 @@ Vérifier le statut du serveur
 
 #### POST `/auth/register`
 
-Inscrire un nouvel utilisateur
+Inscrire un nouvel Agriculteur (User)
 
 **Body:**
 
@@ -263,11 +290,11 @@ Authorization: Bearer votre-token-ici
 
 ---
 
-## 8. Gestion des Utilisateurs
+## 8. Gestion des Agriculteurs (Users)
 
 ### GET `/users/profile`
 
-Obtenir le profil de l'utilisateur connecté
+Obtenir le profil de l'agriculteur connecté
 
 **Headers:**
 

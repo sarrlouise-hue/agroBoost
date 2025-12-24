@@ -35,7 +35,7 @@ const { ROLES } = require("../config/constants");
  *               mechanicId:
  *                 type: string
  *                 format: uuid
- *                 description: ID du mécanicien assigné
+ *                 description: ID du mécanicien assigné (Utilisateur avec le rôle 'mechanic')
  *               startDate:
  *                 type: string
  *                 format: date-time
@@ -446,3 +446,4 @@ router.post(
 );
 
 module.exports = router;
+// Touching file to trigger reload
