@@ -8,55 +8,58 @@ const styles = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '100vh',
+        minHeight: '100vh', // Utilisation de minHeight pour le scroll mobile
         backgroundColor: '#f4f7f9', 
+        padding: '20px', // Espace de sécurité sur les bords
     },
     card: {
-        width: '400px',
-        padding: '50px',
+        width: '100%', // Prend toute la largeur dispo
+        maxWidth: '400px', // Mais s'arrête à 400px sur PC
+        padding: '30px 20px', // Padding réduit pour mobile
         backgroundColor: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+        borderRadius: '12px',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
         textAlign: 'center',
     },
     logo: {
-        fontSize: '1.8em',
+        fontSize: 'clamp(1.4em, 5vw, 1.8em)', // Taille de texte fluide
         fontWeight: 'bold',
         color: '#006633', 
-        marginBottom: '30px',
+        marginBottom: '20px',
     },
     input: { 
         width: '100%',
-        padding: '12px',
+        padding: '14px', // Plus grand pour faciliter le clic au doigt
         margin: '5px 0 15px 0', 
         border: '1px solid #ccc',
-        borderRadius: '4px',
+        borderRadius: '8px',
         boxSizing: 'border-box',
+        fontSize: '16px', // Évite le zoom automatique forcé sur iPhone
     },
     labelContainer: { 
         textAlign: 'left',
-        marginBottom: '10px',
-        // MODIFICATION ICI
+        marginBottom: '5px',
         fontWeight: 'bold', 
         fontSize: '14px',  
         color: '#333',      
     },
     button: {
         width: '100%',
-        padding: '12px',
+        padding: '14px',
         backgroundColor: '#4CAF50', 
         color: 'white',
         border: 'none',
-        borderRadius: '4px',
+        borderRadius: '8px',
         cursor: 'pointer',
         marginTop: '10px',
         fontSize: '1em',
         fontWeight: 'bold',
         transition: 'background-color 0.3s',
     },
+    // Le cercle d'icône devient plus petit sur mobile via une astuce simple
     iconCircleStyle: {
-        width: '160px', 
-        height: '160px',
+        width: 'clamp(80px, 20vw, 140px)', 
+        height: 'clamp(80px, 20vw, 140px)',
         borderRadius: '50%', 
         backgroundColor: '#E8F5E9', 
         display: 'flex',
@@ -104,19 +107,21 @@ function LoginPage() {
                 <div style={styles.logo}>ALLOTRACTEUR Admin</div>
                 
                 <div style={styles.iconCircleStyle}>
-                  <FiTruck size={80} color="#4CAF50" />
+                  {/* L'icône s'adapte aussi à la taille du cercle */}
+                  <FiTruck size="50%" color="#4CAF50" />
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     {error && (
-                        <p style={{ color: 'red', fontSize: '13px', marginBottom: '15px'}}>
+                        <p style={{ color: '#d32f2f', fontSize: '13px', marginBottom: '15px', backgroundColor: '#ffebee', padding: '10px', borderRadius: '4px'}}>
                             ⚠️ {error}
                         </p>
                     )}
 
                     <div style={styles.labelContainer}>
-                        <label>Numéro de Téléphone</label>
+                        <label htmlFor="phone">Numéro de Téléphone</label>
                         <input
+                            id="phone"
                             type="tel"
                             placeholder="Ex: 77XXXXXXX"
                             value={phone}
@@ -127,8 +132,9 @@ function LoginPage() {
                     </div>
 
                     <div style={styles.labelContainer}>
-                        <label>Mot de passe</label>
+                        <label htmlFor="password">Mot de passe</label>
                         <input
+                            id="password"
                             type="password"
                             placeholder="••••••••"
                             value={password}
@@ -138,8 +144,16 @@ function LoginPage() {
                         />
                     </div>
 
-                    <button type="submit" disabled={loading} style={styles.button}>
-                        {loading ? 'Connexion en cours...' : 'SE CONNECTER'}
+                    <button 
+                        type="submit" 
+                        disabled={loading} 
+                        style={{
+                            ...styles.button,
+                            backgroundColor: loading ? '#a5d6a7' : '#4CAF50',
+                            cursor: loading ? 'not-allowed' : 'pointer'
+                        }}
+                    >
+                        {loading ? 'Connexion...' : 'SE CONNECTER'}
                     </button>
                 </form>
             </div>

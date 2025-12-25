@@ -3,52 +3,13 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api'; 
 import { 
     FaUser, FaTractor, FaUsers, FaClipboardList, 
-    FaTools, FaSignOutAlt, FaBell, FaChartBar, FaTimes 
+    FaTools, FaSignOutAlt, FaBell, FaChartBar, FaTimes, FaBars 
 } from 'react-icons/fa';
 
-// Couleurs & Styles 
+// Couleurs thématiques
 const COLOR_BLUE_DARK = '#002534';
 const COLOR_BLUE_LIGHT_ACTIVE = '#003E57';
 const COLOR_BLUE_LOGO = '#0070AB';
-
-const sidebarStyle = {
-    width: '240px',
-    minHeight: '100vh',
-    background: COLOR_BLUE_DARK,
-    color: 'white',
-    boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'sticky',
-    top: 0,
-};
-
-const navItemStyle = {
-    margin: '5px 0',
-    padding: '10px 15px',
-    borderRadius: '0 40px 40px 0',
-    transition: 'background-color 0.2s',
-};
-
-const navLinkStyle = {
-    color: 'white',
-    textDecoration: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    fontWeight: 500,
-    fontSize: '15px',
-};
-
-const headerStyle = {
-    background: 'white',
-    padding: '10px 30px',
-    borderBottom: '1px solid #eee',
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-    position: 'relative',
-};
 
 const NAV_ITEMS = [
     { name: 'Tableau de bord', path: '/', icon: <FaClipboardList /> },
@@ -62,184 +23,200 @@ const NAV_ITEMS = [
 function AdminLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-
     const [notifications, setNotifications] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
-    
-    // Référence pour garder trace du nombre précédent 
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
     const prevCountRef = useRef(0);
 
-    // 1. Charger les notifications
+    // Chargement des notifications
     const fetchNotifications = async () => {
         try {
             const response = await api.get('/notifications');
             const data = response.data.data || response.data || [];
-            
-            // Jouer un son si le nombre de notifications non lues augmente
             const currentUnread = data.filter(n => !n.isRead).length;
+            
             if (currentUnread > prevCountRef.current) {
                 const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
-                audio.play().catch(e => console.log("Audio bloqué par le navigateur"));
+                audio.play().catch(() => {});
             }
             prevCountRef.current = currentUnread;
-            
             setNotifications(data);
-        } catch (error) {
-            console.error("Erreur notifications:", error);
+        } catch (error) { 
+            console.error("Erreur notifications:", error); 
         }
     };
 
     useEffect(() => {
         fetchNotifications();
-        const interval = setInterval(fetchNotifications, 30000); // Toutes les 30s
+        const interval = setInterval(fetchNotifications, 30000);
         return () => clearInterval(interval);
     }, []);
 
+    // Fermeture automatique du menu mobile lors d'un changement de page
+    useEffect(() => { 
+        setIsSidebarOpen(false); 
+    }, [location.pathname]);
+
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
-    const handleLogout = async () => {
+    const handleLogout = () => {
         if (window.confirm("Voulez-vous vraiment vous déconnecter ?")) {
-            try { await api.post('/auth/logout'); } 
-            catch (e) { console.error(e); } 
-            finally {
-                localStorage.removeItem('agroboost_admin_token');
-                navigate('/login', { replace: true });
-            }
+            localStorage.removeItem('agroboost_admin_token');
+            navigate('/login', { replace: true });
         }
-    };
-
-    const markAllAsRead = async () => {
-        try {
-            await api.patch('/notifications/read-all');
-            fetchNotifications();
-        } catch (error) { console.error(error); }
-    };
-
-    //  (SUPPRESSION)
-    const deleteNotification = async (id, e) => {
-        e.stopPropagation(); // Empêche de déclencher le clic sur la notification elle-même
-        try {
-            
-            await api.delete(`/notifications/${id}`);
-            // Mise à jour immédiate de l'interface
-            setNotifications(prev => prev.filter(n => (n._id || n.id) !== id));
-        } catch (error) {
-            console.error("Erreur suppression:", error);
-            alert("Impossible de supprimer la notification");
-        }
-    };
-
-    const handleNotificationClick = async (notif) => {
-        const id = notif._id || notif.id;
-        try {
-            if (!notif.isRead) {
-                await api.patch(`/notifications/${id}/read`);
-                fetchNotifications();
-            }
-            setShowDropdown(false);
-            if(notif.type === 'booking') navigate('/reservations');
-            if(notif.type === 'provider') navigate('/users');
-        } catch (error) { console.error(error); }
     };
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f4f7f9' }}>
-            
-            {/* SIDEBAR */}
-            <aside style={sidebarStyle}>
-                <div style={{ padding: '20px 0', textAlign: 'center' }}>
-                    <span style={{ color: COLOR_BLUE_LOGO, fontWeight: '900', fontSize: '24px', border: '2px solid '+COLOR_BLUE_LOGO, borderRadius: '50%', padding: '3px 8px', marginRight: '5px' }}>O</span>
-                    <span style={{ fontWeight: 'bold', color: 'white' }}>ALLOTRACTEUR</span>
-                </div>
+        <div className="layout-container">
+            <style>{`
+                .layout-container { display: flex; min-height: 100vh; background: #f4f7f9; }
+                
+                /* --- SIDEBAR --- */
+                .sidebar {
+                    width: 240px; background: ${COLOR_BLUE_DARK}; color: white;
+                    display: flex; flex-direction: column; position: fixed;
+                    top: 0; bottom: 0; left: 0; z-index: 1000;
+                    transition: transform 0.3s ease;
+                    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+                }
 
-                <nav style={{ flexGrow: 1, paddingRight: '20px', marginTop: '30px' }}>
-                    {NAV_ITEMS.map(item => {
-                        const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
-                        return (
-                            <div key={item.path} style={{ ...navItemStyle, backgroundColor: isActive ? COLOR_BLUE_LIGHT_ACTIVE : 'transparent', borderLeft: isActive ? '3px solid white' : 'none' }}>
-                                <Link to={item.path} style={navLinkStyle}>
-                                    <span style={{ marginRight: '10px', fontSize: '18px', opacity: 0.8 }}>{item.icon}</span>
-                                    {item.name}
-                                </Link>
-                            </div>
-                        );
-                    })}
+                .sidebar-logo {
+                    padding: 30px 20px; text-align: center; font-weight: 800; 
+                    font-size: 1.3rem; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.05);
+                }
+
+                .main-content { 
+                    flex-grow: 1; margin-left: 240px; 
+                    display: flex; flex-direction: column; min-width: 0; 
+                    transition: margin 0.3s ease;
+                }
+
+                /* --- RESPONSIVE LOGIC --- */
+                .sidebar-overlay { display: none; }
+
+                @media (max-width: 992px) {
+                    .sidebar { transform: translateX(${isSidebarOpen ? '0' : '-240px'}); }
+                    .main-content { margin-left: 0; }
+                    .sidebar-overlay {
+                        display: ${isSidebarOpen ? 'block' : 'none'};
+                        position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 900;
+                    }
+                }
+
+                /* --- NAVIGATION --- */
+                .nav-item { 
+                    margin: 4px 0; padding: 12px 25px; transition: 0.2s; 
+                    cursor: pointer; display: flex; align-items: center; 
+                    color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.95rem;
+                }
+                .nav-item:hover { color: white; background: rgba(255,255,255,0.05); }
+                .nav-item.active { 
+                    background: ${COLOR_BLUE_LIGHT_ACTIVE}; color: white; 
+                    border-left: 4px solid ${COLOR_BLUE_LOGO}; 
+                }
+                
+                /* --- HEADER --- */
+                .header { 
+                    height: 65px; background: white; padding: 0 30px; 
+                    display: flex; align-items: center; 
+                    position: sticky; top: 0; z-index: 800; 
+                    border-bottom: 1px solid #eee;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+                }
+
+                .header-spacer { flex-grow: 1; } /* Pousse les icônes à droite */
+
+                .mobile-toggle { 
+                    display: none; background: none; border: none; 
+                    font-size: 22px; cursor: pointer; color: #333; margin-right: 15px;
+                }
+                @media (max-width: 992px) { .mobile-toggle { display: block; } }
+
+                /* --- ACTIONS (Notifs & Profil) --- */
+                .header-actions { display: flex; align-items: center; gap: 25px; }
+
+                .profile-badge {
+                    display: flex; align-items: center; gap: 10px; 
+                    background: #f0f2f5; padding: 6px 15px; 
+                    border-radius: 20px; cursor: pointer; border: 1px solid #eef0f2;
+                }
+
+                .notif-badge {
+                    position: absolute; top: -7px; right: -7px; 
+                    background: #FF4D4F; color: white; font-size: 10px; 
+                    min-width: 18px; height: 18px; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center;
+                    border: 2px solid white; font-weight: bold;
+                }
+            `}</style>
+
+            {/* Overlay Mobile */}
+            <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>
+
+            {/* BARRE LATÉRALE */}
+            <aside className="sidebar">
+                <div className="sidebar-logo">
+                    <span style={{ color: COLOR_BLUE_LOGO }}>ALLO</span>TRACTEUR
+                </div>
+                
+                <nav style={{ flexGrow: 1, marginTop: '10px' }}>
+                    {NAV_ITEMS.map(item => (
+                        <Link 
+                            key={item.path} 
+                            to={item.path} 
+                            className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                        >
+                            <span style={{ marginRight: '15px', fontSize: '18px' }}>{item.icon}</span>
+                            {item.name}
+                        </Link>
+                    ))}
                 </nav>
 
-                <div style={{ padding: '20px 15px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <FaUser style={{ fontSize: '24px', marginRight: '10px' }} /> 
-                        <span style={{ fontWeight: 'bold' }}>Admin</span>
-                    </div>
-                    <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '18px' }}><FaSignOutAlt /></button>
+                <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                    <button 
+                        onClick={handleLogout} 
+                        style={{ background: 'none', border: 'none', color: '#ff7875', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontWeight: '600', width: '100%' }}
+                    >
+                        <FaSignOutAlt /> Déconnexion
+                    </button>
                 </div>
             </aside>
 
-            {/* MAIN CONTENT */}
-            <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                <header style={headerStyle}>
-                    <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-                        
-                        {/* Cloche */}
-                        <div onClick={() => setShowDropdown(!showDropdown)} style={{ position: 'relative', cursor: 'pointer', marginRight: '20px' }}>
-                            <FaBell style={{ fontSize: '20px', color: '#666' }} />
+            {/* CONTENU PRINCIPAL */}
+            <main className="main-content">
+                <header className="header">
+                    <button className="mobile-toggle" onClick={() => setIsSidebarOpen(true)}>
+                        <FaBars />
+                    </button>
+
+                    {/* L'espaceur qui garantit que tout ce qui suit va à DROITE */}
+                    <div className="header-spacer"></div>
+                    
+                    <div className="header-actions">
+                        {/* Cloche de Notifications */}
+                        <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => setShowDropdown(!showDropdown)}>
+                            <FaBell color="#595959" size={20} />
                             {unreadCount > 0 && (
-                                <span style={{ position: 'absolute', top: '-8px', right: '-8px', backgroundColor: '#FF4D4F', color: 'white', borderRadius: '50%', padding: '2px 6px', fontSize: '10px', fontWeight: 'bold', border: '2px solid white' }}>
-                                    {unreadCount}
-                                </span>
+                                <span className="notif-badge">{unreadCount}</span>
                             )}
                         </div>
 
-                        {/* Dropdown */}
-                        {showDropdown && (
-                            <div style={{ position: 'absolute', top: '45px', right: '50px', width: '320px', backgroundColor: 'white', boxShadow: '0 10px 25px rgba(0,0,0,0.15)', borderRadius: '12px', zIndex: 1000, border: '1px solid #eee' }}>
-                                <div style={{ padding: '15px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <b style={{fontSize: '14px'}}>Notifications ({unreadCount})</b>
-                                    <button onClick={markAllAsRead} style={{fontSize: '11px', border: 'none', background: 'none', color: COLOR_BLUE_LOGO, cursor: 'pointer', fontWeight: 'bold'}}>Tout lire</button>
-                                </div>
-                                <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
-                                    {notifications.length === 0 ? (
-                                        <p style={{ padding: '20px', textAlign: 'center', color: '#999', fontSize: '13px' }}>Aucune notification</p>
-                                    ) : (
-                                        notifications.map(n => (
-                                            <div 
-                                                key={n._id || n.id} 
-                                                onClick={() => handleNotificationClick(n)}
-                                                style={{ padding: '12px 15px', borderBottom: '1px solid #f0f0f0', backgroundColor: n.isRead ? 'white' : '#f0f7ff', cursor: 'pointer', position: 'relative' }}
-                                            >
-                                                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#333', paddingRight: '20px' }}>{n.title}</div>
-                                                <div style={{ fontSize: '12px', color: '#666', marginTop: '3px' }}>{n.message}</div>
-                                                <div style={{ fontSize: '10px', color: '#aaa', marginTop: '5px' }}>{new Date(n.createdAt).toLocaleString()}</div>
-                                                
-                                                {/* BOUTON */}
-                                                <div 
-                                                    onClick={(e) => deleteNotification(n._id || n.id, e)}
-                                                    style={{ position: 'absolute', top: '10px', right: '10px', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', transition: '0.2s' }}
-                                                    onMouseEnter={e => e.currentTarget.style.backgroundColor = '#ffeeee'}
-                                                    onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
-                                                >
-                                                    <FaTimes style={{ color: '#ccc', fontSize: '12px' }} />
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
+                        {/* Profil Utilisateur */}
+                        <div className="profile-badge">
+                            <div style={{ background: '#d9d9d9', borderRadius: '50%', width: '26px', height: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <FaUser color="white" size={14} />
                             </div>
-                        )}
-
-                        {/* Profil */}
-                        <div style={{ display: 'flex', alignItems: 'center', padding: '5px 12px', borderRadius: '20px', backgroundColor: '#f8f8f8' }}>
-                            <span style={{ fontSize: '14px', marginRight: '10px', color: '#333', fontWeight: '500' }}>Admin</span>
-                            <FaUser style={{ width: '25px', height: '25px', color: '#ccc' }} />
+                            <span style={{ fontSize: '13px', fontWeight: '600', color: '#262626' }}>Admin</span>
                         </div>
                     </div>
                 </header>
 
-                <div style={{ padding: '30px 40px', flexGrow: 1, overflowY: 'auto' }}>
+                {/* Zone d'affichage des pages enfants */}
+                <div style={{ padding: '30px', flexGrow: 1, overflowY: 'auto' }}>
                     <Outlet />
                 </div>
 
-                <footer style={{ padding: '15px 40px', borderTop: '1px solid #eee', textAlign: 'center', fontSize: '12px', color: '#999', background: 'white' }}>
+                <footer style={{ padding: '20px 30px', borderTop: '1px solid #eee', textAlign: 'center', fontSize: '12px', color: '#bfbfbf', background: 'white' }}>
                     © {new Date().getFullYear()} ALLOTRACTEUR - Propulsé par AGROTECH.
                 </footer>
             </main>
@@ -248,5 +225,3 @@ function AdminLayout() {
 }
 
 export default AdminLayout;
-
-     

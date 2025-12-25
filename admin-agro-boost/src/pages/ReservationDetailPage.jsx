@@ -17,7 +17,6 @@ function ReservationDetailPage() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                // On récupère : la réservation + les services + les utilisateurs
                 const [resDetail, resServices, resUsers] = await Promise.all([
                     api.get(`/bookings/${id}`),
                     api.get('/services?limit=100'),
@@ -36,59 +35,118 @@ function ReservationDetailPage() {
         fetchData();
     }, [id]);
 
-    if (loading) return <div style={{ textAlign: 'center', padding: '100px' }}><FiRefreshCcw className="spin-icon" size={30} /></div>;
+    if (loading) return (
+        <div style={{ textAlign: 'center', padding: '100px' }}>
+            <FiRefreshCcw className="spin-icon" size={30} style={{ animation: 'spin 1s linear infinite' }} />
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+    );
+    
     if (!reservation) return <div style={{ textAlign: 'center', padding: '100px' }}>Réservation introuvable.</div>;
 
-    // LOGIQUE DE CORRESPONDANCE (ID -> NOM)
-    
-    // Trouver le service
     const serviceName = servicesList.find(s => (s._id || s.id) === reservation.serviceId)?.name || "Service inconnu";
-
-    // Trouver l'utilisateur (Le Client)
     const client = usersList.find(u => (u._id || u.id) === reservation.userId);
     const clientDisplayName = client ? `${client.firstName} ${client.lastName}` : `ID: ...${reservation.userId?.slice(-6)}`;
     const clientEmail = client?.email || "Email non disponible";
-
     const status = reservation.status?.toLowerCase();
 
     return (
-        <div style={{ padding: '30px', maxWidth: '900px', margin: '0 auto', fontFamily: "'Inter', sans-serif" }}>
-            <button onClick={() => navigate('/reservations')} style={{ border:'none', background:'none', color:'#718096', cursor:'pointer', display:'flex', alignItems:'center', gap:'5px', marginBottom:'20px' }}>
+        <div className="detail-container">
+            <style>{`
+                .detail-container { 
+                    padding: clamp(15px, 5vw, 30px); 
+                    max-width: 900px; 
+                    margin: 0 auto; 
+                    font-family: 'Inter', sans-serif; 
+                }
+                .card { 
+                    background-color: white; 
+                    border-radius: 12px; 
+                    padding: clamp(15px, 5vw, 30px); 
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+                }
+                .header-flex { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    align-items: flex-start;
+                    border-bottom: 1px solid #EDF2F7; 
+                    padding-bottom: 20px; 
+                    marginBottom: 20px; 
+                    gap: 15px;
+                }
+                .grid-info { 
+                    display: grid; 
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+                    gap: 20px; 
+                    margin-top: 20px;
+                }
+                .data-row { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    padding: 12px 0; 
+                    border-bottom: 1px solid #E2E8F0; 
+                    font-size: 14px; 
+                    gap: 10px;
+                }
+                .data-row span { text-align: right; }
+
+                @media (max-width: 600px) {
+                    .header-flex { flex-direction: column; }
+                    .grid-info { grid-template-columns: 1fr; }
+                    .data-row { flex-direction: column; justify-content: flex-start; }
+                    .data-row span { text-align: left; font-weight: 500; }
+                }
+            `}</style>
+
+            <button onClick={() => navigate('/reservations')} style={{ border:'none', background:'none', color:'#718096', cursor:'pointer', display:'flex', alignItems:'center', gap:'5px', marginBottom:'20px', padding: 0 }}>
                 <FiArrowLeft /> Retour au suivi
             </button>
 
-            <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '30px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #EDF2F7', paddingBottom: '20px', marginBottom: '20px' }}>
+            <div className="card">
+                <div className="header-flex">
                     <div>
-                        <h1 style={{ fontSize: '24px', color: '#1A202C', margin: 0 }}>Détails de la Réservation</h1>
-                        <p style={{ color: '#718096', fontSize: '13px', margin: '5px 0 0 0' }}>Référence : {id}</p>
+                        <h1 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.5rem)', color: '#1A202C', margin: 0 }}>Détails de la Réservation</h1>
+                        <p style={{ color: '#718096', fontSize: '13px', margin: '5px 0 0 0', wordBreak: 'break-all' }}>Référence : {id}</p>
                     </div>
                     <span style={statusBadgeStyle(status)}>{reservation.status}</span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-                    
+                <div className="grid-info">
                     {/* SECTION SERVICE */}
                     <div style={sectionBox}>
                         <h3 style={sectionTitle}><FiTruck color="#0070AB" /> Service & Paiement</h3>
-                        <div style={dataRow}><strong>Service:</strong> <span>{serviceName}</span></div>
-                        <div style={dataRow}><strong>Prix total:</strong> <span style={{ color: '#0070AB', fontWeight: 'bold' }}>{reservation.totalPrice?.toLocaleString()} XOF</span></div>
-                        <div style={dataRow}><strong>Date:</strong> <span>{new Date(reservation.bookingDate).toLocaleDateString('fr-FR')}</span></div>
+                        <div className="data-row"><strong>Service:</strong> <span>{serviceName}</span></div>
+                        <div className="data-row"><strong>Prix total:</strong> <span style={{ color: '#0070AB', fontWeight: 'bold' }}>{reservation.totalPrice?.toLocaleString()} XOF</span></div>
+                        <div className="data-row"><strong>Date:</strong> <span>{new Date(reservation.bookingDate).toLocaleDateString('fr-FR')}</span></div>
                     </div>
 
                     {/* SECTION CLIENT */}
                     <div style={sectionBox}>
                         <h3 style={sectionTitle}><FiUser color="#0070AB" /> Informations Client</h3>
-                        <div style={dataRow}><strong>Nom:</strong> <span>{clientDisplayName}</span></div>
-                        <div style={dataRow}><strong>Email:</strong> <span>{clientEmail}</span></div>
-                        <div style={dataRow}><strong>Notes:</strong> <span>{reservation.notes || "Aucune note"}</span></div>
+                        <div className="data-row"><strong>Nom:</strong> <span>{clientDisplayName}</span></div>
+                        <div className="data-row"><strong>Email:</strong> <span>{clientEmail}</span></div>
+                        <div className="data-row"><strong>Notes:</strong> <span>{reservation.notes || "Aucune note"}</span></div>
                     </div>
                 </div>
 
                 {/* LOGISTIQUE */}
-                <div style={{ marginTop: '20px' }}>
+                <div style={{ marginTop: '20px', ...sectionBox }}>
                      <h3 style={sectionTitle}><FiMapPin color="#0070AB" /> Logistique</h3>
-                     <div style={dataRow}><strong>Coordonnées:</strong> <span>Lat: {reservation.latitude} / Long: {reservation.longitude}</span></div>
+                     <div className="data-row">
+                        <strong>Coordonnées:</strong> 
+                        <span>Lat: {reservation.latitude} / Long: {reservation.longitude}</span>
+                     </div>
+                     <div className="data-row">
+                        <strong>Lieu:</strong> 
+                        <a 
+                            href={`https://www.google.com/maps?q=${reservation.latitude},${reservation.longitude}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{ color: '#0070AB', textDecoration: 'none', fontSize: '13px', fontWeight: 'bold' }}
+                        >
+                            Voir sur Google Maps
+                        </a>
+                     </div>
                 </div>
             </div>
         </div>
@@ -97,11 +155,19 @@ function ReservationDetailPage() {
 
 const sectionBox = { backgroundColor: '#F8FAFC', padding: '20px', borderRadius: '8px' };
 const sectionTitle = { fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px', color: '#2D3748' };
-const dataRow = { display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #E2E8F0', fontSize: '14px' };
 
 const statusBadgeStyle = (status) => {
     const colors = { pending: '#FF9800', confirmed: '#2196F3', completed: '#4CAF50', cancelled: '#F44336' };
-    return { backgroundColor: colors[status] || '#CBD5E0', color: 'white', padding: '6px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold', height: 'fit-content' };
+    return { 
+        backgroundColor: colors[status] || '#CBD5E0', 
+        color: 'white', 
+        padding: '6px 16px', 
+        borderRadius: '20px', 
+        fontSize: '12px', 
+        fontWeight: 'bold', 
+        height: 'fit-content',
+        whiteSpace: 'nowrap' 
+    };
 };
 
 export default ReservationDetailPage;

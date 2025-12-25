@@ -1,239 +1,185 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api'; 
 import { Link } from 'react-router-dom';
-import { FaUsers, FaSearch, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaUsers, FaSearch, FaPlus, FaEdit, FaTrash, FaPhone, FaEnvelope } from "react-icons/fa";
 
-// Styles Constants (Bleu et Vert pour le thème Agro)
-const PRIMARY_COLOR = '#0070AB'; // Bleu
-const SUCCESS_COLOR = '#4CAF50'; // Vert
+// Styles Constants
+const PRIMARY_COLOR = '#0070AB';
+const SUCCESS_COLOR = '#4CAF50';
 
-// Style pour les boutons modernes
 const buttonStyle = {
     padding: '10px 18px',
-    borderRadius: '6px',
+    borderRadius: '8px',
     border: 'none',
     cursor: 'pointer',
     fontWeight: '600',
-    transition: 'background-color 0.2s',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    transition: 'all 0.2s ease',
 };
 
-// Style pour les champs de formulaire modernes (recherche)
-const inputStyle = {
-    padding: '10px 15px',
-    borderRadius: '6px',
-    border: '1px solid #ddd',
-    boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)',
-    width: '300px', // Largeur fixe pour la recherche
-    outline: 'none',
-    marginRight: '10px',
-};
-
-// Style pour les badges de statut
 const getStatusBadgeStyle = (isVerified) => ({
     display: 'inline-block',
-    padding: '4px 10px',
-    borderRadius: '12px',
-    fontSize: '12px',
+    padding: '4px 12px',
+    borderRadius: '20px',
+    fontSize: '11px',
     fontWeight: 'bold',
     color: isVerified ? '#0F6B4E' : '#9A3412',
-    backgroundColor: isVerified ? '#E6FFFA' : '#FEFCBF',
+    backgroundColor: isVerified ? '#E6FFFA' : '#FFFBEB',
+    border: `1px solid ${isVerified ? '#B2F5EA' : '#FEF3C7'}`,
 });
 
 function UsersPage() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    
-    // Paramètres de pagination et recherche
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [search, setSearch] = useState('');
-    
-    // Ajouté pour gérer l'état d'une recherche sans résultat distincte du chargement
-    const [searchPerformed, setSearchPerformed] = useState(false); 
-    
-    const columns = ['Nom Complet', 'Email', 'Téléphone', 'Rôle', 'Statut', 'Actions']; 
 
     const fetchUsers = async (page = 1, searchQuery = '') => {
         setLoading(true);
         setError(null);
         try {
-            // Requête pour la liste (GET /api/users) 
             const response = await api.get(`/users`, {
                 params: { page: page, limit: 10, search: searchQuery }
             });
-            
             const { data: fetchedUsers, pagination } = response.data;
-            
-            const filteredUsers = Array.isArray(fetchedUsers) ? fetchedUsers : [];
-            setUsers(filteredUsers); 
-
+            setUsers(Array.isArray(fetchedUsers) ? fetchedUsers : []); 
             setTotalPages(pagination?.totalPages || 1);
             setCurrentPage(pagination?.page || page);
-            
-            setSearchPerformed(searchQuery.trim() !== '');
-
         } catch (err) {
-            console.error("Erreur lors de la récupération des utilisateurs:", err.response || err);
-            // Amélioration du message d'erreur pour aider au debug
-            const errorMessage = err.response?.status === 404 && err.response?.config?.url.includes('/users')
-                ? "API backend : La route /users n'est pas trouvée (pour la liste). Vérifiez la configuration du serveur."
-                : err.response?.data?.message || "Impossible de charger la liste des utilisateurs.";
-            setError(errorMessage);
+            setError(err.response?.data?.message || "Erreur de connexion au serveur.");
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchUsers();
-    }, []); 
+    useEffect(() => { fetchUsers(); }, []); 
 
     const handleSearch = (e) => {
         e.preventDefault();
         fetchUsers(1, search); 
     };
-    
-    const handlePageChange = (newPage) => {
-        fetchUsers(newPage, search);
-    };
 
     const handleDelete = async(userId) => {
-        if (window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
-            try{
-                // Requête de suppression (DELETE /api/users/{id}) 
+        if (window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
+            try {
                 await api.delete(`/users/${userId}`); 
-                
-                // Recharger les données après suppression
                 fetchUsers(currentPage, search);
-                console.log(`Suppression de l'utilisateur ID: ${userId} réussie.`);
-            }catch (err){
-                console.error("Erreur lors de la suppression:", err.response || err);
-                const errorMessage = err.response?.data?.message || "Échec de la suppression. Vérifiez la route de votre API.";
-                setError(errorMessage);
+            } catch (err) {
+                alert("Erreur lors de la suppression.");
             }
         }
     };
 
     return (
-        <div 
-            style={{ 
-                padding: 0, 
-                backgroundColor: 'transparent', 
-                width: '100%', 
-                minHeight: '100vh' 
-            }}
-        >
-            <div style={{ padding: '20px', backgroundColor: 'white' }}>
-
-                <h1 style={{ color: PRIMARY_COLOR, borderBottom: '2px solid #eee', paddingBottom: '10px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <FaUsers size={28} style={{ color: PRIMARY_COLOR }} />
-                    Gestion des Utilisateurs
-                </h1>
+        <div style={{ padding: 'clamp(10px, 3vw, 25px)', backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+            <div style={{ 
+                backgroundColor: 'white', 
+                borderRadius: '16px', 
+                padding: 'clamp(15px, 4vw, 30px)', 
+                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)' 
+            }}>
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                    <form onSubmit={handleSearch} style={{ display: 'flex', alignItems: 'center' }}>
-                        <input 
-                            type="text" 
-                            placeholder="Rechercher par nom ou email..." 
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            style={inputStyle}
-                        />
-                        <button 
-                            type="submit" 
-                            style={{ ...buttonStyle, background: PRIMARY_COLOR, color: 'white' }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#005a8f'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = PRIMARY_COLOR}
-                        >
-                            <FaSearch style={{ marginRight: '6px' }} /> Rechercher
-                        </button>
-                    </form>
-                    <Link to="/users/add">
-                        <button 
-                            style={{ ...buttonStyle, background: SUCCESS_COLOR, color: 'white' }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3e8e41'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = SUCCESS_COLOR}
-                        >
-                            <FaPlus style={{ marginRight: '6px' }} /> Ajouter Utilisateur
-                        </button>
-                    </Link>
+                {/* --- HEADER --- */}
+                <div style={{ marginBottom: '30px' }}>
+                    <h1 style={{ 
+                        color: PRIMARY_COLOR, 
+                        fontSize: 'clamp(1.4rem, 5vw, 2rem)', 
+                        margin: '0 0 20px 0', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '12px' 
+                    }}>
+                        <FaUsers /> Gestion des Utilisateurs
+                    </h1>
+
+                    <div style={{ 
+                        display: 'flex', 
+                        flexWrap: 'wrap', 
+                        gap: '12px', 
+                        justifyContent: 'space-between' 
+                    }}>
+                        <form onSubmit={handleSearch} style={{ display: 'flex', flexGrow: 1, maxWidth: '600px', gap: '8px' }}>
+                            <div style={{ position: 'relative', flexGrow: 1 }}>
+                                <input 
+                                    type="text" 
+                                    placeholder="Rechercher..." 
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    style={{ 
+                                        width: '100%',
+                                        padding: '12px 12px 12px 40px', 
+                                        borderRadius: '10px', 
+                                        border: '1px solid #e2e8f0',
+                                        fontSize: '15px',
+                                        boxSizing: 'border-box'
+                                    }}
+                                />
+                                <FaSearch style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                            </div>
+                            <button type="submit" style={{ ...buttonStyle, background: PRIMARY_COLOR, color: 'white' }}>
+                                <span className="hide-mobile">Rechercher</span>
+                            </button>
+                        </form>
+
+                        <Link to="/users/add" style={{ textDecoration: 'none', width: 'auto' }}>
+                            <button style={{ ...buttonStyle, background: SUCCESS_COLOR, color: 'white', width: '100%' }}>
+                                <FaPlus /> <span className="hide-mobile">Ajouter</span>
+                            </button>
+                        </Link>
+                    </div>
                 </div>
-                
-                {loading && <p style={{ textAlign: 'center', padding: '20px' }}>Chargement de la liste des utilisateurs...</p>}
-                {error && <p style={{ color: 'red', textAlign: 'center', padding: '20px', border: '1px solid red', backgroundColor: '#fee2e2', borderRadius: '4px' }}>
-                    ⚠️ Erreur API : {error}
-                </p>}
 
-                {!loading && !error && users.length > 0 && (
+                {/* --- CONTENU --- */}
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '50px' }}>Chargement...</div>
+                ) : error ? (
+                    <div style={{ color: '#e53e3e', textAlign: 'center', padding: '20px', backgroundColor: '#fff5f5', borderRadius: '8px' }}>⚠️ {error}</div>
+                ) : (
                     <>
-                        <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid #eee' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                        {/* VERSION DESKTOP (Tableau) */}
+                        <div className="hide-mobile">
+                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
-                                    <tr style={{ backgroundColor: '#f4f7f9' }}>
-                                        {columns.map(col => (
-                                            <th 
-                                                key={col} 
-                                                style={{ 
-                                                    padding: '12px 15px', 
-                                                    textAlign: 'left', 
-                                                    fontSize: '14px', 
-                                                    color: '#333', 
-                                                    fontWeight: '700' 
-                                                }}
-                                            >
-                                                {col}
-                                            </th>
-                                        ))}
+                                    <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left' }}>
+                                        <th style={{ padding: '15px', color: '#64748b', fontSize: '13px', textTransform: 'uppercase' }}>Utilisateur</th>
+                                        <th style={{ padding: '15px', color: '#64748b', fontSize: '13px', textTransform: 'uppercase' }}>Contact</th>
+                                        <th style={{ padding: '15px', color: '#64748b', fontSize: '13px', textTransform: 'uppercase' }}>Rôle</th>
+                                        <th style={{ padding: '15px', color: '#64748b', fontSize: '13px', textTransform: 'uppercase' }}>Statut</th>
+                                        <th style={{ padding: '15px', textAlign: 'right', color: '#64748b', fontSize: '13px', textTransform: 'uppercase' }}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {users.map(user => (
-                                        <tr 
-                                            key={user.id} 
-                                            style={{ borderBottom: '1px solid #f0f0f0' }}
-                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#fafafa'}
-                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'white'}
-                                        >
-                                            <td style={{ padding: '12px 15px', fontWeight: '500' }}>{user.firstName} {user.lastName}</td>
-                                            <td style={{ padding: '12px 15px' }}>{user.email}</td>
-                                            <td style={{ padding: '12px 15px' }}>{user.phoneNumber || '-'}</td>
-                                            <td style={{ padding: '12px 15px' }}>
-                                                <span style={{ 
-                                                    padding: '4px 8px', 
-                                                    borderRadius: '4px', 
-                                                    backgroundColor: user.role === 'admin' ? PRIMARY_COLOR : '#eee',
-                                                    color: user.role === 'admin' ? 'white' : '#333',
-                                                    fontSize: '12px',
-                                                    fontWeight: '600',
-                                                }}>
-                                                    {user.role || 'Producteur'}
+                                        <tr key={user.id} className="table-row" style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                            <td style={{ padding: '15px', fontWeight: '600', color: '#1e293b' }}>{user.firstName} {user.lastName}</td>
+                                            <td style={{ padding: '15px', fontSize: '13px', color: '#475569' }}>
+                                                <div><FaEnvelope size={10} /> {user.email}</div>
+                                                <div><FaPhone size={10} /> {user.phoneNumber || 'N/A'}</div>
+                                            </td>
+                                            <td style={{ padding: '15px' }}>
+                                                <span style={{ fontSize: '12px', color: user.role === 'admin' ? PRIMARY_COLOR : '#64748b', fontWeight: '700' }}>
+                                                    {user.role?.toUpperCase() || 'USER'}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '12px 15px' }}>
+                                            <td style={{ padding: '15px' }}>
                                                 <span style={getStatusBadgeStyle(user.isVerified)}>
-                                                    {user.isVerified ? 'Actif' : 'En attente'}
+                                                    {user.isVerified ? 'ACTIF' : 'EN ATTENTE'}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '12px 15px' }}>
-                                                <div style={{ display: 'flex', gap: '8px' }}> 
-                                                    {/* Ce lien déclenche l'appel 404  */}
+                                            <td style={{ padding: '15px', textAlign: 'right' }}>
+                                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                                                     <Link to={`/users/edit/${user.id}`}>
-                                                        <button 
-                                                            style={{ ...buttonStyle, padding: '6px 10px', background: PRIMARY_COLOR, color: 'white', fontSize: '12px' }}
-                                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#005a8f'}
-                                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = PRIMARY_COLOR}
-                                                        >
-                                                            <FaEdit style={{ marginRight: '4px' }} /> Modifier
+                                                        <button style={{ ...buttonStyle, padding: '8px', background: '#f0f9ff', color: PRIMARY_COLOR }} title="Modifier">
+                                                            <FaEdit />
                                                         </button>
                                                     </Link>
-                                                    <button 
-                                                        style={{ ...buttonStyle, padding: '6px 10px', background: '#e53e3e', color: 'white', fontSize: '12px' }} 
-                                                        onClick={() => handleDelete(user.id)}
-                                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c53030'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e53e3e'}
-                                                    >
-                                                        <FaTrash style={{ marginRight: '4px' }} /> Supprimer
+                                                    <button onClick={() => handleDelete(user.id)} style={{ ...buttonStyle, padding: '8px', background: '#fef2f2', color: '#ef4444' }} title="Supprimer">
+                                                        <FaTrash />
                                                     </button>
                                                 </div>
                                             </td>
@@ -242,45 +188,94 @@ function UsersPage() {
                                 </tbody>
                             </table>
                         </div>
-                        
-                        {/* Pagination */}
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: '30px', fontSize: '14px' }}>
-                            <span style={{ marginRight: '15px', color: '#555' }}>Page **{currentPage}** sur **{totalPages}**</span>
-                            <button 
-                                onClick={() => handlePageChange(currentPage - 1)} 
-                                disabled={currentPage === 1}
-                                style={{ 
-                                    ...buttonStyle, 
-                                    background: '#eee', 
-                                    color: '#333', 
-                                    padding: '8px 12px',
-                                    marginRight: '10px'
-                                }}
-                            >
-                                ← Précédent
-                            </button>
-                            <button 
-                                onClick={() => handlePageChange(currentPage + 1)} 
-                                disabled={currentPage === totalPages}
-                                style={{ 
-                                    ...buttonStyle, 
-                                    background: '#eee', 
-                                    color: '#333',
-                                    padding: '8px 12px',
-                                }}
-                            >
-                                Suivant →
-                            </button>
+
+                        {/* VERSION MOBILE (Cards) */}
+                        <div className="show-only-mobile">
+                            {users.map(user => (
+                                <div key={user.id} style={{ 
+                                    border: '1px solid #e2e8f0', 
+                                    borderRadius: '12px', 
+                                    padding: '16px', 
+                                    marginBottom: '12px',
+                                    backgroundColor: '#fff' 
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                                        <div>
+                                            <div style={{ fontWeight: '700', fontSize: '16px', color: '#1e293b' }}>{user.firstName} {user.lastName}</div>
+                                            <div style={{ fontSize: '12px', color: PRIMARY_COLOR, fontWeight: 'bold' }}>{user.role?.toUpperCase() || 'USER'}</div>
+                                        </div>
+                                        <span style={getStatusBadgeStyle(user.isVerified)}>{user.isVerified ? 'ACTIF' : 'EN ATTENTE'}</span>
+                                    </div>
+                                    <div style={{ fontSize: '14px', color: '#475569', marginBottom: '15px', lineHeight: '1.6' }}>
+                                        <div><FaEnvelope style={{ marginRight: '8px' }} /> {user.email}</div>
+                                        <div><FaPhone style={{ marginRight: '8px' }} /> {user.phoneNumber || 'N/A'}</div>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+                                        <Link to={`/users/edit/${user.id}`} style={{ flex: 1, textDecoration: 'none' }}>
+                                            <button style={{ ...buttonStyle, width: '100%', background: '#f0f9ff', color: PRIMARY_COLOR }}>
+                                                <FaEdit /> Modifier
+                                            </button>
+                                        </Link>
+                                        <button onClick={() => handleDelete(user.id)} style={{ ...buttonStyle, flex: 1, background: '#fef2f2', color: '#ef4444' }}>
+                                            <FaTrash /> Supprimer
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </>
                 )}
-                
-                {!loading && !error && users.length === 0 && (
-                    <p style={{ textAlign: 'center', padding: '20px', color: '#555' }}>
-                        {searchPerformed ? `Aucun utilisateur trouvé pour la recherche "${search}".` : 'Aucun utilisateur n\'a été trouvé.'}
-                    </p>
+
+                {/* --- PAGINATION --- */}
+                {!loading && users.length > 0 && (
+                    <div style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center', 
+                        gap: '15px',
+                        marginTop: '30px',
+                        paddingTop: '20px',
+                        borderTop: '1px solid #f1f5f9'
+                    }}>
+                        <div style={{ fontSize: '14px', color: '#64748b' }}>
+                            Page <strong>{currentPage}</strong> sur <strong>{totalPages}</strong>
+                        </div>
+                        <div style={{ display: 'flex', gap: '10px', width: '100%', justifyContent: 'center' }}>
+                            <button 
+                                disabled={currentPage === 1}
+                                onClick={() => fetchUsers(currentPage - 1, search)}
+                                style={{ ...buttonStyle, background: '#f1f5f9', color: '#475569', flex: 1, maxWidth: '120px' }}
+                            >
+                                Précédent
+                            </button>
+                            <button 
+                                disabled={currentPage === totalPages}
+                                onClick={() => fetchUsers(currentPage + 1, search)}
+                                style={{ ...buttonStyle, background: '#f1f5f9', color: '#475569', flex: 1, maxWidth: '120px' }}
+                            >
+                                Suivant
+                            </button>
+                        </div>
+                    </div>
                 )}
             </div>
+
+            <style>
+                {`
+                    .show-only-mobile { display: none; }
+                    .table-row:hover { background-color: #f8fafc; }
+                    
+                    @media (max-width: 768px) {
+                        .hide-mobile { display: none; }
+                        .show-only-mobile { display: block; }
+                        button { font-size: 14px; }
+                    }
+
+                    @media (max-width: 480px) {
+                        .header-actions { flex-direction: column; }
+                    }
+                `}
+            </style>
         </div>
     );
 }
