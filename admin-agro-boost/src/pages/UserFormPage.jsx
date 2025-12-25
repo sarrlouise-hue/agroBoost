@@ -1,25 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { FaArrowLeft, FaSave, FaUserPlus } from "react-icons/fa";
 
 const PRIMARY_COLOR = '#0070AB';
 const SUCCESS_COLOR = '#4CAF50';
-
-const modernInputStyle = {
-    width: '100%', 
-    padding: '12px 15px', 
-    border: '1px solid #ddd', 
-    borderRadius: '8px', 
-    outline: 'none',
-};
-
-const labelStyle = {
-    display: 'block', 
-    fontSize: '14px', 
-    fontWeight: 'bold', 
-    color: '#333', 
-    marginBottom: '6px'
-};
 
 export default function UserFormPage() {
     const { userId } = useParams();
@@ -51,12 +36,11 @@ export default function UserFormPage() {
                         lastName: userData.lastName || "",
                         email: userData.email || "",
                         phoneNumber: userData.phoneNumber || "",
-                        // Conversion du rôle API vers le format attendu par le select
                         role: userData.role || "user",
                         password: "", 
                     });
                 } catch (err) {
-                    setSubmitError("Erreur lors du chargement des données.");
+                    setSubmitError("Impossible de charger les données.");
                 } finally {
                     setLoading(false);
                 }
@@ -75,103 +59,192 @@ export default function UserFormPage() {
         setLoading(true);
         setSubmitError(null);
 
-        // NOUVELLES ROUTES ADMIN
         const url = isEditMode ? `/users/${userId}` : "/users"; 
         const method = isEditMode ? "put" : "post";
-
-        // Préparation des données avec les rôles attendus par l'API ("user", "provider", "admin")
-        const dataToSend = {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phoneNumber: formData.phoneNumber,
-            role: formData.role, 
-        };
-
-        // On ajoute le mot de passe seulement s'il est rempli
-        if (formData.password) {
-            dataToSend.password = formData.password;
-        }
+        const dataToSend = { ...formData };
+        if (isEditMode && !dataToSend.password) delete dataToSend.password; 
 
         try {
             await api[method](url, dataToSend);
-            alert(isEditMode ? "✅ Utilisateur mis à jour !" : "✅ Utilisateur créé avec succès !");
             navigate("/users");
         } catch (err) {
-            const apiErrors = err.response?.data?.errors;
-            setSubmitError(
-                Array.isArray(apiErrors) ? apiErrors.join(', ') : 
-                err.response?.data?.message || "Une erreur est survenue."
-            );
+            setSubmitError(err.response?.data?.message || "Erreur lors de l'enregistrement.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div style={{ padding: '20px', backgroundColor: '#f0f0f0', minHeight: '100vh' }}> 
-            <div style={{ backgroundColor: 'white', boxShadow: '0 8px 16px rgba(0,0,0,0.1)', borderRadius: '12px', padding: '50px', maxWidth: '800px', margin: '30px auto' }}>
-                <h1 style={{ fontSize: '1.8em', fontWeight: 'bold', marginBottom: '30px', color: PRIMARY_COLOR, textAlign: 'center' }}>
-                    {isEditMode ? "Modifier un utilisateur" : "Ajouter un utilisateur (Admin)"}
+        <div style={{ padding: 'clamp(10px, 3vw, 30px)', backgroundColor: '#f8fafc', minHeight: '100vh' }}> 
+            
+            {/* BOUTON RETOUR  */}
+            <div style={{ maxWidth: '800px', margin: '0 auto 20px auto' }}>
+                <button 
+                    onClick={() => navigate("/users")}
+                    className="btn-back"
+                    style={backButtonStyle}
+                >
+                    <FaArrowLeft /> Retour à la liste
+                </button>
+            </div>
+
+            <div style={containerStyle}>
+                <h1 style={titleStyle}>
+                    {isEditMode ? <><FaSave /> Modifier l'utilisateur</> : <><FaUserPlus /> Ajouter un utilisateur</>}
                 </h1>
 
                 {submitError && (
-                    <p style={{ color: '#E53E3E', textAlign: 'center', marginBottom: '20px', padding: '10px', backgroundColor: '#FEE8E8', borderRadius: '6px' }}>
+                    <div style={errorBannerStyle}>
                         ⚠️ {submitError}
-                    </p>
+                    </div>
                 )}
 
                 <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '20px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-                        <div>
-                            <label style={labelStyle}>Prénom</label>
-                            <input type="text" name="firstName" value={formData.firstName} onChange={handleFormChange} required style={modernInputStyle} />
-                        </div>
-                        <div>
-                            <label style={labelStyle}>Nom de famille</label>
-                            <input type="text" name="lastName" value={formData.lastName} onChange={handleFormChange} required style={modernInputStyle} />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label style={labelStyle}>Email</label>
-                        <input type="email" name="email" value={formData.email} onChange={handleFormChange} required style={modernInputStyle} />
-                    </div>
                     
-                    <div>
-                        <label style={labelStyle}>Téléphone</label>
-                        <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleFormChange} style={modernInputStyle} />
+                    <div className="form-grid">
+                        <div className="form-group">
+                            <label style={labelStyle}>Prénom</label>
+                            <input type="text" name="firstName" value={formData.firstName} onChange={handleFormChange} required style={modernInputStyle} placeholder="Ex: Moussa" />
+                        </div>
+                        <div className="form-group">
+                            <label style={labelStyle}>Nom de famille</label>
+                            <input type="text" name="lastName" value={formData.lastName} onChange={handleFormChange} required style={modernInputStyle} placeholder="Ex: Diop" />
+                        </div>
                     </div>
 
-                    <div>
-                        <label style={labelStyle}>Rôle</label>
-                        <select name="role" value={formData.role} onChange={handleFormChange} required style={modernInputStyle}>
-                            <option value="user">Producteur (User)</option>
-                            <option value="provider">Prestataire (Provider)</option>
-                            <option value="admin">Administrateur (Admin)</option>
-                        </select>
+                    <div className="form-grid">
+                        <div className="form-group">
+                            <label style={labelStyle}>Email</label>
+                            <input type="email" name="email" value={formData.email} onChange={handleFormChange} required style={modernInputStyle} placeholder="exemple@mail.com" />
+                        </div>
+                        <div className="form-group">
+                            <label style={labelStyle}>Téléphone</label>
+                            <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleFormChange} style={modernInputStyle} placeholder="+221 ..." />
+                        </div>
                     </div>
 
-                    <div>
-                        <label style={labelStyle}>
-                            Mot de passe {isEditMode && <span style={{ fontWeight: 'normal', color: '#666' }}>(laisser vide pour ne pas changer)</span>}
-                        </label>
-                        <input 
-                            type="password" 
-                            name="password" 
-                            value={formData.password} 
-                            onChange={handleFormChange} 
-                            required={!isEditMode} 
-                            style={modernInputStyle} 
-                            placeholder={isEditMode ? "••••••••" : "Entrez un mot de passe"}
-                        />
+                    <div className="form-grid">
+                        <div className="form-group">
+                            <label style={labelStyle}>Rôle</label>
+                            <select name="role" value={formData.role} onChange={handleFormChange} required style={modernInputStyle}>
+                                <option value="user">Producteur (User)</option>
+                                <option value="provider">Prestataire (Provider)</option>
+                                <option value="admin">Administrateur (Admin)</option>
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label style={labelStyle}>
+                                Mot de passe {isEditMode && <span style={{ fontWeight: 'normal', color: '#94a3b8', fontSize: '12px' }}>(Optionnel)</span>}
+                            </label>
+                            <input 
+                                type="password" name="password" 
+                                value={formData.password} onChange={handleFormChange} 
+                                required={!isEditMode} style={modernInputStyle} 
+                                placeholder={isEditMode ? "Laisser vide" : "Min. 6 caractères"}
+                            />
+                        </div>
                     </div>
 
-                    <button type="submit" disabled={loading} style={{ padding: '12px', background: SUCCESS_COLOR, color: 'white', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: 'pointer', marginTop: '10px' }}>
-                        {loading ? "Chargement..." : isEditMode ? "💾 Sauvegarder" : "✅ Créer l'utilisateur"}
-                    </button>
+                    <div style={actionContainerStyle}>
+                        <button 
+                            type="submit" 
+                            disabled={loading} 
+                            style={{ 
+                                ...btnPrimary,
+                                background: loading ? '#94a3b8' : SUCCESS_COLOR, 
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                            }}
+                        >
+                            {loading ? "Chargement..." : isEditMode ? "Enregistrer les modifications" : "Créer l'utilisateur"}
+                        </button>
+                        
+                        <button 
+                            type="button" 
+                            onClick={() => navigate("/users")}
+                            style={btnSecondary}
+                        >
+                            Annuler
+                        </button>
+                    </div>
                 </form>
             </div>
+
+            <style>
+                {`
+                    .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+                    @media (min-width: 640px) { .form-grid { grid-template-columns: 1fr 1fr; gap: 20px; } }
+                    
+                    .btn-back:hover { 
+                        border-color: ${PRIMARY_COLOR} !important; 
+                        color: ${PRIMARY_COLOR} !important;
+                        background-color: #f0f9ff !important;
+                    }
+
+                    input:focus, select:focus {
+                        border-color: ${PRIMARY_COLOR} !important;
+                        box-shadow: 0 0 0 3px rgba(0, 112, 171, 0.1);
+                    }
+
+                    button:active { transform: scale(0.98); }
+                `}
+            </style>
         </div>
     );
 }
+
+// STYLES OBJETS 
+const backButtonStyle = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '10px',
+    backgroundColor: 'white',
+    color: '#475569',
+    border: '1px solid #cbd5e1', 
+    borderRadius: '8px',
+    padding: '10px 18px',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+    transition: 'all 0.2s ease'
+};
+
+const modernInputStyle = {
+    width: '100%', padding: '12px 15px', border: '1px solid #e2e8f0', 
+    borderRadius: '10px', outline: 'none', fontSize: '16px', boxSizing: 'border-box'
+};
+
+const labelStyle = {
+    display: 'block', fontSize: '14px', fontWeight: '600', color: '#475569', marginBottom: '8px'
+};
+
+const containerStyle = {
+    backgroundColor: 'white', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05)', 
+    borderRadius: '16px', padding: 'clamp(20px, 5vw, 40px)', 
+    maxWidth: '800px', margin: '0 auto', boxSizing: 'border-box'
+};
+
+const titleStyle = { 
+    fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: '800', 
+    marginBottom: '30px', color: PRIMARY_COLOR, textAlign: 'center',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px'
+};
+
+const errorBannerStyle = { 
+    color: '#E53E3E', textAlign: 'center', marginBottom: '25px', 
+    padding: '12px', backgroundColor: '#FFF5F5', 
+    borderRadius: '10px', border: '1px solid #FEB2B2', fontSize: '14px'
+};
+
+const actionContainerStyle = { display: 'flex', gap: '12px', marginTop: '20px', flexDirection: 'column' };
+
+const btnPrimary = { 
+    padding: '15px', color: 'white', borderRadius: '10px', fontWeight: '700', 
+    border: 'none', fontSize: '16px', transition: 'all 0.2s'
+};
+
+const btnSecondary = { 
+    padding: '12px', background: '#fff', color: '#64748b', 
+    borderRadius: '10px', fontWeight: '600', border: '1px solid #cbd5e1', 
+    cursor: 'pointer', fontSize: '14px', transition: 'all 0.2s'
+};

@@ -15,6 +15,7 @@ import MachineMaintenancePage from './pages/MachineMaintenancePage';
 import MaintenanceDetailPage from './pages/MaintenanceDetailPage';
 import RecordMaintenancePage from './pages/RecordMaintenancePage';
 import MaintenanceReportsPage from './pages/MaintenanceReportsPage';
+import ServiceDetailsPage from './pages/ServiceDetailsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 
@@ -32,6 +33,7 @@ function AppRoutes() {
             <Route path="services" element={<ServicesPage />} />
             <Route path="services/add" element={<ServiceFormPage />} />
             <Route path="services/edit/:serviceId" element={<ServiceFormPage />} />
+            <Route path="services/:id" element={<ServiceDetailsPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
             <Route path="reservations/:id" element={<ReservationDetailPage />} />
 
