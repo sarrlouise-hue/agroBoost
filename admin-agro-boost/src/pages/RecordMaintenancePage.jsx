@@ -31,7 +31,6 @@ function RecordMaintenancePage() {
             try {
                 const response = await api.get('/users');
                 const fetchedData = response.data.data || response.data;
-                
                 if (Array.isArray(fetchedData)) {
                     const filtered = fetchedData.filter(user => {
                         const role = user.role ? user.role.toLowerCase() : '';
@@ -57,7 +56,6 @@ function RecordMaintenancePage() {
             alert("Veuillez sélectionner un mécanicien.");
             return;
         }
-
         setLoading(true);
         try {
             const payload = {
@@ -71,7 +69,6 @@ function RecordMaintenancePage() {
                 cost: parseFloat(formData.cost) || 0,
                 notes: formData.notes
             };
-
             await api.post('/maintenances', payload);
             alert("Intervention enregistrée avec succès !");
             navigate(`/maintenance/${id}`); 
@@ -85,52 +82,61 @@ function RecordMaintenancePage() {
     return (
         <div className="record-page-container">
             <style>{`
+                /* Global Reset pour éviter les débordements */
+                * {
+                    box-sizing: border-box;
+                }
+
                 .record-page-container { 
-                    padding: clamp(15px, 4vw, 40px); 
-                    max-width: 900px; 
+                    padding: 10px 5px; /* Très peu d'espace sur les bords mobile */
+                    max-width: 700px; /* Plus étroit sur desktop pour éviter l'étirement */
                     margin: 0 auto; 
                     background-color: #F7FAFC;
                     min-height: 100vh;
                     font-family: 'Inter', sans-serif;
                 }
                 
-                /* STYLE DU BOUTON RETOUR */
                 .btn-back-modern {
                     display: flex;
                     align-items: center;
-                    gap: 10px;
+                    gap: 8px;
                     background-color: white;
                     color: #4A5568;
                     border: 1px solid #E2E8F0;
-                    padding: 10px 20px;
-                    border-radius: 12px;
-                    font-weight: 600;
+                    padding: 10px 15px;
+                    border-radius: 10px;
+                    font-weight: 700; /* Titre du bouton en bold */
                     font-size: 14px;
                     cursor: pointer;
-                    transition: all 0.2s ease;
-                    margin-bottom: 25px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-                }
-
-                .btn-back-modern:hover {
-                    border-color: ${PRIMARY_COLOR};
-                    color: ${PRIMARY_COLOR};
-                    transform: translateX(-4px);
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+                    margin-bottom: 15px;
+                    margin-left: 5px;
                 }
 
                 .form-card { 
                     background-color: white; 
-                    padding: clamp(20px, 5vw, 40px); 
-                    border-radius: 20px; 
-                    box-shadow: 0 15px 35px rgba(0,0,0,0.07);
+                    padding: 20px 15px; /* Padding ajusté */
+                    border-radius: 12px; 
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
                     border: 1px solid #E2E8F0;
+                    width: 98%; /* Occupe presque tout l'espace mobile */
+                    margin: 0 auto;
+                }
+
+                /* Desktop : Réduction de l'espace environnant */
+                @media (min-width: 768px) {
+                    .record-page-container { padding: 20px 0; }
+                    .form-card { padding: 30px; width: 100%; }
+                    .responsive-grid { 
+                        display: grid; 
+                        grid-template-columns: 1fr 1fr; 
+                        gap: 20px; 
+                    }
                 }
 
                 .form-header { 
-                    margin-bottom: 35px; 
+                    margin-bottom: 25px; 
                     border-bottom: 2px solid #F0F4F8; 
-                    padding-bottom: 20px; 
+                    padding-bottom: 15px; 
                 }
 
                 .form-header h2 { 
@@ -138,83 +144,73 @@ function RecordMaintenancePage() {
                     margin: 0; 
                     display: flex; 
                     align-items: center; 
-                    gap: 12px;
-                    font-weight: 800;
-                    font-size: 1.7rem;
+                    gap: 10px;
+                    font-weight: 900;
+                    font-size: 1.5rem;
                     text-transform: uppercase;
                 }
 
-                .responsive-grid { 
-                    display: grid; 
-                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-                    gap: 25px; 
-                }
+                .input-group { margin-bottom: 20px; width: 100%; }
 
                 .input-label {
                     display: flex; 
                     align-items: center; 
-                    gap: 10px;
-                    font-weight: 700;
-                    font-size: 14px; 
+                    gap: 8px;
+                    font-weight: 800; /* LABEL EN BOLD */
+                    font-size: 13px; 
                     color: #1A202C; 
-                    margin-bottom: 10px;
+                    margin-bottom: 8px;
+                    text-transform: uppercase;
                 }
 
                 .custom-input {
-                    width: 100%; 
+                    width: 100%; /* Ne dépassera plus grâce au border-box global */
                     padding: 14px; 
-                    border-radius: 12px; 
+                    border-radius: 8px; 
                     border: 2px solid #E2E8F0;
-                    font-size: 15px;
+                    font-size: 16px;
                     background-color: #F8FAFC;
-                    box-sizing: border-box;
-                    transition: all 0.3s ease;
+                    transition: all 0.2s ease;
+                    outline: none;
                 }
 
                 .custom-input:focus {
                     border-color: ${PRIMARY_COLOR};
                     background-color: #FFF;
-                    outline: none;
-                    box-shadow: 0 0 0 4px rgba(0, 112, 171, 0.15);
+                    box-shadow: 0 0 0 3px rgba(0, 112, 171, 0.1);
                 }
 
                 .btn-submit {
                     width: 100%; 
-                    padding: 18px; 
+                    padding: 16px; 
                     color: white; 
                     border: none; 
-                    border-radius: 12px; 
+                    border-radius: 10px; 
                     cursor: pointer; 
                     font-weight: 800; 
                     font-size: 16px; 
                     display: flex;
                     align-items: center; 
                     justify-content: center; 
-                    gap: 12px;
-                    margin-top: 40px;
-                    transition: transform 0.2s, background-color 0.2s;
-                }
-
-                .btn-submit:active {
-                    transform: scale(0.98);
+                    gap: 10px;
+                    margin-top: 20px;
                 }
             `}</style>
 
-            {/* BOUTON RETOUR CORRIGÉ */}
             <button onClick={() => navigate(-1)} className="btn-back-modern">
-                <FiArrowLeft /> <span>Retour à l'historique</span>
+                <FiArrowLeft /> <span>RETOUR</span>
             </button>
 
             <form onSubmit={handleSubmit} className="form-card">
                 <header className="form-header">
                     <h2><FiTool /> Intervention</h2>
-                    <p style={{ color: '#718096', fontSize: '14px', marginTop: '10px' }}>
+                    <p style={{ color: '#718096', fontSize: '13px', marginTop: '5px', fontWeight: '600' }}>
                         ID Équipement : <strong>{id}</strong>
                     </p>
                 </header>
                 
                 <div className="responsive-grid">
-                    <div style={{gridColumn: '1 / -1'}}>
+                    <div style={{gridColumn: '1 / -1'}} className="input-group">
                         <label className="input-label"><FiUser /> MÉCANICIEN RESPONSABLE</label>
                         <select 
                             name="mechanicId" 
@@ -232,28 +228,28 @@ function RecordMaintenancePage() {
                         </select>
                     </div>
 
-                    <div>
+                    <div className="input-group">
                         <label className="input-label"><FiCalendar /> DATE DE DÉBUT</label>
                         <input type="datetime-local" name="startDate" value={formData.startDate} onChange={handleChange} required className="custom-input" />
                     </div>
 
-                    <div>
+                    <div className="input-group">
                         <label className="input-label"><FiCalendar /> DATE DE FIN</label>
                         <input type="datetime-local" name="endDate" value={formData.endDate} onChange={handleChange} required className="custom-input" />
                     </div>
 
-                    <div>
+                    <div className="input-group">
                         <label className="input-label"><FiClock /> HEURES MOTEUR (H)</label>
                         <input type="number" name="currentHours" value={formData.currentHours} onChange={handleChange} required className="custom-input" />
                     </div>
 
-                    <div>
+                    <div className="input-group">
                         <label className="input-label"><FiDollarSign /> COÛT TOTAL (XOF)</label>
                         <input type="number" name="cost" value={formData.cost} onChange={handleChange} required className="custom-input" />
                     </div>
                 </div>
 
-                <div style={{ marginTop: '25px' }}>
+                <div className="input-group">
                     <label className="input-label">TYPE D'ENTRETIEN</label>
                     <select name="type" value={formData.type} onChange={handleChange} className="custom-input">
                         <option value="STANDARD_SERVICE">Vidange / Entretien Standard</option>
@@ -262,7 +258,7 @@ function RecordMaintenancePage() {
                     </select>
                 </div>
 
-                <div style={{ marginTop: '25px' }}>
+                <div className="input-group">
                     <label className="input-label"><FiFileText /> TRAVAUX EFFECTUÉS</label>
                     <textarea 
                         name="description" 
@@ -270,8 +266,8 @@ function RecordMaintenancePage() {
                         onChange={handleChange} 
                         required 
                         className="custom-input"
-                        style={{ minHeight: '120px' }} 
-                        placeholder="Détaillez les réparations effectuées..."
+                        style={{ minHeight: '120px', resize: 'vertical' }} 
+                        placeholder="Détails des réparations..."
                     />
                 </div>
 
@@ -281,7 +277,7 @@ function RecordMaintenancePage() {
                     className="btn-submit"
                     style={{ backgroundColor: loading ? '#CBD5E0' : SUCCESS_COLOR }}
                 >
-                    {loading ? 'Traitement...' : <><FiSave /> ENREGISTRER L'INTERVENTION</>}
+                    {loading ? 'EN COURS...' : <><FiSave /> ENREGISTRER</>}
                 </button>
             </form>
         </div>

@@ -3,7 +3,7 @@ import api from '../services/api';
 import { Link } from 'react-router-dom';
 import { 
     FiTool, FiFilter, FiPlusCircle, FiEye, 
-    FiCalendar, FiXCircle, FiRefreshCw, FiCheckCircle 
+    FiXCircle, FiRefreshCw
 } from 'react-icons/fi';
 
 const PRIMARY_COLOR = '#0070AB';
@@ -15,23 +15,19 @@ function MachineMaintenancePage() {
     const [servicesList, setServicesList] = useState([]);
     const [loading, setLoading] = useState(true);
     
-    // ÉTATS DES FILTRES
     const [selectedService, setSelectedService] = useState("");
-    const [selectedStatus, setSelectedStatus] = useState(""); // Nouveau filtre statut
+    const [selectedStatus, setSelectedStatus] = useState("");
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            // Charger la liste des services une seule fois
             if (servicesList.length === 0) {
                 const servRes = await api.get('/services?limit=100');
                 setServicesList(servRes.data?.data || servRes.data || []);
             }
-
-            // Construction des paramètres de requête
             const params = { limit: 50 };
             if (selectedService) params.serviceId = selectedService;
-            if (selectedStatus) params.status = selectedStatus; // Ajout du statut aux params
+            if (selectedStatus) params.status = selectedStatus;
 
             const maintRes = await api.get('/maintenances', { params });
             const mData = maintRes.data?.data || maintRes.data || [];
@@ -43,13 +39,10 @@ function MachineMaintenancePage() {
         }
     };
 
-    // Déclencher la recherche quand l'un des filtres change
-    useEffect(() => {
-        fetchData();
-    }, [selectedService, selectedStatus]);
+    useEffect(() => { fetchData(); }, [selectedService, selectedStatus]);
 
     const formatDateTime = (dateStr) => {
-        if (!dateStr) return "-";
+        if (!dateStr || dateStr === "-") return "-";
         return new Date(dateStr).toLocaleString('fr-FR', {
             day: '2-digit', month: '2-digit', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
@@ -61,130 +54,141 @@ function MachineMaintenancePage() {
         setSelectedStatus("");
     };
 
+    // Helper pour afficher le label du statut avec icône sans background large
+    const renderStatus = (status) => {
+        let color = '#4A5568';
+        let label = status || 'N/A';
+        if(status?.toLowerCase() === 'pending') { color = '#D97706'; label = "⏳ En attente"; }
+        else if(status?.toLowerCase() === 'in_progress') { color = '#2563EB'; label = "⚙️ En cours"; }
+        else if(status?.toLowerCase() === 'completed') { color = '#059669'; label = "✅ Terminé"; }
+        else if(status?.toLowerCase() === 'cancelled') { color = '#DC2626'; label = "❌ Annulé"; }
+        
+        return <span style={{ color, fontWeight: '700', fontSize: '13px' }}>{label}</span>;
+    };
+
     return (
         <div className="maintenance-page">
             <style>{`
-                .maintenance-page { padding: clamp(15px, 4vw, 40px); background-color: ${BG_COLOR}; min-height: 100vh; font-family: 'Inter', sans-serif; }
-                .header-section { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 35px; }
-                .title-container { margin: 0; font-size: clamp(1.2rem, 5vw, 1.5rem); color: ${PRIMARY_COLOR}; display: flex; align-items: center; gap: 15px; }
-                
+                .maintenance-page { 
+                    padding: 20px; 
+                    background-color: ${BG_COLOR}; 
+                    min-height: 100vh; 
+                    font-family: 'Inter', sans-serif;
+                }
+                .header-section { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    align-items: center; 
+                    margin-bottom: 25px; 
+                }
                 .filter-bar { 
-                    background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); 
-                    margin-bottom: 25px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 20px; 
+                    background: white; 
+                    padding: 15px; 
+                    border-radius: 12px; 
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+                    margin-bottom: 20px; 
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                    align-items: flex-end;
                 }
-                .filter-group { flex: 1; min-width: 200px; }
+                .table-wrapper { 
+                    background: white;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+                }
+                table { width: 100%; border-collapse: collapse; }
                 
-                .table-wrapper { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; }
-
-                @media screen and (max-width: 850px) {
-                    .header-section { flex-direction: column; align-items: flex-start; }
-                    .btn-create { width: 100%; justify-content: center; }
-                    table, thead, tbody, th, td, tr { display: block; }
-                    thead tr { position: absolute; top: -9999px; left: -9999px; }
-                    tr { border-bottom: 2px solid #EDF2F7; padding: 15px 10px; }
-                    td { border: none; position: relative; padding-left: 50% !important; text-align: right !important; margin-bottom: 10px; display: flex; align-items: center; justify-content: flex-end; }
-                    td:before { position: absolute; left: 10px; width: 45%; text-align: left; font-weight: 700; color: #718096; font-size: 11px; content: attr(data-label); text-transform: uppercase; }
-                    .actions-cell { justify-content: center !important; padding-left: 0 !important; margin-top: 15px; border-top: 1px dashed #E2E8F0; padding-top: 15px !important; }
+                @media screen and (max-width: 768px) {
+                    .header-section { flex-direction: column; gap: 15px; }
+                    thead { display: none; }
+                    tr { display: block; border-bottom: 8px solid ${BG_COLOR}; padding: 15px; }
+                    td { 
+                        display: flex; 
+                        justify-content: space-between; 
+                        padding: 8px 0; 
+                        border: none !important;
+                    }
+                    td:before { content: attr(data-label); font-weight: bold; color: #718096; }
+                    .btn-details { width: 100%; justify-content: center; margin-top: 10px; }
                 }
+
                 .spin { animation: rotate 1s linear infinite; }
                 @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
             `}</style>
 
             <div className="header-section">
-                <h1 className="title-container">
-                    <FiTool size={28} /> Gestion des <strong>Maintenances</strong>
+                <h1 style={{ margin: 0, color: PRIMARY_COLOR, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <FiTool /> Gestion Maintenances
                 </h1>
                 <Link to="/services" style={{ textDecoration: 'none' }}>
-                    <button style={btnCreateStyle} className="btn-create">
-                        <FiPlusCircle /> Programmer une Maintenance
+                    <button style={btnCreateStyle}>
+                        <FiPlusCircle /> Programmer une maintenance
                     </button>
                 </Link>
             </div>
 
-            {/* BARRE DE FILTRE MISE À JOUR */}
             <div className="filter-bar">
-                {/* Filtre Machine */}
-                <div className="filter-group">
-                    <label style={labelStyle}><FiFilter size={12} /> Machine / Équipement</label>
-                    <select 
-                        value={selectedService}
-                        onChange={(e) => setSelectedService(e.target.value)}
-                        style={selectStyle}
-                    >
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                    <label style={labelStyle}>Filtrer par Équipement</label>
+                    <select value={selectedService} onChange={(e) => setSelectedService(e.target.value)} style={selectStyle}>
                         <option value="">Toutes les machines</option>
-                        {servicesList.map(s => (
-                            <option key={s._id || s.id} value={s._id || s.id}>{s.name}</option>
-                        ))}
+                        {servicesList.map(s => <option key={s._id || s.id} value={s._id || s.id}>{s.name}</option>)}
                     </select>
                 </div>
 
-                {/* Filtre Statut */}
-                <div className="filter-group">
-                    <label style={labelStyle}><FiCheckCircle size={12} /> État / Statut</label>
-                    <select 
-                        value={selectedStatus}
-                        onChange={(e) => setSelectedStatus(e.target.value)}
-                        style={selectStyle}
-                    >
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                    <label style={labelStyle}>Filtrer par Statut</label>
+                    <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} style={selectStyle}>
                         <option value="">Tous les statuts</option>
-                        <option value="pending">⏳ En attente (Pending)</option>
-                        <option value="in_progress">⚙️ En cours (In Progress)</option>
-                        <option value="completed">✅ Terminé (Completed)</option>
-                        <option value="cancelled">❌ Annulé (Cancelled)</option>
+                        <option value="pending">En attente</option>
+                        <option value="in_progress">En cours</option>
+                        <option value="completed">Terminé</option>
+                        <option value="cancelled">Annulé</option>
                     </select>
                 </div>
                 
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    {(selectedService || selectedStatus) && (
-                        <button onClick={resetFilters} style={btnResetStyle}>
-                            <FiXCircle /> Reset
-                        </button>
-                    )}
-                    <button onClick={fetchData} style={btnRefreshStyle} title="Actualiser">
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={fetchData} style={btnRefreshStyle}>
                         <FiRefreshCw className={loading ? 'spin' : ''} />
                     </button>
+                    {(selectedService || selectedStatus) && (
+                        <button onClick={resetFilters} style={btnResetStyle}><FiXCircle /> Reset</button>
+                    )}
                 </div>
             </div>
 
             <div className="table-wrapper">
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <table>
                     <thead>
                         <tr style={theadStyle}>
                             <th style={thStyle}>Équipement</th>
-                            <th style={thStyle}>Début Prévu</th>
-                            <th style={thStyle}>Fin Prévue</th>
+                            <th style={thStyle}>Date de début</th>
+                            <th style={thStyle}>Date de fin</th>
                             <th style={thStyle}>Statut</th>
                             <th style={{ ...thStyle, textAlign: 'center' }}>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
-                            <tr><td colSpan="5" style={emptyStateStyle}>Chargement des données...</td></tr>
-                        ) : maintenances.length === 0 ? (
-                            <tr><td colSpan="5" style={emptyStateStyle}>Aucune maintenance trouvée.</td></tr>
-                        ) : maintenances.map(m => (
-                            <tr key={m._id} style={trStyle}>
-                                <td data-label="Équipement" style={tdStyle}>
-                                    <div>
-                                        <div style={{ fontWeight: '600', color: '#1A202C' }}>
-                                            {m.service?.name || "Machine non répertoriée"}
-                                        </div>
-                                        <div style={idSubtitleStyle}>{m.serviceId}</div>
-                                    </div>
+                        {!loading && maintenances.map(m => (
+                            <tr key={m._id || m.id} style={trStyle}>
+                                <td data-label="Équipement" style={{ ...tdStyle, fontWeight: 'bold', color: '#1A202C' }}>
+                                    {m.service?.name || "N/A"}
                                 </td>
-                                <td data-label="Début Prévu" style={tdStyle}>
-                                    <div style={dateBoxStyle}><FiCalendar size={14} /> {formatDateTime(m.startDate)}</div>
+                                <td data-label="Date de début" style={tdStyle}>
+                                    {formatDateTime(m.startDate)}
                                 </td>
-                                <td data-label="Fin Prévue" style={tdStyle}>
-                                    <div style={dateBoxStyle}><FiCalendar size={14} /> {formatDateTime(m.endDate)}</div>
+                                <td data-label="Date de fin" style={tdStyle}>
+                                    {formatDateTime(m.endDate)}
                                 </td>
                                 <td data-label="Statut" style={tdStyle}>
-                                    <span style={statusBadgeStyle(m.status)}>{m.status.replace('_', ' ')}</span>
+                                    {renderStatus(m.status)}
                                 </td>
-                                <td data-label="Actions" className="actions-cell" style={tdStyle}>
-                                    <Link to={`/maintenance/${m._id}`} style={{ textDecoration: 'none' }}>
-                                        <button style={btnDetailsStyle}>
-                                            <FiEye /> Détails
+                                <td style={{ ...tdStyle, textAlign: 'center' }}>
+                                    <Link to={`/maintenance/${m.serviceId || m.service?._id}`} style={{ textDecoration: 'none' }}>
+                                        <button style={btnDetailsStyle} className="btn-details">
+                                            <FiEye /> Voir Détails
                                         </button>
                                     </Link>
                                 </td>
@@ -192,33 +196,24 @@ function MachineMaintenancePage() {
                         ))}
                     </tbody>
                 </table>
+                {loading && <div style={emptyStateStyle}>Chargement...</div>}
+                {!loading && maintenances.length === 0 && <div style={emptyStateStyle}>Aucune maintenance trouvée.</div>}
             </div>
         </div>
     );
 }
 
-// STYLES
-const labelStyle = { display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: '800', color: '#718096', marginBottom: '8px', textTransform: 'uppercase' };
-const selectStyle = { width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', fontSize: '14px', outline: 'none', backgroundColor: '#F8FAFC', cursor: 'pointer' };
-const theadStyle = { backgroundColor: '#F8FAFC', borderBottom: '2px solid #EDF2F7' };
-const thStyle = { padding: '18px', textAlign: 'left', color: '#4A5568', fontSize: '12px', fontWeight: '700', textTransform: 'uppercase' };
+// Styles
+const labelStyle = { display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#4A5568', marginBottom: '5px' };
+const selectStyle = { width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #E2E8F0', outline: 'none' };
+const theadStyle = { backgroundColor: '#EDF2F7' };
+const thStyle = { padding: '15px', textAlign: 'left', fontSize: '13px', color: '#4A5568', textTransform: 'uppercase', letterSpacing: '0.05em' };
 const trStyle = { borderBottom: '1px solid #F1F5F9' };
-const tdStyle = { padding: '18px', fontSize: '14px' };
-const idSubtitleStyle = { fontSize: '11px', color: '#A0AEC0', marginTop: '4px', fontFamily: 'monospace' };
-const dateBoxStyle = { display: 'flex', alignItems: 'center', gap: '8px', color: '#4A5568' };
-const btnCreateStyle = { backgroundColor: SUCCESS_COLOR, color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' };
-const btnDetailsStyle = { border: `1px solid ${PRIMARY_COLOR}`, background: 'transparent', color: PRIMARY_COLOR, padding: '7px 15px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '6px' };
-const btnResetStyle = { backgroundColor: '#FFF5F5', border: '1px solid #FEB2B2', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', color: '#E53E3E', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' };
-const btnRefreshStyle = { backgroundColor: 'white', border: '1px solid #E2E8F0', padding: '10px', borderRadius: '8px', cursor: 'pointer', color: PRIMARY_COLOR, display: 'flex', alignItems: 'center' };
-const emptyStateStyle = { padding: '80px', textAlign: 'center', color: '#A0AEC0', fontSize: '16px' };
-
-const statusBadgeStyle = (status) => {
-    let bg = '#EDF2F7', color = '#4A5568';
-    if(status === 'pending') { bg = '#FEF3C7'; color = '#92400E'; }
-    else if(status === 'in_progress') { bg = '#DBEAFE'; color = '#1E40AF'; }
-    else if(status === 'completed') { bg = '#D1FAE5'; color = '#065F46'; }
-    else if(status === 'cancelled') { bg = '#FEE2E2'; color = '#991B1B'; }
-    return { backgroundColor: bg, color: color, padding: '6px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', whiteSpace: 'nowrap' };
-};
+const tdStyle = { padding: '15px', fontSize: '14px', color: '#4A5568' };
+const btnCreateStyle = { backgroundColor: SUCCESS_COLOR, color: 'white', border: 'none', padding: '12px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' };
+const btnDetailsStyle = { border: `1px solid ${PRIMARY_COLOR}`, background: 'white', color: PRIMARY_COLOR, padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px' };
+const btnResetStyle = { backgroundColor: '#FED7D7', color: '#C53030', border: 'none', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' };
+const btnRefreshStyle = { background: 'white', border: '1px solid #E2E8F0', padding: '10px', borderRadius: '8px', cursor: 'pointer', color: PRIMARY_COLOR };
+const emptyStateStyle = { padding: '40px', textAlign: 'center', color: '#A0AEC0', fontWeight: 'bold' };
 
 export default MachineMaintenancePage;

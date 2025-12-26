@@ -67,13 +67,13 @@ function ServicesPage() {
     };
 
     return (
-        <div style={{ padding: 'clamp(10px, 3vw, 25px)', backgroundColor: '#f8fafc', minHeight: '100vh' }}>
-            <div style={{ backgroundColor: 'white', padding: 'clamp(15px, 4vw, 25px)', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+        <div className="main-page-wrapper" style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+            <div className="content-card">
                 
-                {/* Header (Bouton Nouveau Service Supprimé) */}
-                <div className="header-container" style={{ marginBottom: '30px' }}>
+                {/* Header */}
+                <div className="header-container" style={{ marginBottom: '25px' }}>
                     <div>
-                        <h1 style={{ color: PRIMARY_COLOR, margin: 0, fontSize: 'clamp(1.4rem, 5vw, 1.8rem)', fontWeight: '800', display: 'flex', alignItems: 'center' }}>
+                        <h1 style={{ color: PRIMARY_COLOR, margin: 0, fontSize: 'clamp(1.3rem, 5vw, 1.8rem)', fontWeight: '800', display: 'flex', alignItems: 'center' }}>
                             <FaTractor style={{ marginRight: 12 }} /> Catalogue
                         </h1>
                         <p style={{ color: '#64748b', marginTop: '5px', fontSize: '14px' }}>Gestion des prestations agricoles</p>
@@ -81,8 +81,8 @@ function ServicesPage() {
                 </div>
 
                 {/* Filtres */}
-                <div className="filters-container" style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '30px', padding: '20px', backgroundColor: '#F8FAFC', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', width: '100%' }}>
+                <div className="filters-container">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', width: '100%' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#475569' }}><FaFilter /> Type</label>
                             <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="custom-select">
@@ -104,13 +104,13 @@ function ServicesPage() {
                     </div>
                     {(typeFilter || availabilityFilter) && (
                         <button onClick={() => { setTypeFilter(''); setAvailabilityFilter(''); }} className="reset-btn">
-                            <FaUndo /> Réinitialiser les filtres
+                            <FaUndo /> Réinitialiser
                         </button>
                     )}
                 </div>
 
                 {loading ? (
-                    <div style={{ textAlign: 'center', padding: '50px', color: '#64748b' }}>Chargement des services...</div>
+                    <div style={{ textAlign: 'center', padding: '50px', color: '#64748b' }}>Chargement...</div>
                 ) : (
                     <>
                         {/* VERSION DESKTOP */}
@@ -153,29 +153,51 @@ function ServicesPage() {
                             </table>
                         </div>
 
-                        {/* VERSION MOBILE */}
+                        {/* VERSION MOBILE (Corrigée avec bouton Voir) */}
                         <div className="show-only-mobile">
                             {services.map(service => (
                                 <div key={service.id} className="service-card">
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
                                         <span className="badge">{service.serviceType}</span>
-                                        {service.availability ? <FaCheckCircle color={SUCCESS_COLOR} /> : <FaTimesCircle color={DANGER_COLOR} />}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{fontSize: '11px', fontWeight: 'bold', color: service.availability ? SUCCESS_COLOR : DANGER_COLOR}}>
+                                                {service.availability ? 'DISPONIBLE' : 'INDISPO'}
+                                            </span>
+                                            {service.availability ? <FaCheckCircle color={SUCCESS_COLOR} /> : <FaTimesCircle color={DANGER_COLOR} />}
+                                        </div>
                                     </div>
-                                    <h3 style={{ margin: '0 0 5px 0', fontSize: '16px' }}>{service.name}</h3>
-                                    <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '15px' }}>
-                                        <FaUser size={10} /> {service.provider?.businessName || 'Prestataire'}<br />
-                                        <FaTag size={10} /> {service.pricePerHour || service.pricePerDay} FCFA
+                                    
+                                    <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#1e293b' }}>{service.name}</h3>
+                                    
+                                    <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '15px', backgroundColor: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
+                                        <div style={{marginBottom: '4px'}}><FaUser size={11} style={{marginRight: '6px'}}/> {service.provider?.businessName || 'Prestataire'}</div>
+                                        <div><FaTag size={11} style={{marginRight: '6px'}}/> <span style={{fontWeight: 'bold', color: '#1e293b'}}>{service.pricePerHour || service.pricePerDay} FCFA</span></div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                        <Link to={`/maintenance/record/${service.id}`} style={{ width: '100%' }}>
-                                            <button style={{ ...buttonStyle, width: '100%', background: '#FFFBEB', color: WARNING_COLOR, border: `1px solid ${WARNING_COLOR}` }}>
-                                                <FaWrench /> Intervention
+
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        {/* Action Principale */}
+                                        <Link to={`/maintenance/record/${service.id}`} style={{ width: '100%', textDecoration: 'none' }}>
+                                            <button style={{ ...buttonStyle, width: '100%', background: '#FFFBEB', color: WARNING_COLOR, border: `1px solid ${WARNING_COLOR}`, padding: '12px' }}>
+                                                <FaWrench /> Nouvelle Intervention
                                             </button>
                                         </Link>
-                                        <Link to={`/services/edit/${service.id}`} style={{ flex: 1 }}>
-                                            <button style={{ ...buttonStyle, width: '100%', background: '#f0f9ff', color: PRIMARY_COLOR }}><FaEdit /> Éditer</button>
-                                        </Link>
-                                        <button onClick={() => handleDelete(service.id)} style={{ ...buttonStyle, flex: 1, background: '#fef2f2', color: DANGER_COLOR }}><FaTrash /> Suppr.</button>
+
+                                        {/* Actions Secondaires */}
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <Link to={`/services/${service.id}`} style={{ flex: 1, textDecoration: 'none' }}>
+                                                <button style={{ ...buttonStyle, width: '100%', background: '#f1f5f9', color: '#475569', padding: '12px' }}>
+                                                    <FaEye /> Voir
+                                                </button>
+                                            </Link>
+                                            <Link to={`/services/edit/${service.id}`} style={{ flex: 1, textDecoration: 'none' }}>
+                                                <button style={{ ...buttonStyle, width: '100%', background: '#f0f9ff', color: PRIMARY_COLOR, padding: '12px' }}>
+                                                    <FaEdit /> Éditer
+                                                </button>
+                                            </Link>
+                                            <button onClick={() => handleDelete(service.id)} style={{ ...buttonStyle, flex: 1, background: '#fef2f2', color: DANGER_COLOR, padding: '12px' }}>
+                                                <FaTrash />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -185,30 +207,33 @@ function ServicesPage() {
             </div>
 
             <style>{`
+                .main-page-wrapper { padding: 20px; }
+                .content-card { 
+                    background-color: white; padding: 25px; border-radius: 16px; 
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+                }
                 .hide-mobile { display: block; }
                 .show-only-mobile { display: none; }
                 .badge { padding: 4px 10px; background: #f1f5f9; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; color: #475569; }
-                .custom-select { padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; }
+                .custom-select { padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
                 .reset-btn { background: none; border: none; color: #64748b; cursor: pointer; font-size: 13px; font-weight: bold; text-decoration: underline; display: flex; align-items: center; gap: 5px; margin-top: 5px; }
-                .service-card { border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px; margin-bottom: 15px; background: white; }
+                .service-card { border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px; margin-bottom: 15px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+                .filters-container { display: flex; flex-direction: column; gap: 15px; padding: 20px; background-color: #F8FAFC; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 25px; }
                 
-                .header-container { 
-                    display: flex; 
-                    flex-direction: column; 
-                    gap: 10px; 
-                }
-
                 @media (max-width: 768px) {
+                    .main-page-wrapper { padding: 0 !important; }
+                    .content-card { 
+                        padding: 12px !important; border-radius: 0 !important; 
+                        box-shadow: none !important; width: 100% !important; box-sizing: border-box;
+                    }
                     .hide-mobile { display: none; }
                     .show-only-mobile { display: block; }
+                    .filters-container { padding: 15px !important; margin-bottom: 20px !important; border-radius: 8px !important; }
+                    .service-card { margin: 0 0 15px 0 !important; width: 100% !important; box-sizing: border-box; }
                 }
 
                 @media (min-width: 769px) {
-                    .header-container { 
-                        flex-direction: row; 
-                        justify-content: space-between; 
-                        align-items: center;
-                    }
+                    .header-container { display: flex; flex-direction: row; justify-content: space-between; align-items: center; }
                 }
             `}</style>
         </div>
