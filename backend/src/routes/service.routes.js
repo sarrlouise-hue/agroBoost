@@ -449,7 +449,6 @@ router.put(
  *                 - id: service-id-123
  *                   name: Tracteur John Deere
  *                   distance: 5.2
- *                   ...
  *               pagination:
  *                 page: 1
  *                 limit: 20
