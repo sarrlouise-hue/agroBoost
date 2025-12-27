@@ -1,0 +1,21 @@
+{
+	"name": "ALLO TRACTEUR Admin",
+	"short_name": "AT Admin",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#ffffff",
+	"theme_color": "#0070AB",
+	"description": "Panneau d'administration ALLO TRACTEUR",
+	"icons": [
+		{
+			"src": "/icons/icon-192.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		},
+		{
+			"src": "/icons/icon-512.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		}
+	]
+}
