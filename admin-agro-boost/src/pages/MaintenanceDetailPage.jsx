@@ -38,8 +38,11 @@ function MaintenanceDetailPage() {
     return (
         <div className="maintenance-detail-container">
             <style>{`
+                /* Global Reset pour mobile */
+                * { box-sizing: border-box; }
+
                 .maintenance-detail-container { 
-                    padding: clamp(15px, 4vw, 40px); 
+                    padding: 10px 5px; /* Espace minimal sur les côtés pour mobile */
                     max-width: 1200px; 
                     margin: 0 auto; 
                     font-family: 'Inter', sans-serif;
@@ -51,65 +54,98 @@ function MaintenanceDetailPage() {
                     display: flex; 
                     justify-content: space-between; 
                     align-items: center;
-                    margin-bottom: 35px;
-                    gap: 20px;
-                    flex-wrap: wrap;
+                    margin-bottom: 25px;
+                    gap: 15px;
+                    width: 100%;
+                    padding: 0 5px;
                 }
 
-                .title-group { display: flex; align-items: center; gap: 15px; }
+                .title-group { display: flex; align-items: center; gap: 12px; }
 
                 .table-card { 
                     background-color: white; 
-                    border-radius: 16px; 
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.04); 
+                    border-radius: 12px; 
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
                     overflow: hidden;
                     border: 1px solid #E2E8F0;
+                    width: 100%; /* Prend toute la largeur disponible */
+                    margin-bottom: 20px;
                 }
 
                 .status-badge {
                     padding: 4px 10px;
                     border-radius: 6px;
-                    font-size: 12px;
-                    font-weight: 700;
+                    font-size: 11px;
+                    font-weight: 800; /* Statut en gras */
                     white-space: nowrap;
+                    text-transform: uppercase;
                 }
                 .status-pending { background: #FEF3C7; color: #92400E; }
                 .status-completed { background: #DCFCE7; color: #166534; }
                 .status-in_progress { background: #DBEAFE; color: #1E40AF; }
 
+                /* RESPONSIVE MOBILE - OCCUPATION MAXIMALE */
                 @media screen and (max-width: 992px) {
-                    .header-flex { flex-direction: column; align-items: stretch; text-align: center; }
-                    .title-group { flex-direction: column; }
-                    .btn-action { width: 100%; justify-content: center; }
+                    .maintenance-detail-container { padding: 10px 8px; }
+                    .header-flex { flex-direction: column; align-items: stretch; text-align: left; }
+                    .btn-action { width: 100%; justify-content: center; padding: 15px; }
                     
-                    table, thead, tbody, th, td, tr { display: block; }
+                    table, thead, tbody, th, td, tr { display: block; width: 100%; }
                     thead tr { position: absolute; top: -9999px; left: -9999px; }
-                    tr { border-bottom: 2px solid #EDF2F7; padding: 20px 15px; }
-                    td { 
-                        border: none; position: relative; padding-left: 45% !important; 
-                        text-align: right !important; margin-bottom: 12px; min-height: 30px;
-                        display: flex; align-items: center; justify-content: flex-end;
+                    
+                    tr { 
+                        border-bottom: 8px solid #F7FAFC; /* Séparateur entre les cartes */
+                        padding: 15px 10px; 
                     }
+                    
+                    td { 
+                        border: none; 
+                        position: relative; 
+                        padding-left: 40% !important; 
+                        text-align: right !important; 
+                        margin-bottom: 10px; 
+                        min-height: 35px;
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: flex-end;
+                        font-weight: 600;
+                    }
+                    
                     td:before { 
-                        position: absolute; left: 0; width: 40%; text-align: left;
-                        font-weight: 800; color: #2D3748; font-size: 11px; content: attr(data-label);
+                        position: absolute; 
+                        left: 10px; 
+                        width: 35%; 
+                        text-align: left;
+                        font-weight: 800; /* TITRE DES CHAMPS EN BOLD */
+                        color: #4A5568; 
+                        font-size: 11px; 
+                        content: attr(data-label);
                         text-transform: uppercase;
                     }
+
                     .description-cell { 
-                        text-align: left !important; padding-left: 0 !important; 
-                        flex-direction: column; align-items: flex-start; 
-                        margin-top: 10px; border-top: 1px dashed #E2E8F0; padding-top: 15px !important; 
+                        text-align: left !important; 
+                        padding-left: 10px !important; 
+                        flex-direction: column; 
+                        align-items: flex-start; 
+                        margin-top: 5px; 
+                        border-top: 1px solid #EDF2F7; 
+                        padding-top: 15px !important; 
                     }
-                    .description-cell:before { position: static; margin-bottom: 8px; }
+                    .description-cell:before { position: static; margin-bottom: 5px; width: 100%; }
+                }
+
+                /* Desktop Adjustments */
+                @media screen and (min-width: 993px) {
+                    .maintenance-detail-container { padding: 30px 20px; }
                 }
             `}</style>
 
             <button 
                 onClick={() => navigate('/maintenance')} 
                 style={btnBackStyle}
-                className="btn-back"
             >
-                <FiArrowLeft /> Retour à la gestion
+                <FiArrowLeft /> RETOUR
             </button>
 
             <div className="header-flex">
@@ -119,7 +155,7 @@ function MaintenanceDetailPage() {
                         <h1 style={titleStyle}>Historique d'Interventions</h1>
                         <p style={subtitleStyle}>
                             <FiHash size={12} /> ID Équipement : 
-                            <span style={{ fontWeight: 'bold', marginLeft: '5px', color: '#2D3748' }}>
+                            <span style={{ fontWeight: '800', marginLeft: '5px', color: '#1A202C' }}>
                                 {id || "Non spécifié"}
                             </span>
                         </p>
@@ -128,7 +164,7 @@ function MaintenanceDetailPage() {
 
                 <Link to={`/maintenance/record/${id}`} style={{ textDecoration: 'none' }}>
                     <button style={btnActionStyle} className="btn-action">
-                        <FiPlusCircle /> Enregistrer une Intervention
+                        <FiPlusCircle /> NOUVELLE INTERVENTION
                     </button>
                 </Link>
             </div>
@@ -156,7 +192,7 @@ function MaintenanceDetailPage() {
                                         <span style={{ fontSize: '11px', color: '#718096' }}><strong>Fin:</strong> {formatDate(item.endDate)}</span>
                                     </div>
                                 </td>
-                                <td data-label="Description" style={{ ...tdStyle, fontWeight: '500' }}>
+                                <td data-label="Description" style={{ ...tdStyle, fontWeight: '700' }}>
                                     {item.description}
                                 </td>
                                 <td data-label="Technicien" style={tdStyle}>
@@ -165,11 +201,11 @@ function MaintenanceDetailPage() {
                                         {item.mechanic?.name || (item.mechanic ? `${item.mechanic.firstName} ${item.mechanic.lastName}` : 'Admin')}
                                     </div>
                                 </td>
-                                <td data-label="Coût" style={{ ...tdStyle, color: PRIMARY_COLOR, fontWeight: '800' }}>
+                                <td data-label="Coût" style={{ ...tdStyle, color: PRIMARY_COLOR, fontWeight: '900' }}>
                                     {item.cost ? `${parseFloat(item.cost).toLocaleString()} FCFA` : '---'}
                                 </td>
                                 <td data-label="Notes" className="description-cell" style={{ ...tdStyle, color: '#4A5568', fontSize: '13px' }}>
-                                    {item.notes || 'Aucune note'}
+                                    {item.notes || 'Aucune note supplémentaire'}
                                 </td>
                                 <td data-label="Statut" style={tdStyle}>
                                     <span className={`status-badge status-${item.status || 'pending'}`}>
@@ -179,7 +215,7 @@ function MaintenanceDetailPage() {
                                 </td>
                             </tr>
                         )) : (
-                            <tr><td colSpan="6" style={emptyStyle}>Aucun historique pour cet équipement.</td></tr>
+                            <tr><td colSpan="6" style={emptyStyle}>Aucun historique trouvé pour cet équipement.</td></tr>
                         )}
                     </tbody>
                 </table>
@@ -188,44 +224,40 @@ function MaintenanceDetailPage() {
     );
 }
 
-// STYLES MIS À JOUR
+// STYLES
 const iconBoxStyle = {
     backgroundColor: 'white', padding: '12px', borderRadius: '12px', color: PRIMARY_COLOR,
     boxShadow: '0 2px 8px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center'
 };
 
-const titleStyle = { color: '#1A202C', fontSize: 'clamp(1.1rem, 4vw, 1.4rem)', margin: 0, fontWeight: '800' };
+const titleStyle = { color: '#1A202C', fontSize: 'clamp(1.1rem, 4vw, 1.4rem)', margin: 0, fontWeight: '900' };
 
 const subtitleStyle = { color: '#718096', fontSize: '13px', margin: '5px 0 0 0', display: 'flex', alignItems: 'center', gap: '4px' };
 
 const btnBackStyle = { 
     display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #E2E8F0', 
-    backgroundColor: 'white', color: '#4A5568', cursor: 'pointer', marginBottom: '25px', 
-    fontWeight: '700', padding: '10px 18px', borderRadius: '8px', fontSize: '14px'
+    backgroundColor: 'white', color: '#4A5568', cursor: 'pointer', marginBottom: '20px', 
+    fontWeight: '800', padding: '10px 18px', borderRadius: '8px', fontSize: '13px',
+    textTransform: 'uppercase'
 };
 
 const btnActionStyle = { 
-    padding: '12px 24px', backgroundColor: SUCCESS_COLOR, color: 'white', border: 'none', 
-    borderRadius: '8px', cursor: 'pointer', fontWeight: '800', display: 'flex', 
+    padding: '14px 24px', backgroundColor: SUCCESS_COLOR, color: 'white', border: 'none', 
+    borderRadius: '10px', cursor: 'pointer', fontWeight: '900', display: 'flex', 
     alignItems: 'center', gap: '10px', boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)', fontSize: '14px'
 };
 
 const theadStyle = { backgroundColor: '#F8FAFC', borderBottom: '2px solid #E2E8F0' };
 
 const thStyle = { 
-    padding: '18px', 
-    textAlign: 'left', 
-    color: '#2D3748', // Couleur plus sombre pour plus de contraste
-    fontSize: '12px', 
-    textTransform: 'uppercase', 
-    letterSpacing: '0.05em', 
-    fontWeight: '900' // Titres de colonnes en GRAS (Bold)
+    padding: '18px', textAlign: 'left', color: '#1A202C', fontSize: '12px', 
+    textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '900' 
 };
 
 const tdStyle = { padding: '18px', fontSize: '14px', color: '#2D3748' };
 
 const trStyle = { borderBottom: '1px solid #F1F5F9' };
 
-const emptyStyle = { padding: '60px', textAlign: 'center', color: '#A0AEC0', fontSize: '15px' };
+const emptyStyle = { padding: '80px 20px', textAlign: 'center', color: '#A0AEC0', fontSize: '15px' };
 
 export default MaintenanceDetailPage;

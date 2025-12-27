@@ -75,20 +75,21 @@ export default function UserFormPage() {
     };
 
     return (
-        <div style={{ padding: 'clamp(10px, 3vw, 30px)', backgroundColor: '#f8fafc', minHeight: '100vh' }}> 
+        /* responsive-container-form : on gère l'espace extérieur ici */
+        <div className="responsive-container-form" style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}> 
             
             {/* BOUTON RETOUR  */}
-            <div style={{ maxWidth: '800px', margin: '0 auto 20px auto' }}>
+            <div style={{ maxWidth: '800px', margin: '0 auto 15px auto' }}>
                 <button 
                     onClick={() => navigate("/users")}
                     className="btn-back"
                     style={backButtonStyle}
                 >
-                    <FaArrowLeft /> Retour à la liste
+                    <FaArrowLeft /> <span className="hide-mobile">Retour à la liste</span>
                 </button>
             </div>
 
-            <div style={containerStyle}>
+            <div className="form-main-card" style={containerStyle}>
                 <h1 style={titleStyle}>
                     {isEditMode ? <><FaSave /> Modifier l'utilisateur</> : <><FaUserPlus /> Ajouter un utilisateur</>}
                 </h1>
@@ -155,7 +156,7 @@ export default function UserFormPage() {
                                 cursor: loading ? 'not-allowed' : 'pointer',
                             }}
                         >
-                            {loading ? "Chargement..." : isEditMode ? "Enregistrer les modifications" : "Créer l'utilisateur"}
+                            {loading ? "Chargement..." : isEditMode ? "Enregistrer" : "Créer l'utilisateur"}
                         </button>
                         
                         <button 
@@ -171,9 +172,19 @@ export default function UserFormPage() {
 
             <style>
                 {`
+                    .responsive-container-form { padding: 20px; }
                     .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-                    @media (min-width: 640px) { .form-grid { grid-template-columns: 1fr 1fr; gap: 20px; } }
                     
+                    @media (min-width: 640px) { 
+                        .form-grid { grid-template-columns: 1fr 1fr; gap: 20px; } 
+                    }
+                    
+                    @media (max-width: 768px) {
+                        .responsive-container-form { padding: 8px; }
+                        .form-main-card { padding: 15px !important; border-radius: 10px !important; }
+                        .hide-mobile { display: none; }
+                    }
+
                     .btn-back:hover { 
                         border-color: ${PRIMARY_COLOR} !important; 
                         color: ${PRIMARY_COLOR} !important;
@@ -192,20 +203,19 @@ export default function UserFormPage() {
     );
 }
 
-// STYLES OBJETS 
+// STYLES OBJETS (Mis à jour pour flexibilité mobile)
 const backButtonStyle = {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '10px',
+    gap: '8px',
     backgroundColor: 'white',
     color: '#475569',
     border: '1px solid #cbd5e1', 
     borderRadius: '8px',
-    padding: '10px 18px',
-    fontSize: '14px',
+    padding: '8px 14px',
+    fontSize: '13px',
     fontWeight: '600',
     cursor: 'pointer',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
     transition: 'all 0.2s ease'
 };
 
@@ -220,31 +230,33 @@ const labelStyle = {
 
 const containerStyle = {
     backgroundColor: 'white', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05)', 
-    borderRadius: '16px', padding: 'clamp(20px, 5vw, 40px)', 
-    maxWidth: '800px', margin: '0 auto', boxSizing: 'border-box'
+    borderRadius: '16px', padding: '40px', 
+    maxWidth: '800px', margin: '0 auto', boxSizing: 'border-box', width: '100%'
 };
 
 const titleStyle = { 
-    fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: '800', 
-    marginBottom: '30px', color: PRIMARY_COLOR, textAlign: 'center',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px'
+    fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: '800', 
+    marginBottom: '25px', color: PRIMARY_COLOR, textAlign: 'center',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
 };
 
 const errorBannerStyle = { 
-    color: '#E53E3E', textAlign: 'center', marginBottom: '25px', 
-    padding: '12px', backgroundColor: '#FFF5F5', 
-    borderRadius: '10px', border: '1px solid #FEB2B2', fontSize: '14px'
+    color: '#E53E3E', textAlign: 'center', marginBottom: '20px', 
+    padding: '10px', backgroundColor: '#FFF5F5', 
+    borderRadius: '10px', border: '1px solid #FEB2B2', fontSize: '13px'
 };
 
-const actionContainerStyle = { display: 'flex', gap: '12px', marginTop: '20px', flexDirection: 'column' };
+const actionContainerStyle = { 
+    display: 'flex', gap: '10px', marginTop: '10px', flexDirection: 'column' 
+};
 
 const btnPrimary = { 
-    padding: '15px', color: 'white', borderRadius: '10px', fontWeight: '700', 
+    padding: '14px', color: 'white', borderRadius: '10px', fontWeight: '700', 
     border: 'none', fontSize: '16px', transition: 'all 0.2s'
 };
 
 const btnSecondary = { 
-    padding: '12px', background: '#fff', color: '#64748b', 
-    borderRadius: '10px', fontWeight: '600', border: '1px solid #cbd5e1', 
+    padding: '12px', background: '#f1f5f9', color: '#64748b', 
+    borderRadius: '10px', fontWeight: '600', border: 'none', 
     cursor: 'pointer', fontSize: '14px', transition: 'all 0.2s'
 };
