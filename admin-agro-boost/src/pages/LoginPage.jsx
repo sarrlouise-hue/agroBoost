@@ -9,7 +9,7 @@ const styles = {
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "center",
-		minHeight: "100vh", // Utilisation de minHeight pour le scroll mobile
+		minHeight: "90vh", // Utilisation de minHeight pour le scroll mobile
 		backgroundColor: "#f4f7f9",
 		padding: "20px", // Espace de sécurité sur les bords
 	},
@@ -62,7 +62,7 @@ const styles = {
 		width: "clamp(80px, 20vw, 140px)",
 		height: "clamp(80px, 20vw, 140px)",
 		borderRadius: "50%",
-		backgroundColor: "#E8F5E9",
+		// backgroundColor: "#E8F5E9",
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "center",
@@ -118,7 +118,6 @@ function LoginPage() {
 							width: "90%",
 							height: "90%",
 							objectFit: "contain",
-							padding: "5px",
 						}}
 					/>
 				</div>
