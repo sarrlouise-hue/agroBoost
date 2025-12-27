@@ -208,8 +208,23 @@ function AdminLayout() {
 			></div>
 
 			<aside className="sidebar">
-				<div className="sidebar-logo">
-					<span style={{ color: COLOR_BLUE_LOGO }}>ALLO</span> TRACTEUR
+				<div
+					className="sidebar-logo"
+					style={{
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						gap: "10px",
+					}}
+				>
+					<img
+						src="/logo.jpeg"
+						alt="Logo"
+						style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+					/>
+					<div style={{ textAlign: "left" }}>
+						<span style={{ color: COLOR_BLUE_LOGO }}>ALLO</span> TRACTEUR
+					</div>
 				</div>
 				<nav style={{ flexGrow: 1, marginTop: "10px" }}>
 					{NAV_ITEMS.map((item) => (

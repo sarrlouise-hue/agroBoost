@@ -109,8 +109,16 @@ function LoginPage() {
 				<div style={styles.logo}>ALLO TRACTEUR Admin</div>
 
 				<div style={styles.iconCircleStyle}>
-					{/* L'icône s'adapte aussi à la taille du cercle */}
-					<FiTruck size="50%" color="#4CAF50" />
+					<img
+						src="/logo.jpeg"
+						alt="Logo"
+						style={{
+							width: "80%",
+							height: "80%",
+							borderRadius: "50%",
+							objectFit: "cover",
+						}}
+					/>
 				</div>
 
 				<form onSubmit={handleSubmit}>
