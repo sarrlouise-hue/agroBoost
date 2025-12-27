@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { FiTruck } from "react-icons/fi";
+import logo from "../assets/logo.png";
 
 const styles = {
 	container: {
@@ -110,12 +110,11 @@ function LoginPage() {
 
 				<div style={styles.iconCircleStyle}>
 					<img
-						src="/logo.jpeg"
+						src={logo}
 						alt="Logo"
 						style={{
-							width: "80%",
-							height: "80%",
-							borderRadius: "50%",
+							width: "100%",
+							height: "100%",
 							objectFit: "cover",
 						}}
 					/>
