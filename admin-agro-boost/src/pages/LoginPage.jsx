@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import logo from "../assets/logo.png";
 
 const styles = {
@@ -72,6 +73,7 @@ const styles = {
 function LoginPage() {
 	const [phone, setPhone] = useState("");
 	const [password, setPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const navigate = useNavigate();
@@ -152,15 +154,34 @@ function LoginPage() {
 
 					<div style={styles.labelContainer}>
 						<label htmlFor="password">Mot de passe</label>
-						<input
-							id="password"
-							type="password"
-							placeholder="••••••••"
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-							style={styles.input}
-							required
-						/>
+						<div style={{ position: "relative" }}>
+							<input
+								id="password"
+								type={showPassword ? "text" : "password"}
+								placeholder="••••••••"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								style={{ ...styles.input, paddingRight: "45px" }}
+								required
+							/>
+							<div
+								onClick={() => setShowPassword(!showPassword)}
+								style={{
+									position: "absolute",
+									right: "12px",
+									top: "50%",
+									transform: "translateY(-50%)",
+									cursor: "pointer",
+									display: "flex",
+									alignItems: "center",
+									color: "#666",
+									padding: "5px",
+									marginTop: "-5px", // Ajustement pour compenser la marge de l'input
+								}}
+							>
+								{showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+							</div>
+						</div>
 					</div>
 
 					<button
