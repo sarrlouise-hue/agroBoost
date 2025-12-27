@@ -220,7 +220,12 @@ function AdminLayout() {
 					<img
 						src="/logo.jpeg"
 						alt="Logo"
-						style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+						style={{
+							width: "40px",
+							height: "40px",
+							borderRadius: "50%",
+							objectFit: "contain",
+						}}
 					/>
 					<div style={{ textAlign: "left" }}>
 						<span style={{ color: COLOR_BLUE_LOGO }}>ALLO</span> TRACTEUR

@@ -113,9 +113,10 @@ function LoginPage() {
 						src={logo}
 						alt="Logo"
 						style={{
-							width: "100%",
-							height: "100%",
-							objectFit: "cover",
+							width: "90%",
+							height: "90%",
+							objectFit: "contain",
+							padding: "5px",
 						}}
 					/>
 				</div>
