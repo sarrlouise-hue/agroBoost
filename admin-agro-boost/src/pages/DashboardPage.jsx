@@ -1,79 +1,163 @@
-import React, { useState, useEffect } from 'react';
-import api from '../services/api';
-import { Link } from 'react-router-dom';
-import { FaTachometerAlt, FaUsers, FaTractor, FaLeaf, FaClock, FaMoneyBillWave } from 'react-icons/fa';
-import { MdInsights, MdNotificationsActive, MdPendingActions, MdCheckCircle, MdPersonAddAlt1 } from 'react-icons/md';
-import { FiInfo } from 'react-icons/fi';
+import React, { useState, useEffect } from "react";
+import api from "../services/api";
+import { Link } from "react-router-dom";
+import {
+	FaTachometerAlt,
+	FaUsers,
+	FaTractor,
+	FaLeaf,
+	FaClock,
+	FaMoneyBillWave,
+} from "react-icons/fa";
+import {
+	MdInsights,
+	MdNotificationsActive,
+	MdPendingActions,
+	MdCheckCircle,
+	MdPersonAddAlt1,
+} from "react-icons/md";
+import { FiInfo } from "react-icons/fi";
 
-const PRIMARY_COLOR = '#0070AB';
-const SECONDARY_COLOR = '#4CAF50';
-const ACCENT_COLOR = '#FF9800';
-const REVENUE_COLOR = '#1976D2'; 
+const PRIMARY_COLOR = "#0070AB";
+const SECONDARY_COLOR = "#4CAF50";
+const ACCENT_COLOR = "#FF9800";
+const REVENUE_COLOR = "#1976D2";
 
-const StatCard = ({ title, value, unit = '', color = SECONDARY_COLOR, IconComponent }) => (
-    <div style={{ 
-        padding: '20px', borderRadius: '12px', background: 'white',
-        borderLeft: `6px solid ${color}`, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', 
-        display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        minHeight: '110px', position: 'relative', overflow: 'hidden'
-    }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <h4 style={{ margin: 0, color: '#666', fontSize: '0.85em', fontWeight: '600', textTransform: 'uppercase' }}>{title}</h4>
-            <IconComponent size={22} color={color} style={{ opacity: 0.7 }} />
-        </div>
-        <div style={{ marginTop: '12px' }}>
-            <span style={{ fontSize: '1.4em', fontWeight: '800', color: '#333', wordBreak: 'break-word' }}>{value}</span>
-            {unit && <span style={{ fontSize: '0.8em', color: '#888', marginLeft: '5px' }}>{unit}</span>}
-        </div>
-    </div>
+const StatCard = ({
+	title,
+	value,
+	unit = "",
+	color = SECONDARY_COLOR,
+	IconComponent,
+}) => (
+	<div
+		style={{
+			padding: "20px",
+			borderRadius: "12px",
+			background: "white",
+			borderLeft: `6px solid ${color}`,
+			boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+			display: "flex",
+			flexDirection: "column",
+			justifyContent: "center",
+			minHeight: "110px",
+			position: "relative",
+			overflow: "hidden",
+		}}
+	>
+		<div
+			style={{
+				display: "flex",
+				justifyContent: "space-between",
+				alignItems: "flex-start",
+			}}
+		>
+			<h4
+				style={{
+					margin: 0,
+					color: "#666",
+					fontSize: "0.85em",
+					fontWeight: "600",
+					textTransform: "uppercase",
+				}}
+			>
+				{title}
+			</h4>
+			<IconComponent size={22} color={color} style={{ opacity: 0.7 }} />
+		</div>
+		<div style={{ marginTop: "12px" }}>
+			<span
+				style={{
+					fontSize: "1.4em",
+					fontWeight: "800",
+					color: "#333",
+					wordBreak: "break-word",
+				}}
+			>
+				{value}
+			</span>
+			{unit && (
+				<span style={{ fontSize: "0.8em", color: "#888", marginLeft: "5px" }}>
+					{unit}
+				</span>
+			)}
+		</div>
+	</div>
 );
 
 function DashboardPage() {
-    const [stats, setStats] = useState({
-        totalUsers: 0, totalProviders: 0, totalServices: 0,
-        reservationsPending: 0, monthlyRevenue: 0, recentActivities: [],
-        loading: true, error: null,
-    });
+	const [stats, setStats] = useState({
+		totalUsers: 0,
+		totalProviders: 0,
+		totalServices: 0,
+		reservationsPending: 0,
+		monthlyRevenue: 0,
+		recentActivities: [],
+		loading: true,
+		error: null,
+	});
 
-    useEffect(() => {
-        const fetchDashboardStats = async () => {
-            setStats(s => ({ ...s, loading: true, error: null }));
-            try {
-                const response = await api.get('/admin/dashboard'); 
-                const data = response.data;
-                const currencyFormatter = new Intl.NumberFormat('fr-FR', {
-                    style: 'currency', currency: 'XOF', minimumFractionDigits: 0,
-                });
-                setStats({
-                    totalUsers: (data.users || 0).toLocaleString('fr-FR'),
-                    totalProviders: (data.providers || 0).toLocaleString('fr-FR'),
-                    totalServices: (data.services || 0).toLocaleString('fr-FR'),
-                    reservationsPending: (data.pending || 0).toLocaleString('fr-FR'),
-                    monthlyRevenue: currencyFormatter.format(data.monthlyRevenue || 0), 
-                    recentActivities: data.recentActivities || [],
-                    loading: false, error: null,
-                });
-            } catch (err) {
-                setStats(s => ({ ...s, loading: false, error: 'Erreur.' }));
-            }
-        };
-        fetchDashboardStats();
-    }, []); 
+	useEffect(() => {
+		const fetchDashboardStats = async () => {
+			setStats((s) => ({ ...s, loading: true, error: null }));
+			try {
+				const response = await api.get("/admin/dashboard");
+				const data = response.data;
+				const currencyFormatter = new Intl.NumberFormat("fr-FR", {
+					style: "currency",
+					currency: "XOF",
+					minimumFractionDigits: 0,
+				});
+				setStats({
+					totalUsers: (data.users || 0).toLocaleString("fr-FR"),
+					totalProviders: (data.providers || 0).toLocaleString("fr-FR"),
+					totalServices: (data.services || 0).toLocaleString("fr-FR"),
+					reservationsPending: (data.pending || 0).toLocaleString("fr-FR"),
+					monthlyRevenue: currencyFormatter.format(data.monthlyRevenue || 0),
+					recentActivities: data.recentActivities || [],
+					loading: false,
+					error: null,
+				});
+			} catch (err) {
+				setStats((s) => ({ ...s, loading: false, error: "Erreur." }));
+			}
+		};
+		fetchDashboardStats();
+	}, []);
 
-    const getActivityStyle = (type) => {
-        switch (type) {
-            case 'NEW_PROVIDER': return { icon: MdPersonAddAlt1, color: PRIMARY_COLOR, background: '#E3F2FD' };
-            case 'PENDING': return { icon: MdPendingActions, color: ACCENT_COLOR, background: '#FFF3E0' };
-            case 'CONFIRMED': return { icon: MdCheckCircle, color: SECONDARY_COLOR, background: '#E8F5E9' };
-            default: return { icon: FiInfo, color: '#555', background: '#f0f0f0' };
-        }
-    };
+	const getActivityStyle = (type) => {
+		switch (type) {
+			case "NEW_PROVIDER":
+				return {
+					icon: MdPersonAddAlt1,
+					color: PRIMARY_COLOR,
+					background: "#E3F2FD",
+				};
+			case "PENDING":
+				return {
+					icon: MdPendingActions,
+					color: ACCENT_COLOR,
+					background: "#FFF3E0",
+				};
+			case "CONFIRMED":
+				return {
+					icon: MdCheckCircle,
+					color: SECONDARY_COLOR,
+					background: "#E8F5E9",
+				};
+			default:
+				return { icon: FiInfo, color: "#555", background: "#f0f0f0" };
+		}
+	};
 
-    if (stats.loading) return <div style={{ textAlign: 'center', padding: '50px' }}>Chargement...</div>;
+	if (stats.loading)
+		return (
+			<div style={{ textAlign: "center", padding: "50px" }}>Chargement...</div>
+		);
 
-    return (
-        <div className="dashboard-page-container">
-            <style>{`
+	return (
+		<div className="dashboard-page-container">
+			<style>{`
                 /* Container principal sans marge inutile sur mobile */
                 .dashboard-page-container { padding: 20px; }
 
@@ -100,52 +184,178 @@ function DashboardPage() {
                 }
             `}</style>
 
-            <div style={{ padding: '0 10px' }}>
-                <h1 style={{ color: PRIMARY_COLOR, fontSize: 'clamp(1.4em, 5vw, 2.2em)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                    <FaTachometerAlt size={32} color={PRIMARY_COLOR} />
-                    <span>Tableau de Bord AGRO BOOST</span>
-                </h1>
-                <p style={{ color: '#777', marginBottom: '30px', fontSize: '1em' }}>Vue d'ensemble et indicateurs clés.</p>
-                <hr style={{ border: 'none', borderTop: '1px solid #ddd', marginBottom: '30px' }} />
+			<div style={{ padding: "0 10px" }}>
+				<h1
+					style={{
+						color: PRIMARY_COLOR,
+						fontSize: "clamp(1.4em, 5vw, 2.2em)",
+						marginBottom: "10px",
+						display: "flex",
+						alignItems: "center",
+						gap: "12px",
+						flexWrap: "wrap",
+					}}
+				>
+					<FaTachometerAlt size={32} color={PRIMARY_COLOR} />
+					<span>Tableau de Bord ALLO TRACTEUR</span>
+				</h1>
+				<p
+					style={{
+						color: "#555",
+						marginBottom: "5px",
+						fontSize: "1.1em",
+						fontWeight: "600",
+					}}
+				>
+					Plateforme de réservation de services agricoles au Sénégal.
+				</p>
+				<p style={{ color: "#777", marginBottom: "30px", fontSize: "0.95em" }}>
+					Gérez efficacement les utilisateurs, les prestataires de services et
+					le suivi des réservations de machines agricoles.
+				</p>
+				<hr
+					style={{
+						border: "none",
+						borderTop: "1px solid #ddd",
+						marginBottom: "30px",
+					}}
+				/>
 
-                <h2 style={{ color: '#444', fontSize: '1.2em', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <MdInsights size={24} color={PRIMARY_COLOR} /> Indicateurs Clés
-                </h2>
-            </div>
+				<h2
+					style={{
+						color: "#444",
+						fontSize: "1.2em",
+						marginBottom: "20px",
+						display: "flex",
+						alignItems: "center",
+						gap: "8px",
+					}}
+				>
+					<MdInsights size={24} color={PRIMARY_COLOR} /> Indicateurs Clés
+				</h2>
+			</div>
 
-            <div className="stats-grid">
-                <StatCard title='Revenu du Mois' value={stats.monthlyRevenue} IconComponent={FaMoneyBillWave} color={REVENUE_COLOR} />
-                <StatCard title='Total Utilisateurs' value={stats.totalUsers} IconComponent={FaUsers} color={PRIMARY_COLOR} />
-                <StatCard title='Total Prestataires' value={stats.totalProviders} IconComponent={FaTractor} color={PRIMARY_COLOR} />
-                <StatCard title='Services Actifs' value={stats.totalServices} IconComponent={FaLeaf} color={SECONDARY_COLOR} />
-                <StatCard title='En Attente' value={stats.reservationsPending} IconComponent={FaClock} color={ACCENT_COLOR} />
-            </div>
+			<div className="stats-grid">
+				<StatCard
+					title="Revenu du Mois"
+					value={stats.monthlyRevenue}
+					IconComponent={FaMoneyBillWave}
+					color={REVENUE_COLOR}
+				/>
+				<StatCard
+					title="Total Utilisateurs"
+					value={stats.totalUsers}
+					IconComponent={FaUsers}
+					color={PRIMARY_COLOR}
+				/>
+				<StatCard
+					title="Total Prestataires"
+					value={stats.totalProviders}
+					IconComponent={FaTractor}
+					color={PRIMARY_COLOR}
+				/>
+				<StatCard
+					title="Services Actifs"
+					value={stats.totalServices}
+					IconComponent={FaLeaf}
+					color={SECONDARY_COLOR}
+				/>
+				<StatCard
+					title="En Attente"
+					value={stats.reservationsPending}
+					IconComponent={FaClock}
+					color={ACCENT_COLOR}
+				/>
+			</div>
 
-            <div className="activities-container" style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-                <h2 style={{ color: '#444', fontSize: '1.2em', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <MdNotificationsActive size={24} color={PRIMARY_COLOR} /> Activités Récentes
-                </h2>
-                <div>
-                    {stats.recentActivities.length > 0 ? stats.recentActivities.map(activity => {
-                        const style = getActivityStyle(activity.type);
-                        const Icon = style.icon;
-                        return (
-                            <div key={activity.id} style={{ display: 'flex', alignItems: 'flex-start', padding: '15px 0', borderBottom: '1px solid #f0f0f0', gap: '15px' }}>
-                                <div style={{ padding: '10px', borderRadius: '50%', backgroundColor: style.background, flexShrink: 0 }}><Icon size={20} color={style.color} /></div>
-                                <div style={{ flexGrow: 1 }}>
-                                    <p style={{ margin: '0 0 4px 0', fontWeight: '600', fontSize: '0.95em' }}>{activity.description}</p>
-                                    <span style={{ fontSize: '0.8em', color: '#999' }}>{activity.date}</span>
-                                </div>
-                            </div>
-                        );
-                    }) : <p style={{ color: '#999', textAlign: 'center' }}>Aucune activité récente.</p>}
-                </div>
-                <Link to='/reservations' style={{ display: 'block', textAlign: 'center', marginTop: '20px', color: PRIMARY_COLOR, fontWeight: 'bold', textDecoration: 'none', fontSize: '0.9em' }}>
-                    Voir toutes les réservations →
-                </Link>
-            </div>
-        </div>
-    );
+			<div
+				className="activities-container"
+				style={{
+					background: "white",
+					padding: "20px",
+					borderRadius: "12px",
+					boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+				}}
+			>
+				<h2
+					style={{
+						color: "#444",
+						fontSize: "1.2em",
+						marginBottom: "20px",
+						display: "flex",
+						alignItems: "center",
+						gap: "8px",
+					}}
+				>
+					<MdNotificationsActive size={24} color={PRIMARY_COLOR} /> Activités
+					Récentes
+				</h2>
+				<div>
+					{stats.recentActivities.length > 0 ? (
+						stats.recentActivities.map((activity) => {
+							const style = getActivityStyle(activity.type);
+							const Icon = style.icon;
+							return (
+								<div
+									key={activity.id}
+									style={{
+										display: "flex",
+										alignItems: "flex-start",
+										padding: "15px 0",
+										borderBottom: "1px solid #f0f0f0",
+										gap: "15px",
+									}}
+								>
+									<div
+										style={{
+											padding: "10px",
+											borderRadius: "50%",
+											backgroundColor: style.background,
+											flexShrink: 0,
+										}}
+									>
+										<Icon size={20} color={style.color} />
+									</div>
+									<div style={{ flexGrow: 1 }}>
+										<p
+											style={{
+												margin: "0 0 4px 0",
+												fontWeight: "600",
+												fontSize: "0.95em",
+											}}
+										>
+											{activity.description}
+										</p>
+										<span style={{ fontSize: "0.8em", color: "#999" }}>
+											{activity.date}
+										</span>
+									</div>
+								</div>
+							);
+						})
+					) : (
+						<p style={{ color: "#999", textAlign: "center" }}>
+							Aucune activité récente.
+						</p>
+					)}
+				</div>
+				<Link
+					to="/reservations"
+					style={{
+						display: "block",
+						textAlign: "center",
+						marginTop: "20px",
+						color: PRIMARY_COLOR,
+						fontWeight: "bold",
+						textDecoration: "none",
+						fontSize: "0.9em",
+					}}
+				>
+					Voir toutes les réservations →
+				</Link>
+			</div>
+		</div>
+	);
 }
 
 export default DashboardPage;
