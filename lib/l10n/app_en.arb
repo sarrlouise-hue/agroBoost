@@ -1,8 +1,0 @@
-{
-  "@@locale": "en",
-  "appName": "AGRO BOOST",
-  "loginButtonText": "Log In",
-  "@loginButtonText": {
-    "description": "The text for the login button"
-  }
-}

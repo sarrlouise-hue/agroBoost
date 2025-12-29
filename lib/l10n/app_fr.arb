@@ -1,9 +1,0 @@
-{
-  "@@locale": "fr",
-  "appName": "AGRO BOOST",
-  "@appName": {},
-  "loginButtonText": "Se connecter",
-  "@loginButtonText": {
-    "description": "Le texte pour le bouton de connexion"
-  }
-}
