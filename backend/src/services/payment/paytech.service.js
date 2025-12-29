@@ -58,15 +58,21 @@ class PayTechService {
 				currency: "XOF",
 				command_name: `Réservation ${bookingId}`,
 				env_token: PAYTECH.MERCHANT_ID,
-				ipn_url: `${
-					process.env.API_URL || "http://localhost:3000"
-				}/api/payments/webhook/paytech`,
-				success_url: `${
-					process.env.FRONTEND_URL || "http://localhost:3001"
-				}/payment/success`,
-				cancel_url: `${
-					process.env.FRONTEND_URL || "http://localhost:3001"
-				}/payment/cancel`,
+				ipn_url:
+					PAYTECH.IPN_URL ||
+					`${
+						process.env.API_URL || "http://localhost:3000"
+					}/api/payments/webhook/paytech`,
+				success_url:
+					process.env.PAYTECH_SUCCESS_URL ||
+					`${
+						process.env.FRONTEND_URL || "http://localhost:3001"
+					}/payment/success`,
+				cancel_url:
+					process.env.PAYTECH_CANCEL_URL ||
+					`${
+						process.env.FRONTEND_URL || "http://localhost:3001"
+					}/payment/cancel`,
 				custom_field: JSON.stringify({
 					bookingId,
 					userId,
