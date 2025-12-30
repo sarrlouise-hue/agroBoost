@@ -1,7 +1,11 @@
 import axios from "axios";
 import * as Types from "../types";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const API_URL = import.meta.env.VITE_API_URL;
+
+if (!API_URL) {
+	console.warn("VITE_API_URL is not defined in the environment variables.");
+}
 
 export const api = axios.create({
 	baseURL: API_URL,
