@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../../../contexts/AuthContext";
 import { servicesService } from "../../../services/servicesService";
-import { Link, useRouter } from "../../../router";
+import { Link } from "../../../router";
 import { Tractor, Edit, Trash2, Plus, DollarSign, Clock } from "lucide-react";
 import { Service } from "../../../lib/api";
 
 export const PrestataireManageServices: React.FC = () => {
-	const { user } = useAuth();
-	const { navigate } = useRouter();
 	const [services, setServices] = useState<Service[]>([]);
 	const [loading, setLoading] = useState(true);
 

@@ -1,11 +1,5 @@
 import React from "react";
-import {
-	User as UserIcon,
-	Settings,
-	Calendar,
-	Award,
-	Star,
-} from "lucide-react";
+import { Settings, Calendar, Award, Star } from "lucide-react";
 import { Service } from "../../../lib/api";
 
 interface ServiceInfoProps {
