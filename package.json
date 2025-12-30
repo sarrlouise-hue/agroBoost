@@ -4,10 +4,11 @@
 	"description": "ALLO TRACTEUR - Plateforme de réservation de services agricoles (Backend + Admin Panel)",
 	"private": true,
 	"scripts": {
-		"dev": "concurrently \"npm run dev:backend\" \"npm run dev:admin\" --names \"BACKEND,ADMIN\" --prefix-colors \"cyan,magenta\"",
+		"dev": "concurrently \"npm run dev:backend\" \"npm run dev:admin\" \"npm run dev:frontend\" --names \"BACKEND,ADMIN,FRONTEND\" --prefix-colors \"cyan,magenta,yellow\"",
 		"dev:backend": "cd backend && npm run dev",
 		"dev:admin": "cd admin-agro-boost && npm run dev",
-		"install:all": "npm install && cd backend && npm install && cd ../admin-agro-boost && npm install",
+		"dev:frontend": "cd frontend && npm run dev",
+		"install:all": "npm install && cd backend && npm install && cd ../admin-agro-boost && npm install && cd ../frontend && npm install",
 		"build:admin": "cd admin-agro-boost && npm run build",
 		"start:backend": "cd backend && npm start",
 		"lint:backend": "cd backend && npm run lint",

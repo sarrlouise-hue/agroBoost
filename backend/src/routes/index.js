@@ -12,11 +12,13 @@ const maintenanceRoutes = require("./maintenance.routes");
 const reviewRoutes = require("./review.routes");
 const notificationRoutes = require("./notification.routes");
 const adminRoutes = require("./admin.routes");
+const producteurRoutes = require("./producteur.routes");
 
 // Mount routes
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/providers", providerRoutes);
+router.use("/producteur", producteurRoutes);
 router.use("/services", serviceRoutes);
 router.use("/bookings", bookingRoutes);
 router.use("/payments", paymentRoutes);

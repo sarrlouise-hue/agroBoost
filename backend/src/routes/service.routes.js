@@ -8,6 +8,7 @@ const {
 	updateAvailabilitySchema,
 	validate,
 } = require("../validators/service.validator");
+const upload = require("../middleware/upload.middleware");
 const { ROLES } = require("../config/constants");
 
 /**
@@ -51,6 +52,7 @@ router.post(
 	"/",
 	authenticate,
 	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	upload.array("images", 5),
 	validate(createServiceSchema),
 	serviceController.createService
 );
@@ -275,6 +277,7 @@ router.put(
 	"/:id",
 	authenticate,
 	authorize(ROLES.PROVIDER, ROLES.ADMIN),
+	upload.array("images", 5),
 	validate(updateServiceSchema),
 	serviceController.updateService
 );

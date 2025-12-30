@@ -17,12 +17,13 @@ class BookingService {
 	async createBooking(userId, bookingData) {
 		const {
 			serviceId,
+			type,
+			startDate,
+			endDate,
 			bookingDate,
 			startTime,
 			endTime,
 			duration,
-			latitude,
-			longitude,
 			notes,
 		} = bookingData;
 
@@ -43,67 +44,74 @@ class BookingService {
 			throw new AppError("Le prestataire n'est pas approuvé", 400);
 		}
 
-		// Calculer l'heure de fin si non fournie
+		let finalDuration = duration;
+		let finalTotalPrice = 0;
 		let calculatedEndTime = endTime;
-		if (!calculatedEndTime && duration) {
-			const [hours, minutes] = startTime.split(":").map(Number);
-			const startDate = new Date();
-			startDate.setHours(hours, minutes, 0, 0);
-			startDate.setHours(startDate.getHours() + duration);
-			calculatedEndTime = `${String(startDate.getHours()).padStart(
-				2,
-				"0"
-			)}:${String(startDate.getMinutes()).padStart(2, "0")}`;
+
+		if (type === "daily") {
+			// Logique JOUR
+			const start = new Date(startDate);
+			const end = new Date(endDate);
+			const durationInMilliseconds = end.getTime() - start.getTime();
+			finalDuration =
+				Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)) + 1;
+
+			if (finalDuration < 1) {
+				throw new AppError(
+					"La durée de réservation doit être d'au moins 1 jour",
+					400
+				);
+			}
+			finalTotalPrice = this._calculatePrice(service, finalDuration, "daily");
+		} else {
+			// Logique HEURE
+			if (!calculatedEndTime && duration) {
+				const [hours, minutes] = startTime.split(":").map(Number);
+				const dateObj = new Date();
+				dateObj.setHours(hours, minutes, 0, 0);
+				dateObj.setHours(dateObj.getHours() + duration);
+				calculatedEndTime = `${String(dateObj.getHours()).padStart(
+					2,
+					"0"
+				)}:${String(dateObj.getMinutes()).padStart(2, "0")}`;
+			}
+
+			if (!calculatedEndTime) {
+				throw new AppError("L'heure de fin ou la durée est requise", 400);
+			}
+
+			if (!finalDuration && startTime && calculatedEndTime) {
+				const [h1, m1] = startTime.split(":").map(Number);
+				const [h2, m2] = calculatedEndTime.split(":").map(Number);
+				let diff = h2 * 60 + m2 - (h1 * 60 + m1);
+				if (diff < 0) diff += 24 * 60;
+				finalDuration = diff / 60;
+			}
+			finalTotalPrice = this._calculatePrice(service, finalDuration, "hourly");
 		}
-
-		if (!calculatedEndTime) {
-			throw new AppError("L'heure de fin ou la durée est requise", 400);
-		}
-
-		// Vérifier la disponibilité (anti-double réservation)
-		const isAvailable = await bookingRepository.checkAvailability(
-			serviceId,
-			bookingDate,
-			startTime,
-			calculatedEndTime
-		);
-
-		if (!isAvailable) {
-			throw new AppError(
-				"Ce service n'est pas disponible à cette date/heure",
-				409
-			);
-		}
-
-		// Calculer le prix total
-		const totalPrice = this._calculatePrice(
-			service,
-			duration,
-			startTime,
-			calculatedEndTime
-		);
 
 		// Créer la réservation
 		const booking = await bookingRepository.create({
 			userId,
 			serviceId,
 			providerId: service.providerId,
-			bookingDate,
-			startTime,
-			endTime: calculatedEndTime,
-			duration,
-			totalPrice,
-			latitude,
-			longitude,
+			type,
+			startDate: type === "daily" ? startDate : null,
+			endDate: type === "daily" ? endDate : null,
+			bookingDate: type === "hourly" ? bookingDate : null,
+			startTime: type === "hourly" ? startTime : null,
+			endTime: type === "hourly" ? calculatedEndTime : null,
+			duration: finalDuration,
+			totalPrice: finalTotalPrice,
 			notes,
 			status: Booking.STATUS.PENDING,
 		});
 
 		logger.info(
-			`Réservation créée: ${booking.id} pour le service ${serviceId}`
+			`Réservation créée (${type}): ${booking.id} pour le service ${serviceId}`
 		);
 
-		// Notifications: utilisateur + prestataire
+		// Notifications
 		try {
 			await notificationService.createNotification(
 				userId,
@@ -130,46 +138,28 @@ class BookingService {
 		return booking;
 	}
 
-	/**
-	 * Calculer le prix total d'une réservation
-	 * @private
-	 */
-	_calculatePrice(service, duration, startTime, endTime) {
-		if (service.pricePerDay && duration && duration >= 8) {
-			// Si durée >= 8h, utiliser le prix par jour
-			const days = Math.ceil(duration / 24);
-			return parseFloat((service.pricePerDay * days).toFixed(2));
-		}
-
-		if (service.pricePerHour && duration) {
-			// Utiliser le prix par heure
-			return parseFloat((service.pricePerHour * duration).toFixed(2));
-		}
-
-		// Calculer depuis les heures si pas de duration
-		if (startTime && endTime) {
-			const [startHours, startMinutes] = startTime.split(":").map(Number);
-			const [endHours, endMinutes] = endTime.split(":").map(Number);
-
-			const startTotal = startHours * 60 + startMinutes;
-			const endTotal = endHours * 60 + endMinutes;
-			let diffMinutes = endTotal - startTotal;
-
-			if (diffMinutes < 0) {
-				diffMinutes += 24 * 60; // Gérer le passage à minuit
+	_calculatePrice(service, duration, type) {
+		let price = 0;
+		if (type === "daily") {
+			if (service.pricePerDay) {
+				price = service.pricePerDay * duration;
+			} else if (service.pricePerHour) {
+				price = service.pricePerHour * 8 * duration;
 			}
 
-			const hours = diffMinutes / 60;
-
+			let discountPercentage = 0;
+			if (duration >= 30) discountPercentage = 20;
+			else if (duration >= 14) discountPercentage = 15;
+			else if (duration >= 7) discountPercentage = 10;
+			price = price - (price * discountPercentage) / 100;
+		} else {
 			if (service.pricePerHour) {
-				return parseFloat((service.pricePerHour * hours).toFixed(2));
+				price = service.pricePerHour * duration;
+			} else if (service.pricePerDay) {
+				price = (service.pricePerDay / 8) * duration;
 			}
 		}
-
-		throw new AppError(
-			"Impossible de calculer le prix (durée ou prix manquant)",
-			400
-		);
+		return parseFloat(price.toFixed(2));
 	}
 
 	/**
@@ -236,7 +226,7 @@ class BookingService {
 		}
 
 		// Si pas admin, vérifier que c'est bien le prestataire
-		if (userRole !== "admin" && booking.providerId !== userId) {
+		if (userRole !== "admin" && booking.provider?.userId !== userId) {
 			throw new AppError(
 				"Vous n'êtes pas autorisé à confirmer cette réservation",
 				403
@@ -280,7 +270,7 @@ class BookingService {
 		if (
 			userRole !== "admin" &&
 			booking.userId !== userId &&
-			booking.providerId !== userId
+			booking.provider?.userId !== userId
 		) {
 			throw new AppError(
 				"Vous n'êtes pas autorisé à annuler cette réservation",
@@ -331,7 +321,7 @@ class BookingService {
 			throw new AppError(ERROR_MESSAGES.NOT_FOUND, 404);
 		}
 
-		if (userRole !== "admin" && booking.providerId !== userId) {
+		if (userRole !== "admin" && booking.provider?.userId !== userId) {
 			throw new AppError(
 				"Vous n'êtes pas autorisé à terminer cette réservation",
 				403
@@ -363,6 +353,33 @@ class BookingService {
 		}
 
 		return updated;
+	}
+
+	/**
+	 * Obtenir les statistiques du dashboard pour un producteur
+	 */
+	async getProducteurDashboardStats(userId) {
+		const bookings = await Booking.findAll({
+			where: { userId },
+		});
+
+		const stats = {
+			reservations: {
+				total: bookings.length,
+				enAttente: bookings.filter((b) => b.status === "pending").length,
+				confirmees: bookings.filter((b) => b.status === "confirmed").length,
+				enCours: bookings.filter((b) => b.status === "in_progress").length,
+				terminees: bookings.filter((b) => b.status === "completed").length,
+				annulees: bookings.filter((b) => b.status === "cancelled").length,
+			},
+			finances: {
+				depensesTotales: bookings
+					.filter((b) => b.status !== "cancelled")
+					.reduce((sum, b) => sum + Number(b.totalPrice), 0),
+			},
+		};
+
+		return stats;
 	}
 
 	/**

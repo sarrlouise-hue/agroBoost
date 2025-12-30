@@ -135,6 +135,24 @@ const completeBooking = async (req, res, next) => {
 	}
 };
 
+/**
+ * Statistiques pour le tableau de bord du producteur
+ * GET /api/producteur/dashboard
+ */
+const getProducteurDashboardStats = async (req, res, next) => {
+	try {
+		const userId = req.user.userId;
+		const stats = await bookingService.getProducteurDashboardStats(userId);
+		return success(
+			res,
+			stats,
+			"Statistiques du tableau de bord producteur récupérées avec succès"
+		);
+	} catch (err) {
+		next(err);
+	}
+};
+
 module.exports = {
 	createBooking,
 	getBookingById,
@@ -143,4 +161,5 @@ module.exports = {
 	cancelBooking,
 	completeBooking,
 	deleteBooking,
+	getProducteurDashboardStats,
 };
