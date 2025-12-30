@@ -1,36 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MapPin, Star } from "lucide-react";
+import { providerService, Provider } from "../../services/providerService";
 
 export const ProvidersList: React.FC = () => {
-	const providers = [
-		{
-			name: "Moussa Diop",
-			location: "Thiès",
-			rating: 4.8,
-			reviews: 25,
-			machines: 8,
-			avatar:
-				"https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=200",
-		},
-		{
-			name: "Fatou Sall",
-			location: "Kaolack",
-			rating: 4.9,
-			reviews: 32,
-			machines: 12,
-			avatar:
-				"https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=200",
-		},
-		{
-			name: "Ibrahima Ndiaye",
-			location: "Saint-Louis",
-			rating: 4.7,
-			reviews: 18,
-			machines: 6,
-			avatar:
-				"https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=200",
-		},
-	];
+	const [providers, setProviders] = useState<Provider[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		const fetchProviders = async () => {
+			try {
+				const data = await providerService.getApprovedProviders();
+				setProviders(data);
+			} catch (error) {
+				console.error("Failed to fetch providers:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchProviders();
+	}, []);
+
+	if (loading) {
+		return (
+			<section className="py-20 bg-white">
+				<div className="max-w-7xl mx-auto px-4 text-center">
+					<div className="animate-pulse space-y-4">
+						<div className="h-8 bg-gray-200 rounded w-1/4 mx-auto"></div>
+						<div className="h-4 bg-gray-200 rounded w-1/3 mx-auto"></div>
+						<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+							{[1, 2, 3].map((i) => (
+								<div key={i} className="h-48 bg-gray-100 rounded-2xl"></div>
+							))}
+						</div>
+					</div>
+				</div>
+			</section>
+		);
+	}
 
 	return (
 		<section className="py-20 bg-white">
@@ -45,24 +52,29 @@ export const ProvidersList: React.FC = () => {
 				</div>
 
 				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-					{providers.map((provider, index) => (
+					{providers.map((provider) => (
 						<div
-							key={index}
+							key={provider.id}
 							className="bg-white p-6 rounded-2xl border-2 border-gray-100 hover:border-green-200 hover:shadow-xl transition-all duration-300"
 						>
 							<div className="flex items-start gap-4 mb-4">
 								<img
-									src={provider.avatar}
-									alt={provider.name}
-									className="w-16 h-16 rounded-full object-cover"
+									src={
+										provider.user?.profileImage ||
+										"https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+									}
+									alt={provider.businessName}
+									className="w-16 h-16 rounded-full object-cover bg-gray-100"
 								/>
 								<div className="flex-1">
 									<h3 className="text-lg font-bold text-gray-900">
-										{provider.name}
+										{provider.user
+											? `${provider.user.firstName} ${provider.user.lastName}`
+											: provider.businessName}
 									</h3>
 									<div className="flex items-center gap-1 text-gray-600 text-sm mt-1">
 										<MapPin className="w-4 h-4" />
-										{provider.location}
+										{provider.city || provider.location || "Sénégal"}
 									</div>
 								</div>
 							</div>
@@ -72,21 +84,25 @@ export const ProvidersList: React.FC = () => {
 										{[...Array(5)].map((_, i) => (
 											<Star
 												key={i}
-												className="w-4 h-4 fill-yellow-400 text-yellow-400"
+												className={`w-4 h-4 ${
+													i < Math.round(Number(provider.rating || 0))
+														? "fill-yellow-400 text-yellow-400"
+														: "fill-gray-200 text-gray-200"
+												}`}
 											/>
 										))}
 									</div>
 									<span className="text-sm font-semibold text-gray-900">
-										{provider.rating}
+										{Number(provider.rating || 0).toFixed(1)}
 									</span>
 									<span className="text-sm text-gray-500">
-										({provider.reviews} avis)
+										({provider.reviewCount || 0} avis)
 									</span>
 								</div>
 							</div>
 							<div className="mt-4 pt-4 border-t border-gray-100">
 								<p className="text-sm text-gray-600">
-									{provider.machines} machines disponibles
+									{provider.machineCount || 0} machines disponibles
 								</p>
 							</div>
 						</div>
