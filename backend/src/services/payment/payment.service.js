@@ -173,6 +173,8 @@ class PaymentService {
 			const updateFields = {
 				status: paymentStatus,
 				paymentDate: isPaid ? new Date() : payment.paymentDate || null,
+				transactionId: transaction_id || payment.transactionId,
+				paytechTransactionId: token || payment.paytechTransactionId,
 				metadata: {
 					...(payment.metadata || {}),
 					webhook_data: webhookData,
@@ -345,6 +347,13 @@ class PaymentService {
 							{
 								status: newStatus,
 								paymentDate: isPaid ? new Date() : payment.paymentDate || null,
+								transactionId:
+									paytechStatus.transaction_id || payment.transactionId,
+								metadata: {
+									...(payment.metadata || {}),
+									paytech_verify_data: paytechStatus,
+									verified_at: new Date(),
+								},
 							}
 						);
 

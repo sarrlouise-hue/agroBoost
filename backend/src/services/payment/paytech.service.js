@@ -150,7 +150,8 @@ class PayTechService {
 	 */
 	async verifyPayment(token) {
 		try {
-			const apiUrl = `https://paytech.sn/api/payment/get-status/${token}`;
+			// Correction: Le token doit être passé en paramètre de requête
+			const apiUrl = `https://paytech.sn/api/payment/get-status?token_payment=${token}`;
 
 			const response = await axios.get(apiUrl, {
 				headers: {
