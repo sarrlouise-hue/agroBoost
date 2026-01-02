@@ -3,7 +3,7 @@ import { Link, useRouter } from "../../router";
 import { useAuth } from "../../contexts/AuthContext";
 import { reservationsService } from "../../services/reservationsService";
 import { bookingsService } from "../../services/bookingsService";
-import { Booking } from "../../types";
+
 import { CheckCircle, Loader } from "lucide-react";
 
 export const PaymentSuccess: React.FC = () => {
@@ -161,6 +161,35 @@ export const PaymentSuccess: React.FC = () => {
 											? "Confirmé"
 											: "En attente"}
 									</span>
+								</div>
+
+								{/* Debug Section - Remove after fix */}
+								<div className="mt-4 p-4 bg-gray-100 rounded text-xs font-mono break-all">
+									<p>Debug Status DB: {data?.payment?.status}</p>
+									<p>Debug Status Global: {data?.paymentStatus}</p>
+									<button
+										onClick={async () => {
+											try {
+												const { paymentService } = await import(
+													"../../services/paymentService"
+												);
+												const params = new URLSearchParams(
+													window.location.search
+												);
+												const id =
+													params.get("booking") || params.get("reservation");
+												if (!id) throw new Error("No ID found");
+												const res = await paymentService.checkStatus(id);
+												alert(JSON.stringify(res, null, 2));
+												window.location.reload();
+											} catch (e) {
+												alert("Error: " + e);
+											}
+										}}
+										className="mt-2 bg-blue-500 text-white px-2 py-1 rounded"
+									>
+										Forcer Vérification PayTech
+									</button>
 								</div>
 								<div className="pt-4 border-t border-gray-200 space-y-2 text-sm">
 									<div className="flex justify-between items-center">

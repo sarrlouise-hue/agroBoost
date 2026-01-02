@@ -290,8 +290,8 @@ class PaymentService {
 	 * @private
 	 */
 	async _verifyAndUpdateStatus(payment) {
-		// Si le paiement est déjà en succès, retourner directement
-		if (payment.status === Payment.STATUS.SUCCESS) {
+		// Si le paiement est déjà en succès ET a une date, retourner directement
+		if (payment.status === Payment.STATUS.SUCCESS && payment.paymentDate) {
 			return payment;
 		}
 
@@ -307,70 +307,66 @@ class PaymentService {
 					)}`
 				);
 
-				// Mettre à jour si le statut a changé
-				if (paytechStatus.status !== payment.status) {
-					let newStatus = "pending";
+				// Mettre à jour si le statut a changé ou si la date manque
+				let newStatus = "pending";
 
-					if (
-						paytechStatus.status === "success" ||
-						paytechStatus.status === "completed" ||
-						paytechStatus.status === "paid"
-					) {
-						newStatus = "success";
-					} else if (
-						paytechStatus.status === "failed" ||
-						paytechStatus.status === "expired"
-					) {
-						newStatus = "failed";
-					} else if (paytechStatus.status === "cancelled") {
-						newStatus = "cancelled";
-					}
+				if (
+					paytechStatus.status === "success" ||
+					paytechStatus.status === "completed" ||
+					paytechStatus.status === "paid"
+				) {
+					newStatus = "success";
+				} else if (
+					paytechStatus.status === "failed" ||
+					paytechStatus.status === "expired"
+				) {
+					newStatus = "failed";
+				} else if (paytechStatus.status === "cancelled") {
+					newStatus = "cancelled";
+				}
 
+				logger.info(
+					`Mapping PayTech '${paytechStatus.status}' -> DB '${newStatus}' for ${payment.id}`
+				);
+
+				// Condition de mise à jour: statut changé ou (succès et pas de date)
+				if (
+					newStatus !== payment.status ||
+					(newStatus === "success" && !payment.paymentDate)
+				) {
+					let isPaid = newStatus === "success";
 					logger.info(
-						`Mapping PayTech '${paytechStatus.status}' -> DB '${newStatus}' for ${payment.id}`
+						`Verification: Mise à jour paiement ${
+							payment.id
+						} status=${newStatus}, paymentDate=${isPaid ? "NOW" : "STAY"}`
 					);
 
-					logger.info(
-						`Determined new status for ${payment.id}: ${newStatus} (from PayTech: ${paytechStatus.status})`
-					);
-
-					if (newStatus !== payment.status) {
-						let isPaid = newStatus === "success" || newStatus === "completed";
-						logger.info(
-							`Verification: Mise à jour paiement ${
-								payment.id
-							} status=${newStatus}, paymentDate=${isPaid ? "NOW" : "STAY"}`
-						);
-
-						const updatedPayment = await paymentRepository.updateById(
-							payment.id,
-							{
-								status: newStatus,
-								paymentDate: isPaid ? new Date() : payment.paymentDate || null,
-								transactionId:
-									paytechStatus.transaction_id || payment.transactionId,
-								metadata: {
-									...(payment.metadata || {}),
-									paytech_verify_data: paytechStatus,
-									verified_at: new Date(),
-								},
-							}
-						);
-
-						// Si succès, confirmer aussi la réservation
-						if (newStatus === "success") {
-							const booking = await bookingRepository.findById(
-								payment.bookingId
-							);
-							if (booking && booking.status === Booking.STATUS.PENDING) {
-								await bookingRepository.updateById(booking.id, {
-									status: Booking.STATUS.CONFIRMED,
-								});
-							}
+					const updatedPayment = await paymentRepository.updateById(
+						payment.id,
+						{
+							status: newStatus,
+							paymentDate: isPaid ? new Date() : payment.paymentDate || null,
+							transactionId:
+								paytechStatus.transaction_id || payment.transactionId,
+							metadata: {
+								...(payment.metadata || {}),
+								paytech_verify_data: paytechStatus,
+								verified_at: new Date(),
+							},
 						}
+					);
 
-						return updatedPayment;
+					// Si succès, confirmer aussi la réservation
+					if (newStatus === "success") {
+						const booking = await bookingRepository.findById(payment.bookingId);
+						if (booking && booking.status === Booking.STATUS.PENDING) {
+							await bookingRepository.updateById(booking.id, {
+								status: Booking.STATUS.CONFIRMED,
+							});
+						}
 					}
+
+					return updatedPayment;
 				}
 			} catch (error) {
 				logger.warn("Erreur vérification statut PayTech:", error);
