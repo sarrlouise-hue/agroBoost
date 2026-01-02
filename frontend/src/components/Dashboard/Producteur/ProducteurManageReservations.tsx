@@ -90,6 +90,16 @@ export const ProducteurManageReservations: React.FC = () => {
 
 	const openDetails = async (bookingId: string) => {
 		try {
+			// Optionnel : Forcer la vérification du statut avant d'afficher
+			try {
+				const { paymentService } = await import(
+					"../../../services/paymentService"
+				);
+				await paymentService.checkStatus(bookingId);
+			} catch (e) {
+				console.warn("Soft error checking payment status:", e);
+			}
+
 			const res = await api.get(`/bookings/${bookingId}`);
 			setSelectedBooking(res.data.data || res.data.booking || null);
 		} catch (err) {
@@ -149,8 +159,13 @@ export const ProducteurManageReservations: React.FC = () => {
 		);
 	};
 
-	const getPaymentBadge = (paymentStatus: string | undefined) => {
-		if (paymentStatus === "completed" || paymentStatus === "paid") {
+	const getPaymentBadge = (booking: any) => {
+		const paymentStatus = booking.paymentStatus || booking.payment?.status;
+		if (
+			paymentStatus === "completed" ||
+			paymentStatus === "paid" ||
+			paymentStatus === "success"
+		) {
 			return (
 				<span className="px-3 py-1 rounded-full text-sm font-medium bg-green-50 text-green-700 border border-green-200 flex items-center space-x-1">
 					<CheckCircle className="w-4 h-4" />
@@ -248,6 +263,7 @@ export const ProducteurManageReservations: React.FC = () => {
 													{booking.service?.name || "Service"}
 												</h3>
 												{getStatusBadge(booking.status)}
+												{getPaymentBadge(booking)}
 											</div>
 
 											<div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4 text-sm">
@@ -449,11 +465,13 @@ export const ProducteurManageReservations: React.FC = () => {
 											<span className="text-sm font-medium text-gray-500">
 												Statut de paiement
 											</span>
-											{getPaymentBadge(selectedBooking.paymentStatus)}
+											{getPaymentBadge(selectedBooking)}
 										</div>
 
-										{!["paid", "completed"].includes(
-											selectedBooking.paymentStatus || ""
+										{!(
+											selectedBooking.paymentStatus === "paid" ||
+											selectedBooking.paymentStatus === "success" ||
+											selectedBooking.payment?.status === "success"
 										) && (
 											<div className="pt-4">
 												<PayButton

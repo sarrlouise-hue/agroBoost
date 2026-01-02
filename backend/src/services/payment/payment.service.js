@@ -108,21 +108,52 @@ class PaymentService {
 				throw new AppError("Signature webhook invalide", 401);
 			}
 
-			const { token, transaction_id, status, amount, custom_field } =
-				webhookData;
+			const {
+				token,
+				transaction_id,
+				status,
+				amount,
+				custom_field,
+				ref_command,
+			} = webhookData;
+
+			logger.info(
+				`Webhook PayTech reçu: ${
+					token || transaction_id
+				} (${status}) pour la commande ${ref_command}`
+			);
 
 			const transactionId = token || transaction_id;
+			let payment = null;
 
-			if (!transactionId) {
-				throw new AppError("Transaction ID manquant dans le webhook", 400);
+			if (transactionId) {
+				payment = await paymentRepository.findByTransactionId(transactionId);
 			}
 
-			// Trouver le paiement
-			const payment = await paymentRepository.findByTransactionId(
-				transactionId
-			);
+			// Fallback sur ref_command ou custom_field si non trouvé par token
+			if (!payment && (ref_command || custom_field)) {
+				let bookingId = ref_command;
+				if (!bookingId && custom_field) {
+					try {
+						const custom = JSON.parse(custom_field);
+						bookingId = custom.bookingId;
+					} catch (e) {
+						logger.warn("Erreur parsing custom_field webhook:", e);
+					}
+				}
+
+				if (bookingId) {
+					logger.info(`Recherche de paiement par bookingId: ${bookingId}`);
+					payment = await paymentRepository.findByBookingId(bookingId);
+				}
+			}
+
 			if (!payment) {
-				logger.warn(`Paiement non trouvé pour transaction: ${transactionId}`);
+				logger.warn(
+					`Paiement non trouvé pour webhook. Token: ${transactionId}, Ref: ${ref_command}`
+				);
+				// Créer un paiement s'il n'existe pas encore (sécurité)
+				// Ou lever une erreur
 				throw new AppError("Paiement non trouvé", 404);
 			}
 
