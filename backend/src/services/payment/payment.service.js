@@ -115,12 +115,13 @@ class PaymentService {
 				amount,
 				custom_field,
 				ref_command,
+				type_event,
 			} = webhookData;
 
 			logger.info(
 				`Webhook PayTech reçu: ${
 					token || transaction_id
-				} (${status}) pour la commande ${ref_command}`
+				} (Status: ${status}, Event: ${type_event}) pour la commande ${ref_command}`
 			);
 
 			const transactionId = token || transaction_id;
@@ -159,9 +160,19 @@ class PaymentService {
 
 			// Mettre à jour le statut du paiement avec un mapping strict
 			let paymentStatus = "pending";
-			if (status === "success" || status === "completed" || status === "paid") {
+			if (
+				status === "success" ||
+				status === "completed" ||
+				status === "paid" ||
+				type_event === "sale_complete"
+			) {
 				paymentStatus = "success";
-			} else if (status === "failed" || status === "expired") {
+			} else if (
+				status === "failed" ||
+				status === "expired" ||
+				type_event === "sale_canceled" ||
+				type_event === "sale_failed"
+			) {
 				paymentStatus = "failed";
 			} else if (status === "cancelled") {
 				paymentStatus = "cancelled";
@@ -313,12 +324,15 @@ class PaymentService {
 				if (
 					paytechStatus.status === "success" ||
 					paytechStatus.status === "completed" ||
-					paytechStatus.status === "paid"
+					paytechStatus.status === "paid" ||
+					paytechStatus.type_event === "sale_complete"
 				) {
 					newStatus = "success";
 				} else if (
 					paytechStatus.status === "failed" ||
-					paytechStatus.status === "expired"
+					paytechStatus.status === "expired" ||
+					paytechStatus.type_event === "sale_canceled" ||
+					paytechStatus.type_event === "sale_failed"
 				) {
 					newStatus = "failed";
 				} else if (paytechStatus.status === "cancelled") {

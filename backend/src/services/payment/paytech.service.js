@@ -176,6 +176,7 @@ class PayTechService {
 				token: token,
 				amount: response.data?.item_price,
 				currency: response.data?.currency,
+				type_event: response.data?.type_event,
 			};
 		} catch (error) {
 			logger.error("Erreur PayTech verifyPayment:", error);
