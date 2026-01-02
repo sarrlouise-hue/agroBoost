@@ -160,6 +160,7 @@ export const ProducteurManageReservations: React.FC = () => {
 	};
 
 	const getPaymentBadge = (booking: any) => {
+		if (!booking) return null;
 		const paymentStatus = booking.paymentStatus || booking.payment?.status;
 		if (
 			paymentStatus === "completed" ||
