@@ -10,6 +10,7 @@ import {
 	XCircle,
 	AlertCircle,
 	Search,
+	Eye,
 } from "lucide-react";
 import { Booking } from "../../../lib/api";
 
@@ -19,6 +20,7 @@ export const PrestataireManageBookings: React.FC = () => {
 	const [loading, setLoading] = useState(true);
 	const [filter, setFilter] = useState<string>("all");
 	const [searchTerm, setSearchTerm] = useState("");
+	const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
 	useEffect(() => {
 		fetchBookings();
@@ -266,6 +268,13 @@ export const PrestataireManageBookings: React.FC = () => {
 													Terminer
 												</button>
 											)}
+											<button
+												onClick={() => setSelectedBooking(booking)}
+												className="p-1 text-gray-500 hover:text-green-600 transition"
+												title="Voir détails"
+											>
+												<Eye className="w-5 h-5" />
+											</button>
 										</div>
 									</td>
 								</tr>
@@ -279,6 +288,133 @@ export const PrestataireManageBookings: React.FC = () => {
 					)}
 				</div>
 			</div>
+
+			{/* Modal Détails */}
+			{selectedBooking && (
+				<div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+					<div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
+						<div className="bg-green-600 p-6 md:p-8 text-white relative flex-shrink-0">
+							<button
+								onClick={() => setSelectedBooking(null)}
+								className="absolute top-4 right-4 md:top-6 md:right-6 text-white/80 hover:text-white transition-colors"
+							>
+								<XCircle className="w-6 h-6 md:w-8 md:h-8" />
+							</button>
+							<h3 className="text-xl md:text-2xl font-bold">
+								Détails de la Réservation
+							</h3>
+							<p className="text-green-100 mt-1 font-mono text-sm">
+								Référence: #{selectedBooking.id.toUpperCase()}
+							</p>
+						</div>
+
+						<div className="p-6 md:p-8 overflow-y-auto scrollbar-hide">
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+								<div className="space-y-6">
+									<div>
+										<h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+											Client
+										</h4>
+										<div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex items-center">
+											<div className="bg-green-100 p-3 rounded-full mr-3 text-green-700">
+												<User className="w-5 h-5" />
+											</div>
+											<div>
+												<p className="font-bold text-gray-900 leading-tight">
+													{selectedBooking.user?.firstName}{" "}
+													{selectedBooking.user?.lastName}
+												</p>
+												<p className="text-sm text-gray-500 mt-1">
+													{selectedBooking.user?.phoneNumber}
+												</p>
+												<p className="text-xs text-gray-400 mt-0.5">
+													{selectedBooking.user?.email}
+												</p>
+											</div>
+										</div>
+									</div>
+
+									<div>
+										<h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+											Service
+										</h4>
+										<p className="text-lg font-bold text-gray-900 leading-tight">
+											{selectedBooking.service?.name}
+										</p>
+										<p className="text-sm text-gray-500 mt-1 capitalize">
+											Type: {selectedBooking.service?.serviceType}
+										</p>
+									</div>
+
+									<div>
+										<h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+											Période de réservation
+										</h4>
+										<div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+											<p className="font-semibold text-gray-900">
+												{selectedBooking.startDate
+													? `Du ${new Date(
+															selectedBooking.startDate
+													  ).toLocaleDateString("fr-FR")} au ${new Date(
+															selectedBooking.endDate
+													  ).toLocaleDateString("fr-FR")}`
+													: `Le ${new Date(
+															selectedBooking.bookingDate || ""
+													  ).toLocaleDateString("fr-FR")} à ${
+															selectedBooking.startTime
+													  }`}
+											</p>
+											<p className="text-xs text-green-600 mt-2 font-bold">
+												Durée totale: {selectedBooking.duration}{" "}
+												{selectedBooking.type === "hourly"
+													? "heure(s)"
+													: "jour(s)"}
+											</p>
+										</div>
+									</div>
+								</div>
+
+								<div className="flex flex-col justify-between">
+									<div className="bg-green-50 p-6 rounded-3xl border border-green-100 text-center">
+										<p className="text-xs text-green-600 font-bold uppercase tracking-widest mb-1">
+											Prix Total
+										</p>
+										<p className="text-4xl font-black text-green-700">
+											{selectedBooking.totalPrice?.toLocaleString() || 0}
+										</p>
+										<p className="text-lg font-bold text-green-700">FCFA</p>
+									</div>
+
+									<div className="mt-8 space-y-4">
+										<div className="flex items-center justify-between px-2">
+											<span className="text-sm font-medium text-gray-500">
+												Statut
+											</span>
+											{getStatusBadge(selectedBooking.status)}
+										</div>
+
+										<div>
+											<h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+												Notes du client
+											</h4>
+											<div className="text-gray-700 bg-gray-50 p-4 rounded-2xl border border-gray-100 italic text-sm">
+												{selectedBooking.notes || "Aucune note particulière"}
+											</div>
+										</div>
+
+										<button
+											onClick={() => setSelectedBooking(null)}
+											className="w-full py-4 text-gray-500 font-bold hover:text-gray-700 transition-colors pt-6"
+										>
+											Fermer la fenêtre
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
