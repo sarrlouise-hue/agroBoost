@@ -45,9 +45,11 @@ class PayTechService {
 			};
 
 			const defaultSuccessUrl =
-				PAYTECH.SUCCESS_URL || "https://allotracteur.com/payment-success";
+				PAYTECH.SUCCESS_URL ||
+				"https://agro-boost-ruddy.vercel.app/payment-success";
 			const defaultCancelUrl =
-				PAYTECH.CANCEL_URL || "https://allotracteur.com/payment-cancel";
+				PAYTECH.CANCEL_URL ||
+				"https://agro-boost-ruddy.vercel.app/payment-cancel";
 
 			const requestData = {
 				item_name: description,
@@ -117,7 +119,10 @@ class PayTechService {
 				);
 			}
 
-			throw new AppError("Erreur de communication avec PayTech", 500);
+			throw new AppError(
+				`Erreur de communication avec PayTech: ${error.message}`,
+				500
+			);
 		}
 	}
 
