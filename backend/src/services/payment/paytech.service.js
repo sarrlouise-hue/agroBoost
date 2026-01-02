@@ -161,9 +161,18 @@ class PayTechService {
 				timeout: 30000,
 			});
 
+			logger.info(
+				`PayTech Response [${token}]: ${JSON.stringify(response.data)}`
+			);
+
 			return {
-				success: response.data?.success === 1,
-				status: response.data?.status || "pending",
+				success:
+					response.data &&
+					(response.data.success === 1 ||
+						response.data.success === "1" ||
+						response.data.success === true),
+				status: (response.data?.status || "pending").toLowerCase(),
+				transaction_id: response.data?.transaction_id,
 				token: token,
 				amount: response.data?.item_price,
 				currency: response.data?.currency,
