@@ -106,6 +106,29 @@ export const PrestataireManageBookings: React.FC = () => {
 			>
 				<Icon className="w-4 h-4" />
 				<span>{config.label}</span>
+		);
+	};
+
+	const getPaymentBadge = (booking: any) => {
+		if (!booking) return null;
+		const paymentStatus =
+			booking.paymentStatus || booking.payment?.status || "pending";
+		if (
+			paymentStatus === "completed" ||
+			paymentStatus === "paid" ||
+			paymentStatus === "success"
+		) {
+			return (
+				<span className="px-3 py-1 rounded-full text-sm font-medium bg-green-50 text-green-700 border border-green-200 flex items-center space-x-1">
+					<CheckCircle className="w-4 h-4" />
+					<span>Payé</span>
+				</span>
+			);
+		}
+		return (
+			<span className="px-3 py-1 rounded-full text-sm font-medium bg-red-50 text-red-700 border border-red-200 flex items-center space-x-1">
+				<AlertCircle className="w-4 h-4" />
+				<span>Non payé</span>
 			</span>
 		);
 	};
@@ -180,6 +203,9 @@ export const PrestataireManageBookings: React.FC = () => {
 									Statut
 								</th>
 								<th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+									Paiement
+								</th>
+								<th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
 									Actions
 								</th>
 							</tr>
@@ -241,6 +267,9 @@ export const PrestataireManageBookings: React.FC = () => {
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap">
 										{getStatusBadge(booking.status)}
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap">
+										{getPaymentBadge(booking)}
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 										<div className="flex space-x-2">
@@ -388,9 +417,16 @@ export const PrestataireManageBookings: React.FC = () => {
 									<div className="mt-8 space-y-4">
 										<div className="flex items-center justify-between px-2">
 											<span className="text-sm font-medium text-gray-500">
-												Statut
+												Statut Réservation
 											</span>
 											{getStatusBadge(selectedBooking.status)}
+										</div>
+
+										<div className="flex items-center justify-between px-2">
+											<span className="text-sm font-medium text-gray-500">
+												Statut Paiement
+											</span>
+											{getPaymentBadge(selectedBooking)}
 										</div>
 
 										<div>
