@@ -79,10 +79,10 @@ export default function DashboardProducteur() {
 					</Link>
 				</div>
 
-				<div className="mb-6 flex space-x-4 border-b border-gray-200">
+				<div className="mb-6 flex space-x-4 border-b border-gray-200 overflow-x-auto scrollbar-hide whitespace-nowrap">
 					<button
 						onClick={() => setActiveTab("stats")}
-						className={`pb-4 px-4 font-medium border-b-2 transition ${
+						className={`flex-shrink-0 pb-4 px-4 font-medium border-b-2 transition ${
 							activeTab === "stats"
 								? "border-green-600 text-green-600"
 								: "border-transparent text-gray-600 hover:text-gray-900"
@@ -92,7 +92,7 @@ export default function DashboardProducteur() {
 					</button>
 					<button
 						onClick={() => setActiveTab("reservations")}
-						className={`pb-4 px-4 font-medium border-b-2 transition ${
+						className={`flex-shrink-0 pb-4 px-4 font-medium border-b-2 transition ${
 							activeTab === "reservations"
 								? "border-green-600 text-green-600"
 								: "border-transparent text-gray-600 hover:text-gray-900"
@@ -102,7 +102,7 @@ export default function DashboardProducteur() {
 					</button>
 					<button
 						onClick={() => setActiveTab("profile")}
-						className={`pb-4 px-4 font-medium border-b-2 transition ${
+						className={`flex-shrink-0 pb-4 px-4 font-medium border-b-2 transition ${
 							activeTab === "profile"
 								? "border-green-600 text-green-600"
 								: "border-transparent text-gray-600 hover:text-gray-900"

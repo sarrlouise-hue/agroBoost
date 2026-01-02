@@ -361,22 +361,24 @@ export const ProducteurManageReservations: React.FC = () => {
 
 			{/* Details modal */}
 			{selectedBooking && (
-				<div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-					<div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-						<div className="bg-green-600 p-8 text-white relative">
+				<div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 md:p-4">
+					<div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
+						<div className="bg-green-600 p-6 md:p-8 text-white relative flex-shrink-0">
 							<button
 								onClick={closeDetails}
-								className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors"
+								className="absolute top-4 right-4 md:top-6 md:right-6 text-white/80 hover:text-white transition-colors"
 							>
-								<XCircle className="w-8 h-8" />
+								<XCircle className="w-6 h-6 md:w-8 md:h-8" />
 							</button>
-							<h3 className="text-2xl font-bold">Détails de la Réservation</h3>
-							<p className="text-green-100 mt-1 font-mono">
+							<h3 className="text-xl md:text-2xl font-bold">
+								Détails de la Réservation
+							</h3>
+							<p className="text-green-100 mt-1 font-mono text-sm">
 								Référence: #{selectedBooking.id.toUpperCase()}
 							</p>
 						</div>
 
-						<div className="p-8">
+						<div className="p-6 md:p-8 overflow-y-auto scrollbar-hide">
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 								<div className="space-y-6">
 									<div>

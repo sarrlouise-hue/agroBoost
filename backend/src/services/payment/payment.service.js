@@ -1,5 +1,6 @@
 const paymentRepository = require("../../data-access/payment.repository");
 const bookingRepository = require("../../data-access/booking.repository");
+const userRepository = require("../../data-access/user.repository");
 const paytechService = require("./paytech.service");
 const { AppError, ERROR_MESSAGES } = require("../../utils/errors");
 const logger = require("../../utils/logger");
@@ -15,7 +16,7 @@ class PaymentService {
 	/**
 	 * Initialiser un paiement pour une réservation
 	 */
-	async initiatePayment(userId, bookingId, phoneNumber) {
+	async initiatePayment(userId, bookingId, phoneNumber, options = {}) {
 		// Vérifier que la réservation existe
 		const booking = await bookingRepository.findById(bookingId);
 		if (!booking) {
@@ -58,13 +59,19 @@ class PaymentService {
 			});
 		}
 
+		// Récupérer les infos de l'utilisateur pour le pré-remplissage
+		const user = await userRepository.findById(userId);
+
 		// Initialiser le paiement PayTech
 		const paytechResponse = await paytechService.initiatePayment({
 			amount: booking.totalPrice,
 			phoneNumber,
+			fullName: user ? `${user.firstName} ${user.lastName}` : undefined,
 			description: `Paiement réservation ${bookingId}`,
 			bookingId,
 			userId,
+			successUrl: options.successUrl,
+			cancelUrl: options.cancelUrl,
 		});
 
 		// Mettre à jour le paiement avec l'ID de transaction PayTech
@@ -92,13 +99,10 @@ class PaymentService {
 	/**
 	 * Traiter un webhook PayTech
 	 */
-	async handleWebhook(webhookData, signature) {
+	async handleWebhook(webhookData) {
 		try {
 			// Vérifier la signature
-			const isValid = paytechService.verifyWebhookSignature(
-				webhookData,
-				signature
-			);
+			const isValid = paytechService.verifyWebhookSignature(webhookData);
 			if (!isValid) {
 				logger.warn("Signature webhook PayTech invalide", { webhookData });
 				throw new AppError("Signature webhook invalide", 401);
@@ -226,7 +230,25 @@ class PaymentService {
 		if (!payment) {
 			throw new AppError(ERROR_MESSAGES.NOT_FOUND, 404);
 		}
+		return this._verifyAndUpdateStatus(payment);
+	}
 
+	/**
+	 * Vérifier le statut d'un paiement via l'ID de réservation
+	 */
+	async checkPaymentStatusByBookingId(bookingId) {
+		const payment = await paymentRepository.findByBookingId(bookingId);
+		if (!payment) {
+			throw new AppError("Aucun paiement trouvé pour cette réservation", 404);
+		}
+		return this._verifyAndUpdateStatus(payment);
+	}
+
+	/**
+	 * Logique interne de vérification et mise à jour du statut
+	 * @private
+	 */
+	async _verifyAndUpdateStatus(payment) {
 		// Si le paiement est déjà en succès, retourner directement
 		if (payment.status === Payment.STATUS.SUCCESS) {
 			return payment;
@@ -254,15 +276,33 @@ class PaymentService {
 						newStatus = Payment.STATUS.FAILED;
 					}
 
-					return paymentRepository.updateById(payment.id, {
-						status: newStatus,
-						paymentDate:
-							newStatus === Payment.STATUS.SUCCESS ? new Date() : null,
-					});
+					if (newStatus !== payment.status) {
+						const updatedPayment = await paymentRepository.updateById(
+							payment.id,
+							{
+								status: newStatus,
+								paymentDate:
+									newStatus === Payment.STATUS.SUCCESS ? new Date() : null,
+							}
+						);
+
+						// Si succès, confirmer aussi la réservation
+						if (newStatus === Payment.STATUS.SUCCESS) {
+							const booking = await bookingRepository.findById(
+								payment.bookingId
+							);
+							if (booking && booking.status === Booking.STATUS.PENDING) {
+								await bookingRepository.updateById(booking.id, {
+									status: Booking.STATUS.CONFIRMED,
+								});
+							}
+						}
+
+						return updatedPayment;
+					}
 				}
 			} catch (error) {
 				logger.warn("Erreur vérification statut PayTech:", error);
-				// Continuer même en cas d'erreur
 			}
 		}
 

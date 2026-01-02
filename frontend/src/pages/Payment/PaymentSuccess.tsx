@@ -35,6 +35,10 @@ export const PaymentSuccess: React.FC = () => {
 
 	const loadBooking = async (id: string) => {
 		try {
+			// Forcer la vérification du statut côté serveur avec PayTech
+			const { paymentService } = await import("../../services/paymentService");
+			await paymentService.checkStatus(id);
+
 			const booking = await bookingsService.getBookingById(id);
 			if (!booking) {
 				navigate("/dashboard");
@@ -42,7 +46,7 @@ export const PaymentSuccess: React.FC = () => {
 			}
 			setData(booking);
 		} catch (error) {
-			console.error("Error loading booking:", error);
+			console.error("Error loading/verifying booking:", error);
 			// Show what we have anyway
 		} finally {
 			setLoading(false);

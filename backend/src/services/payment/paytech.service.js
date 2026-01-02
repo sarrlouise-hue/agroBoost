@@ -6,24 +6,9 @@ const logger = require("../../utils/logger");
 
 /**
  * Service d'intégration PayTech pour Mobile Money
+ * Basé EXCLUSIVEMENT sur la documentation officielle : https://doc.intech.sn/doc_paytech.php
  */
 class PayTechService {
-	/**
-	 * Générer la signature pour une requête PayTech
-	 * @private
-	 */
-	_generateSignature(data) {
-		const message = Object.keys(data)
-			.sort()
-			.map((key) => `${key}=${data[key]}`)
-			.join("&");
-
-		return crypto
-			.createHmac("sha256", PAYTECH.API_SECRET)
-			.update(message)
-			.digest("hex");
-	}
-
 	/**
 	 * Initialiser un paiement PayTech
 	 * @param {object} paymentData - Données du paiement
@@ -34,45 +19,46 @@ class PayTechService {
 			const {
 				amount,
 				phoneNumber,
+				fullName,
 				description = "Paiement ALLO TRACTEUR",
 				bookingId,
 				userId,
 			} = paymentData;
 
-			if (!PAYTECH.API_KEY || !PAYTECH.API_SECRET || !PAYTECH.MERCHANT_ID) {
-				logger.warn("PayTech non configuré, mode simulation activé");
-				// Mode simulation pour développement
-				return {
-					success: true,
-					transaction_id: `sim_${Date.now()}_${bookingId}`,
-					payment_url: null,
-					token: `token_${Date.now()}`,
-					message: "Paiement simulé (PayTech non configuré)",
-					simulated: true,
-				};
+			if (!PAYTECH.API_KEY || !PAYTECH.API_SECRET) {
+				throw new AppError(
+					"Configuration PayTech incomplète (API_KEY ou API_SECRET manquante)",
+					500
+				);
 			}
+
+			const sanitizeUrl = (url, fallback) => {
+				if (!url) return fallback;
+				// PayTech rejette souvent les URLs localhost/127.0.0.1
+				if (url.includes("localhost") || url.includes("127.0.0.1")) {
+					logger.warn(
+						`L'URL PayTech ${url} contient localhost. Substitution par le fallback: ${fallback}`
+					);
+					return fallback;
+				}
+				return url;
+			};
+
+			const defaultSuccessUrl =
+				PAYTECH.SUCCESS_URL || "https://allotracteur.com/payment-success";
+			const defaultCancelUrl =
+				PAYTECH.CANCEL_URL || "https://allotracteur.com/payment-cancel";
 
 			const requestData = {
 				item_name: description,
 				item_price: parseFloat(amount),
 				currency: "XOF",
+				ref_command: bookingId,
 				command_name: `Réservation ${bookingId}`,
-				env_token: PAYTECH.MERCHANT_ID,
-				ipn_url:
-					PAYTECH.IPN_URL ||
-					`${
-						process.env.API_URL || "http://localhost:3000"
-					}/api/payments/webhook/paytech`,
-				success_url:
-					process.env.PAYTECH_SUCCESS_URL ||
-					`${
-						process.env.FRONTEND_URL || "http://localhost:3001"
-					}/payment/success`,
-				cancel_url:
-					process.env.PAYTECH_CANCEL_URL ||
-					`${
-						process.env.FRONTEND_URL || "http://localhost:3001"
-					}/payment/cancel`,
+				env: PAYTECH.ENV || "test",
+				ipn_url: PAYTECH.IPN_URL,
+				success_url: sanitizeUrl(paymentData.successUrl, defaultSuccessUrl),
+				cancel_url: sanitizeUrl(paymentData.cancelUrl, defaultCancelUrl),
 				custom_field: JSON.stringify({
 					bookingId,
 					userId,
@@ -80,34 +66,38 @@ class PayTechService {
 				}),
 			};
 
-			// Générer la signature
-			const signature = this._generateSignature(requestData);
-			requestData.hash = signature;
-
-			// Ajouter les credentials
-			requestData.api_key = PAYTECH.API_KEY;
-			requestData.api_secret = PAYTECH.API_SECRET;
-
-			const apiUrl = `${PAYTECH.BASE_URL}/api/payment/request-payment`;
+			const apiUrl = "https://paytech.sn/api/payment/request-payment";
 
 			logger.info(
-				`Initialisation paiement PayTech: ${bookingId}, montant: ${amount}`
+				`Envoi requête PayTech (${
+					requestData.env
+				}) pour ${bookingId}: ${JSON.stringify(requestData)}`
 			);
 
 			const response = await axios.post(apiUrl, requestData, {
 				headers: {
+					Accept: "application/json",
 					"Content-Type": "application/json",
+					API_KEY: PAYTECH.API_KEY,
+					API_SECRET: PAYTECH.API_SECRET,
 				},
 				timeout: 30000,
 			});
 
-			if (response.data && response.data.success) {
+			if (response.data && response.data.success === 1) {
+				let redirectUrl = response.data.redirect_url;
+
+				// Facultatif : Enrichir l'URL pour le pré-remplissage (Autofill)
+				// fn = full name, pn = phone number
+				const url = new URL(redirectUrl);
+				if (fullName) url.searchParams.append("fn", fullName);
+				if (phoneNumber) url.searchParams.append("pn", phoneNumber);
+
 				return {
 					success: true,
-					transaction_id: response.data.transaction_id || response.data.token,
-					payment_url: response.data.payment_url || response.data.url,
-					token: response.data.token || response.data.transaction_id,
-					message: response.data.message || "Paiement initialisé",
+					token: response.data.token,
+					payment_url: url.toString(),
+					message: "Paiement initialisé avec succès",
 				};
 			}
 
@@ -133,46 +123,27 @@ class PayTechService {
 
 	/**
 	 * Vérifier le statut d'un paiement PayTech
-	 * @param {string} transactionId - ID de la transaction
+	 * @param {string} token - Token de la transaction (si disponible)
 	 * @returns {Promise<object>} Statut du paiement
 	 */
-	async verifyPayment(transactionId) {
+	async verifyPayment(token) {
 		try {
-			if (!PAYTECH.API_KEY || !PAYTECH.API_SECRET) {
-				logger.warn("PayTech non configuré, vérification simulée");
-				return {
-					success: true,
-					status: "success",
-					transaction_id: transactionId,
-					simulated: true,
-				};
-			}
+			const apiUrl = `https://paytech.sn/api/payment/get-status/${token}`;
 
-			const requestData = {
-				token: transactionId,
-				api_key: PAYTECH.API_KEY,
-				api_secret: PAYTECH.API_SECRET,
-			};
-
-			const signature = this._generateSignature(requestData);
-			requestData.hash = signature;
-
-			const apiUrl = `${PAYTECH.BASE_URL}/api/payment/verify`;
-
-			const response = await axios.post(apiUrl, requestData, {
+			const response = await axios.get(apiUrl, {
 				headers: {
-					"Content-Type": "application/json",
+					API_KEY: PAYTECH.API_KEY,
+					API_SECRET: PAYTECH.API_SECRET,
 				},
 				timeout: 30000,
 			});
 
 			return {
-				success: response.data?.success || false,
+				success: response.data?.success === 1,
 				status: response.data?.status || "pending",
-				transaction_id: transactionId,
-				amount: response.data?.amount,
+				token: token,
+				amount: response.data?.item_price,
 				currency: response.data?.currency,
-				message: response.data?.message,
 			};
 		} catch (error) {
 			logger.error("Erreur PayTech verifyPayment:", error);
@@ -181,21 +152,25 @@ class PayTechService {
 	}
 
 	/**
-	 * Vérifier la signature d'un webhook PayTech
+	 * Vérifier la signature d'un webhook PayTech (IPN)
+	 * Formule : hash_hmac('sha256', item_price|ref_command|api_key, api_secret)
 	 * @param {object} webhookData - Données du webhook
-	 * @param {string} receivedSignature - Signature reçue
+	 * @param {string} receivedSignature - Signature reçue (hash)
 	 * @returns {boolean} True si la signature est valide
 	 */
-	verifyWebhookSignature(webhookData, receivedSignature) {
-		if (!PAYTECH.WEBHOOK_SECRET) {
-			logger.warn(
-				"PayTech WEBHOOK_SECRET non configuré, signature non vérifiée"
-			);
-			return true; // En développement, accepter si pas de secret configuré
-		}
+	verifyWebhookSignature(webhookData) {
+		const { item_price, ref_command, hmac_compute } = webhookData;
 
-		const calculatedSignature = this._generateSignature(webhookData);
-		return calculatedSignature === receivedSignature;
+		if (!item_price || !ref_command || !hmac_compute) return false;
+
+		const message = `${item_price}|${ref_command}|${PAYTECH.API_KEY}`;
+
+		const calculatedSignature = crypto
+			.createHmac("sha256", PAYTECH.API_SECRET)
+			.update(message)
+			.digest("hex");
+
+		return calculatedSignature === hmac_compute;
 	}
 }
 

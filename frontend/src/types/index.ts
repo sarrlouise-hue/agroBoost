@@ -107,6 +107,7 @@ export interface User {
 	phoneNumber: string;
 	role: "producteur" | "prestataire" | "admin" | "user" | "provider";
 	isVerified: boolean;
+	token?: string;
 	createdAt: string;
 	updatedAt?: string;
 }

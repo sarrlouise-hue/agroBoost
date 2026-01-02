@@ -178,6 +178,31 @@ router.get("/:id/status", authenticate, paymentController.checkPaymentStatus);
 
 /**
  * @swagger
+ * /api/payments/bookings/{bookingId}/status:
+ *   get:
+ *     summary: Vérifier le statut d'un paiement via l'ID de réservation (User/Provider/Admin)
+ *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bookingId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la réservation
+ *     responses:
+ *       200:
+ *         description: Statut du paiement récupéré avec succès
+ */
+router.get(
+	"/bookings/:bookingId/status",
+	authenticate,
+	paymentController.checkBookingPaymentStatus
+);
+
+/**
+ * @swagger
  * /api/payments:
  *   get:
  *     summary: Obtenir tous les paiements (User/Provider/Admin)

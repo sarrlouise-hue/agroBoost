@@ -37,20 +37,20 @@ const Profile: React.FC = () => {
 				<div className="flex flex-col lg:flex-row gap-8">
 					{/* Sidebar Navigation */}
 					<div className="w-full lg:w-64 flex-shrink-0">
-						<nav className="space-y-1 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-							<button className="w-full flex items-center px-4 py-3 text-sm font-bold text-green-700 bg-green-50 rounded-xl transition-all">
+						<nav className="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-1 overflow-x-auto scrollbar-hide bg-white p-4 rounded-2xl shadow-sm border border-gray-100 whitespace-nowrap lg:whitespace-normal">
+							<button className="flex-shrink-0 lg:w-full flex items-center px-4 py-3 text-sm font-bold text-green-700 bg-green-50 rounded-xl transition-all">
 								<User className="w-5 h-5 mr-3" />
 								Mon profil
 							</button>
-							<button className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-all">
+							<button className="flex-shrink-0 lg:w-full flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-all">
 								<Shield className="w-5 h-5 mr-3" />
 								Sécurité
 							</button>
-							<button className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-all">
+							<button className="flex-shrink-0 lg:w-full flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-all">
 								<Bell className="w-5 h-5 mr-3" />
 								Notifications
 							</button>
-							<button className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-all">
+							<button className="flex-shrink-0 lg:w-full flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-all">
 								<Settings className="w-5 h-5 mr-3" />
 								Préférences
 							</button>

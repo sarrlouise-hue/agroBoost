@@ -121,7 +121,7 @@ export const Header: React.FC = () => {
 
 				{/* Mobile Navigation */}
 				{mobileMenuOpen && (
-					<div className="md:hidden mt-4 pb-4 border-t border-gray-200 pt-4">
+					<div className="md:hidden mt-4 pb-4 border-t border-gray-200 pt-4 max-h-[calc(100vh-100px)] overflow-y-auto scrollbar-hide">
 						<div className="flex flex-col space-y-4">
 							<Link
 								to="/"

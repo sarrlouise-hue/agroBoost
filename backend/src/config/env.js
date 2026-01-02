@@ -49,13 +49,11 @@ module.exports = {
 	PAYTECH: {
 		API_KEY: process.env.PAYTECH_API_KEY || "",
 		API_SECRET: process.env.PAYTECH_API_SECRET || "",
-		MERCHANT_ID: process.env.PAYTECH_MERCHANT_ID || "",
 		BASE_URL: process.env.PAYTECH_BASE_URL || "https://paytech.sn",
-		WEBHOOK_SECRET:
-			process.env.PAYTECH_WEBHOOK_SECRET ||
-			process.env.PAYTECH_CALLBACK_SECRET ||
-			"",
+		ENV: process.env.PAYTECH_ENV || "test",
 		IPN_URL: process.env.PAYTECH_IPN_URL || "",
+		SUCCESS_URL: process.env.PAYTECH_SUCCESS_URL || "",
+		CANCEL_URL: process.env.PAYTECH_CANCEL_URL || "",
 	},
 
 	// Google Maps

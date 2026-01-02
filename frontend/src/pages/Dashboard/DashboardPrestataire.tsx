@@ -75,10 +75,10 @@ export default function DashboardPrestataire() {
 					</p>
 				</div>
 
-				<div className="mb-8 flex space-x-2 border-b border-gray-200 overflow-x-auto pb-px">
+				<div className="mb-8 flex space-x-2 border-b border-gray-200 overflow-x-auto scrollbar-hide pb-px whitespace-nowrap">
 					<button
 						onClick={() => setActiveTab("stats")}
-						className={`pb-4 px-6 font-bold border-b-2 transition ${
+						className={`flex-shrink-0 pb-4 px-6 font-bold border-b-2 transition ${
 							activeTab === "stats"
 								? "border-green-600 text-green-600 text-lg"
 								: "border-transparent text-gray-500 hover:text-gray-900"
@@ -88,7 +88,7 @@ export default function DashboardPrestataire() {
 					</button>
 					<button
 						onClick={() => setActiveTab("services")}
-						className={`pb-4 px-6 font-bold border-b-2 transition ${
+						className={`flex-shrink-0 pb-4 px-6 font-bold border-b-2 transition ${
 							activeTab === "services"
 								? "border-green-600 text-green-600 text-lg"
 								: "border-transparent text-gray-500 hover:text-gray-900"
@@ -98,7 +98,7 @@ export default function DashboardPrestataire() {
 					</button>
 					<button
 						onClick={() => setActiveTab("bookings")}
-						className={`pb-4 px-6 font-bold border-b-2 transition ${
+						className={`flex-shrink-0 pb-4 px-6 font-bold border-b-2 transition ${
 							activeTab === "bookings"
 								? "border-green-600 text-green-600 text-lg"
 								: "border-transparent text-gray-500 hover:text-gray-900"
@@ -108,7 +108,7 @@ export default function DashboardPrestataire() {
 					</button>
 					<button
 						onClick={() => setActiveTab("profile")}
-						className={`pb-4 px-6 font-bold border-b-2 transition ${
+						className={`flex-shrink-0 pb-4 px-6 font-bold border-b-2 transition ${
 							activeTab === "profile"
 								? "border-green-600 text-green-600 text-lg"
 								: "border-transparent text-gray-500 hover:text-gray-900"

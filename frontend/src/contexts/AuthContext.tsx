@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 				if (token && storedUser) {
 					const userData: User = JSON.parse(storedUser);
-					setUser(userData);
+					setUser({ ...userData, token });
 
 					setProfile({
 						id: userData.id,
@@ -113,7 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			localStorage.setItem("token", token);
 			localStorage.setItem("user", JSON.stringify(userData));
 
-			setUser(userData);
+			setUser({ ...userData, token });
 			setProfile({
 				id: userData.id,
 				userId: userData.id,
@@ -143,7 +143,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			const response = await api.put("/auth/profile", updates);
 			const userData: User = response.data.data;
 
-			setUser(userData);
+			const token = localStorage.getItem("token");
+			setUser({ ...userData, token: token || undefined });
 			localStorage.setItem("user", JSON.stringify(userData));
 
 			setProfile({
@@ -167,7 +168,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			const response = await api.get("/auth/profile");
 			const userData: User = response.data.data;
 
-			setUser(userData);
+			const token = localStorage.getItem("token");
+			setUser({ ...userData, token: token || undefined });
 			localStorage.setItem("user", JSON.stringify(userData));
 
 			setProfile({
