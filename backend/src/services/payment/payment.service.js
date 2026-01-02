@@ -312,11 +312,6 @@ class PaymentService {
 				const paytechStatus = await paytechService.verifyPayment(
 					payment.paytechTransactionId
 				);
-				logger.info(
-					`PayTech Status Response for ${payment.id}: ${JSON.stringify(
-						paytechStatus
-					)}`
-				);
 
 				// Mettre à jour si le statut a changé ou si la date manque
 				let newStatus = "pending";
@@ -339,21 +334,12 @@ class PaymentService {
 					newStatus = "cancelled";
 				}
 
-				logger.info(
-					`Mapping PayTech '${paytechStatus.status}' -> DB '${newStatus}' for ${payment.id}`
-				);
-
 				// Condition de mise à jour: statut changé ou (succès et pas de date)
 				if (
 					newStatus !== payment.status ||
 					(newStatus === "success" && !payment.paymentDate)
 				) {
 					let isPaid = newStatus === "success";
-					logger.info(
-						`Verification: Mise à jour paiement ${
-							payment.id
-						} status=${newStatus}, paymentDate=${isPaid ? "NOW" : "STAY"}`
-					);
 
 					const updatedPayment = await paymentRepository.updateById(
 						payment.id,
