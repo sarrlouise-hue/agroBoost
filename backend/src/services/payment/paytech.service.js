@@ -51,6 +51,23 @@ class PayTechService {
 				PAYTECH.CANCEL_URL ||
 				"https://agro-boost-ruddy.vercel.app/payment-cancel";
 
+			const appendParam = (url, param, value) => {
+				const u = new URL(url);
+				u.searchParams.set(param, value);
+				return u.toString();
+			};
+
+			let successUrl = sanitizeUrl(paymentData.successUrl, defaultSuccessUrl);
+			let cancelUrl = sanitizeUrl(paymentData.cancelUrl, defaultCancelUrl);
+
+			// S'assurer que bookingId est dans les URLs de retour
+			if (!successUrl.includes("booking=")) {
+				successUrl = appendParam(successUrl, "booking", bookingId);
+			}
+			if (!cancelUrl.includes("booking=")) {
+				cancelUrl = appendParam(cancelUrl, "booking", bookingId);
+			}
+
 			const requestData = {
 				item_name: description,
 				item_price: parseFloat(amount),
@@ -59,8 +76,8 @@ class PayTechService {
 				command_name: `Réservation ${bookingId}`,
 				env: PAYTECH.ENV || "test",
 				ipn_url: PAYTECH.IPN_URL,
-				success_url: sanitizeUrl(paymentData.successUrl, defaultSuccessUrl),
-				cancel_url: sanitizeUrl(paymentData.cancelUrl, defaultCancelUrl),
+				success_url: successUrl,
+				cancel_url: cancelUrl,
 				custom_field: JSON.stringify({
 					bookingId,
 					userId,

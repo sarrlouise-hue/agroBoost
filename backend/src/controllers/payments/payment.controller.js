@@ -29,6 +29,7 @@ const initiatePayment = async (req, res, next) => {
  */
 const handlePayTechWebhook = async (req, res, next) => {
 	try {
+		console.log("PAYTECH WEBHOOK BODY:", JSON.stringify(req.body));
 		const result = await paymentService.handleWebhook(req.body);
 
 		// PayTech attend un statut 200 pour confirmer la réception

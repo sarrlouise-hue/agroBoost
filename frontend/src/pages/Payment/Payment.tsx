@@ -71,6 +71,8 @@ export const Payment: React.FC = () => {
 				description: `Location ${reservation.machine?.name || "Machine"} - ${
 					reservation.total_days
 				} jours`,
+				successUrl: `${window.location.origin}/payment-success?booking=${reservation.id}`,
+				cancelUrl: `${window.location.origin}/payment-cancel?booking=${reservation.id}`,
 			});
 
 			if (result.success && result.redirect_url) {

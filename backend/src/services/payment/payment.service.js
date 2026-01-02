@@ -166,16 +166,25 @@ class PaymentService {
 			}
 
 			// Mettre à jour le paiement
-			await paymentRepository.updateById(payment.id, {
-				status: paymentStatus,
-				paymentDate:
-					paymentStatus === Payment.STATUS.SUCCESS ? new Date() : null,
+			let isPaid =
+				status === "success" ||
+				status === "completed" ||
+				paymentStatus === "success";
+
+			const updateFields = {
+				status: isPaid ? "success" : paymentStatus,
+				paymentDate: isPaid ? new Date() : payment.paymentDate || null,
 				metadata: {
 					...(payment.metadata || {}),
 					webhook_data: webhookData,
 					webhook_received_at: new Date(),
 				},
-			});
+			};
+
+			logger.info(
+				`Mise à jour paiement ${payment.id}: ${JSON.stringify(updateFields)}`
+			);
+			await paymentRepository.updateById(payment.id, updateFields);
 
 			// Si le paiement est réussi, mettre à jour le statut de la réservation
 			if (paymentStatus === Payment.STATUS.SUCCESS) {
@@ -308,12 +317,18 @@ class PaymentService {
 					}
 
 					if (newStatus !== payment.status) {
+						let isPaid = newStatus === "success" || newStatus === "completed";
+						logger.info(
+							`Verification: Mise à jour paiement ${
+								payment.id
+							} status=${newStatus}, paymentDate=${isPaid ? "NOW" : "STAY"}`
+						);
+
 						const updatedPayment = await paymentRepository.updateById(
 							payment.id,
 							{
 								status: newStatus,
-								paymentDate:
-									newStatus === Payment.STATUS.SUCCESS ? new Date() : null,
+								paymentDate: isPaid ? new Date() : payment.paymentDate || null,
 							}
 						);
 
