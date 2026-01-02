@@ -106,6 +106,7 @@ export const PrestataireManageBookings: React.FC = () => {
 			>
 				<Icon className="w-4 h-4" />
 				<span>{config.label}</span>
+			</span>
 		);
 	};
 
