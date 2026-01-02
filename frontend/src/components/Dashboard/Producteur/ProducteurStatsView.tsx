@@ -126,18 +126,28 @@ export const ProducteurStatsView: React.FC<ProducteurStatsViewProps> = ({
 					<h2 className="text-xl font-bold mb-4">Finances</h2>
 					<div className="space-y-4">
 						<div className="flex justify-between items-center">
-							<span className="text-gray-600">Total dépensé</span>
-							<span className="font-bold text-lg text-green-600">
-								{((stats?.finances.depensesTotales || 0) / 1000).toFixed(0)}K
+							<span className="text-gray-600">Total payé</span>
+							<span className="font-bold text-lg text-emerald-600">
+								{(stats?.finances.depensesTotales || 0).toLocaleString()} FCFA
+							</span>
+						</div>
+						<div className="flex justify-between items-center text-sm">
+							<span className="text-gray-500">En attente de paiement</span>
+							<span className="font-semibold text-orange-600">
+								{(
+									(stats?.finances as any)?.enAttentePaiement || 0
+								).toLocaleString()}{" "}
 								FCFA
 							</span>
 						</div>
-						<div className="flex justify-between items-center">
-							<span className="text-gray-600">Réservations payées</span>
-							<span className="font-bold text-lg">
-								{(stats?.reservations?.confirmees ?? 0) +
-									(stats?.reservations?.enCours ?? 0) +
-									(stats?.reservations?.terminees ?? 0)}
+						<div className="flex justify-between items-center pt-2 border-t">
+							<span className="text-gray-600 font-bold">Total général</span>
+							<span className="font-bold text-lg text-gray-900">
+								{(
+									(stats?.finances.depensesTotales || 0) +
+									((stats?.finances as any)?.enAttentePaiement || 0)
+								).toLocaleString()}{" "}
+								FCFA
 							</span>
 						</div>
 						<div className="flex justify-between items-center">

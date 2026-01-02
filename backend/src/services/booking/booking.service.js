@@ -4,6 +4,7 @@ const providerRepository = require("../../data-access/provider.repository");
 const { AppError, ERROR_MESSAGES } = require("../../utils/errors");
 const logger = require("../../utils/logger");
 const Booking = require("../../models/Booking");
+const Payment = require("../../models/Payment");
 const notificationService = require("../notification/notification.service");
 const { NOTIFICATION_TYPES, PAGINATION } = require("../../config/constants");
 
@@ -355,26 +356,37 @@ class BookingService {
 		return updated;
 	}
 
-	/**
-	 * Obtenir les statistiques du dashboard pour un producteur
-	 */
 	async getProducteurDashboardStats(userId) {
 		const bookings = await Booking.findAll({
 			where: { userId },
+			include: [{ model: Payment, as: "payment" }],
 		});
 
 		const stats = {
 			reservations: {
 				total: bookings.length,
-				enAttente: bookings.filter((b) => b.status === "pending").length,
-				confirmees: bookings.filter((b) => b.status === "confirmed").length,
-				enCours: bookings.filter((b) => b.status === "in_progress").length,
-				terminees: bookings.filter((b) => b.status === "completed").length,
-				annulees: bookings.filter((b) => b.status === "cancelled").length,
+				enAttente: bookings.filter((b) => b.status === Booking.STATUS.PENDING)
+					.length,
+				confirmees: bookings.filter(
+					(b) => b.status === Booking.STATUS.CONFIRMED
+				).length,
+				enCours: bookings.filter((b) => b.status === Booking.STATUS.IN_PROGRESS)
+					.length,
+				terminees: bookings.filter((b) => b.status === Booking.STATUS.COMPLETED)
+					.length,
+				annulees: bookings.filter((b) => b.status === Booking.STATUS.CANCELLED)
+					.length,
 			},
 			finances: {
 				depensesTotales: bookings
-					.filter((b) => b.status !== "cancelled")
+					.filter((b) => b.payment?.status === Payment.STATUS.SUCCESS)
+					.reduce((sum, b) => sum + Number(b.totalPrice), 0),
+				enAttentePaiement: bookings
+					.filter(
+						(b) =>
+							b.status !== Booking.STATUS.CANCELLED &&
+							(!b.payment || b.payment.status !== Payment.STATUS.SUCCESS)
+					)
 					.reduce((sum, b) => sum + Number(b.totalPrice), 0),
 			},
 		};

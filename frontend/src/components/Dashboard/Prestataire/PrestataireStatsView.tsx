@@ -11,6 +11,7 @@ interface PrestataireStatsViewProps {
 			pendingBookings: number;
 			completedBookings: number;
 			totalEarnings: number;
+			pendingEarnings: number;
 		};
 	} | null;
 	user: any;
@@ -124,6 +125,35 @@ export const PrestataireStatsView: React.FC<PrestataireStatsViewProps> = ({
 					</div>
 				</div>
 
+				<div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+					<h2 className="text-xl font-bold mb-6 text-gray-900">
+						Revenus détaillés
+					</h2>
+					<div className="space-y-4">
+						<div className="flex justify-between items-center py-2 border-b border-gray-50">
+							<span className="text-gray-600">Revenu encaissé</span>
+							<span className="font-bold text-emerald-600">
+								{(overview?.totalEarnings || 0).toLocaleString()} FCFA
+							</span>
+						</div>
+						<div className="flex justify-between items-center py-2 border-b border-gray-50 text-sm">
+							<span className="text-gray-500">En attente de paiement</span>
+							<span className="font-semibold text-orange-600">
+								{(overview?.pendingEarnings || 0).toLocaleString()} FCFA
+							</span>
+						</div>
+						<div className="flex justify-between items-center pt-4">
+							<span className="text-gray-900 font-bold">Total prévu</span>
+							<span className="font-black text-xl text-gray-900">
+								{(
+									(overview?.totalEarnings || 0) +
+									(overview?.pendingEarnings || 0)
+								).toLocaleString()}{" "}
+								FCFA
+							</span>
+						</div>
+					</div>
+				</div>
 				<div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
 					<h2 className="text-xl font-bold mb-6 text-gray-900">Mon Profil</h2>
 					<div className="flex items-center space-x-4 mb-6">

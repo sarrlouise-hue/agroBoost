@@ -2,6 +2,7 @@ const providerRepository = require("../../data-access/provider.repository");
 const userRepository = require("../../data-access/user.repository");
 const Service = require("../../models/Service");
 const Booking = require("../../models/Booking");
+const Payment = require("../../models/Payment");
 const { AppError, ERROR_MESSAGES } = require("../../utils/errors");
 const { ROLES, PAGINATION } = require("../../config/constants");
 
@@ -272,25 +273,34 @@ class ProviderService {
 		const totalServices = services.length;
 		const activeServices = services.filter((s) => s.availability).length;
 
-		// Récupérer les réservations
+		// Récupérer les réservations avec paiements
 		const bookings = await Booking.findAll({
 			where: { providerId: provider.id },
+			include: [{ model: Payment, as: "payment" }],
 		});
 
 		const totalBookings = bookings.length;
 		const activeBookings = bookings.filter(
-			(b) => b.status === "confirmed"
+			(b) => b.status === Booking.STATUS.CONFIRMED
 		).length;
 		const pendingBookings = bookings.filter(
-			(b) => b.status === "pending"
+			(b) => b.status === Booking.STATUS.PENDING
 		).length;
 		const completedBookings = bookings.filter(
-			(b) => b.status === "completed"
+			(b) => b.status === Booking.STATUS.COMPLETED
 		).length;
 
-		// Calculer les revenus (somme des prix des réservations complétées ou confirmées selon logique métier, ici complétées pour être sûr)
+		// Calculer les revenus (somme des prix des réservations avec paiement réussi)
 		const totalEarnings = bookings
-			.filter((b) => b.status === "completed")
+			.filter((b) => b.payment?.status === Payment.STATUS.SUCCESS)
+			.reduce((sum, b) => sum + Number(b.totalPrice), 0);
+
+		const pendingEarnings = bookings
+			.filter(
+				(b) =>
+					b.status !== Booking.STATUS.CANCELLED &&
+					(!b.payment || b.payment.status !== Payment.STATUS.SUCCESS)
+			)
 			.reduce((sum, b) => sum + Number(b.totalPrice), 0);
 
 		return {
@@ -302,6 +312,7 @@ class ProviderService {
 				pendingBookings,
 				completedBookings,
 				totalEarnings,
+				pendingEarnings,
 			},
 		};
 	}
