@@ -300,21 +300,31 @@ class PaymentService {
 				const paytechStatus = await paytechService.verifyPayment(
 					payment.paytechTransactionId
 				);
+				logger.info(
+					`PayTech Status Response for ${payment.id}: ${JSON.stringify(
+						paytechStatus
+					)}`
+				);
 
 				// Mettre à jour si le statut a changé
 				if (paytechStatus.status !== payment.status) {
 					let newStatus = Payment.STATUS.PENDING;
 					if (
 						paytechStatus.status === "success" ||
-						paytechStatus.status === "completed"
+						paytechStatus.status === "completed" ||
+						paytechStatus.status === "paid"
 					) {
-						newStatus = Payment.STATUS.SUCCESS;
+						newStatus = "success";
 					} else if (
 						paytechStatus.status === "failed" ||
 						paytechStatus.status === "cancelled"
 					) {
-						newStatus = Payment.STATUS.FAILED;
+						newStatus = "failed";
 					}
+
+					logger.info(
+						`Determined new status for ${payment.id}: ${newStatus} (from PayTech: ${paytechStatus.status})`
+					);
 
 					if (newStatus !== payment.status) {
 						let isPaid = newStatus === "success" || newStatus === "completed";

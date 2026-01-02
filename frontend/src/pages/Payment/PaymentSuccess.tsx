@@ -39,6 +39,7 @@ export const PaymentSuccess: React.FC = () => {
 			const { paymentService } = await import("../../services/paymentService");
 			await paymentService.checkStatus(id);
 
+			// Re-charger les données après le check
 			const booking = await bookingsService.getBookingById(id);
 			if (!booking) {
 				navigate("/dashboard");
@@ -47,7 +48,9 @@ export const PaymentSuccess: React.FC = () => {
 			setData(booking);
 		} catch (error) {
 			console.error("Error loading/verifying booking:", error);
-			// Show what we have anyway
+			// Fallback: load anyway
+			const booking = await bookingsService.getBookingById(id);
+			if (booking) setData(booking);
 		} finally {
 			setLoading(false);
 		}
@@ -143,11 +146,41 @@ export const PaymentSuccess: React.FC = () => {
 										{getAmount().toLocaleString()} FCFA
 									</span>
 								</div>
-								<div className="pt-4 border-t border-gray-200 flex justify-between items-center text-sm">
-									<span className="text-gray-500">Référence</span>
-									<span className="font-mono text-gray-700 bg-gray-200 px-2 py-1 rounded">
-										{getReference().slice(-12)}
+								<div className="flex justify-between items-center text-lg">
+									<span className="text-gray-600">Statut Paiement</span>
+									<span
+										className={`font-bold px-3 py-1 rounded-full text-sm ${
+											data?.payment?.status === "success" ||
+											data?.paymentStatus === "paid"
+												? "bg-green-100 text-green-700"
+												: "bg-yellow-100 text-yellow-700"
+										}`}
+									>
+										{data?.payment?.status === "success" ||
+										data?.paymentStatus === "paid"
+											? "Confirmé"
+											: "En attente"}
 									</span>
+								</div>
+								<div className="pt-4 border-t border-gray-200 space-y-2 text-sm">
+									<div className="flex justify-between items-center">
+										<span className="text-gray-500">Référence Réservation</span>
+										<span className="font-mono text-gray-700 bg-gray-100 px-2 py-0.5 rounded">
+											{getReference()}
+										</span>
+									</div>
+									{data?.payment?.transactionId && (
+										<div className="flex justify-between items-center">
+											<span className="text-gray-500">ID Transaction</span>
+											<span className="font-mono text-gray-700 bg-gray-100 px-2 py-0.5 rounded">
+												{data.payment.transactionId}
+											</span>
+										</div>
+									)}
+									<div className="flex justify-between items-center text-xs text-gray-400 mt-2 italic">
+										* Utilisez l'ID Transaction pour vos recherches dans la base
+										de données de paiement.
+									</div>
 								</div>
 							</div>
 						</div>
