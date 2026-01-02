@@ -157,22 +157,21 @@ class PaymentService {
 				throw new AppError("Paiement non trouvé", 404);
 			}
 
-			// Mettre à jour le statut du paiement
-			let paymentStatus = Payment.STATUS.PENDING;
-			if (status === "success" || status === "completed") {
-				paymentStatus = Payment.STATUS.SUCCESS;
-			} else if (status === "failed" || status === "cancelled") {
-				paymentStatus = Payment.STATUS.FAILED;
+			// Mettre à jour le statut du paiement avec un mapping strict
+			let paymentStatus = "pending";
+			if (status === "success" || status === "completed" || status === "paid") {
+				paymentStatus = "success";
+			} else if (status === "failed" || status === "expired") {
+				paymentStatus = "failed";
+			} else if (status === "cancelled") {
+				paymentStatus = "cancelled";
 			}
 
-			// Mettre à jour le paiement
-			let isPaid =
-				status === "success" ||
-				status === "completed" ||
-				paymentStatus === "success";
+			// Déterminer si on doit mettre à jour la date de paiement
+			const isPaid = paymentStatus === "success";
 
 			const updateFields = {
-				status: isPaid ? "success" : paymentStatus,
+				status: paymentStatus,
 				paymentDate: isPaid ? new Date() : payment.paymentDate || null,
 				metadata: {
 					...(payment.metadata || {}),
@@ -187,7 +186,7 @@ class PaymentService {
 			await paymentRepository.updateById(payment.id, updateFields);
 
 			// Si le paiement est réussi, mettre à jour le statut de la réservation
-			if (paymentStatus === Payment.STATUS.SUCCESS) {
+			if (paymentStatus === "success") {
 				const booking = await bookingRepository.findById(payment.bookingId);
 				if (booking && booking.status === Booking.STATUS.PENDING) {
 					await bookingRepository.updateById(booking.id, {
@@ -308,7 +307,8 @@ class PaymentService {
 
 				// Mettre à jour si le statut a changé
 				if (paytechStatus.status !== payment.status) {
-					let newStatus = Payment.STATUS.PENDING;
+					let newStatus = "pending";
+
 					if (
 						paytechStatus.status === "success" ||
 						paytechStatus.status === "completed" ||
@@ -317,10 +317,16 @@ class PaymentService {
 						newStatus = "success";
 					} else if (
 						paytechStatus.status === "failed" ||
-						paytechStatus.status === "cancelled"
+						paytechStatus.status === "expired"
 					) {
 						newStatus = "failed";
+					} else if (paytechStatus.status === "cancelled") {
+						newStatus = "cancelled";
 					}
+
+					logger.info(
+						`Mapping PayTech '${paytechStatus.status}' -> DB '${newStatus}' for ${payment.id}`
+					);
 
 					logger.info(
 						`Determined new status for ${payment.id}: ${newStatus} (from PayTech: ${paytechStatus.status})`
@@ -343,7 +349,7 @@ class PaymentService {
 						);
 
 						// Si succès, confirmer aussi la réservation
-						if (newStatus === Payment.STATUS.SUCCESS) {
+						if (newStatus === "success") {
 							const booking = await bookingRepository.findById(
 								payment.bookingId
 							);
