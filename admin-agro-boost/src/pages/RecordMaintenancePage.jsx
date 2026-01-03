@@ -3,11 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api'; 
 import { 
     FiArrowLeft, FiSave, FiCalendar, FiClock, 
-    FiTool, FiDollarSign, FiFileText, FiUser 
+    FiTool, FiDollarSign, FiFileText, FiUser, FiSettings 
 } from 'react-icons/fi';
 
-const SUCCESS_COLOR = '#4CAF50';
-const PRIMARY_COLOR = '#0070AB';
+const SUCCESS_COLOR = '#3A7C35';
+const DARK_ACCENT = '#2D3748'; 
+const BG_COLOR = '#F1F5F9';
+const DARK_TEXT = '#1A202C';
 
 function RecordMaintenancePage() {
     const { id } = useParams(); 
@@ -82,135 +84,155 @@ function RecordMaintenancePage() {
     return (
         <div className="record-page-container">
             <style>{`
-                /* Global Reset pour éviter les débordements */
-                * {
-                    box-sizing: border-box;
-                }
-
                 .record-page-container { 
-                    padding: 10px 5px; /* Très peu d'espace sur les bords mobile */
-                    max-width: 700px; /* Plus étroit sur desktop pour éviter l'étirement */
+                    padding: 0; 
+                    width: 100%;
+                    max-width: 1000px; 
                     margin: 0 auto; 
-                    background-color: #F7FAFC;
+                    background-color: ${BG_COLOR};
                     min-height: 100vh;
                     font-family: 'Inter', sans-serif;
                 }
                 
-                .btn-back-modern {
+                /* Bouton retour : icône seule sur mobile, avec texte sur desktop */
+                .btn-back-container {
+                    padding: 15px;
+                }
+
+                .btn-back-circle {
                     display: flex;
                     align-items: center;
-                    gap: 8px;
+                    justify-content: center;
+                    width: 40px;
+                    height: 40px;
                     background-color: white;
-                    color: #4A5568;
+                    color: ${DARK_ACCENT};
                     border: 1px solid #E2E8F0;
-                    padding: 10px 15px;
-                    border-radius: 10px;
-                    font-weight: 700; /* Titre du bouton en bold */
-                    font-size: 14px;
+                    border-radius: 50%;
                     cursor: pointer;
-                    margin-bottom: 15px;
-                    margin-left: 5px;
+                    transition: all 0.2s;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
                 }
+
+                .btn-back-circle span { display: none; } /* Caché par défaut (mobile) */
 
                 .form-card { 
                     background-color: white; 
-                    padding: 20px 15px; /* Padding ajusté */
-                    border-radius: 12px; 
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-                    border: 1px solid #E2E8F0;
-                    width: 98%; /* Occupe presque tout l'espace mobile */
-                    margin: 0 auto;
-                }
-
-                /* Desktop : Réduction de l'espace environnant */
-                @media (min-width: 768px) {
-                    .record-page-container { padding: 20px 0; }
-                    .form-card { padding: 30px; width: 100%; }
-                    .responsive-grid { 
-                        display: grid; 
-                        grid-template-columns: 1fr 1fr; 
-                        gap: 20px; 
-                    }
+                    padding: 20px 15px; 
+                    border-radius: 0; 
+                    border: none;
+                    min-height: 100vh;
                 }
 
                 .form-header { 
-                    margin-bottom: 25px; 
-                    border-bottom: 2px solid #F0F4F8; 
+                    margin-bottom: 30px; 
+                    border-bottom: 3px solid #EDF2F7; 
                     padding-bottom: 15px; 
                 }
 
+                /* Titre et Icône en VERT */
                 .form-header h2 { 
-                    color: ${PRIMARY_COLOR}; 
+                    color: ${SUCCESS_COLOR}; 
                     margin: 0; 
                     display: flex; 
                     align-items: center; 
-                    gap: 10px;
+                    gap: 12px;
                     font-weight: 900;
                     font-size: 1.5rem;
                     text-transform: uppercase;
                 }
 
-                .input-group { margin-bottom: 20px; width: 100%; }
+                .responsive-grid { 
+                    display: grid; 
+                    grid-template-columns: 1fr; 
+                    gap: 20px; 
+                }
+
+                @media (min-width: 768px) {
+                    .record-page-container { padding: 20px; }
+                    .form-card { 
+                        padding: 40px; 
+                        border-radius: 12px; 
+                        min-height: auto;
+                        border: 1px solid #E2E8F0;
+                    }
+                    .btn-back-container { padding: 0 0 20px 0; }
+                    .btn-back-circle { 
+                        width: auto; 
+                        height: auto; 
+                        padding: 10px 20px; 
+                        border-radius: 8px; 
+                        gap: 8px;
+                    }
+                    .btn-back-circle span { display: inline; font-weight: 700; font-size: 13px; }
+                    .responsive-grid { grid-template-columns: 1fr 1fr; }
+                    .full-width { grid-column: span 2; }
+                }
+
+                .input-group { margin-bottom: 5px; }
 
                 .input-label {
                     display: flex; 
                     align-items: center; 
                     gap: 8px;
-                    font-weight: 800; /* LABEL EN BOLD */
-                    font-size: 13px; 
-                    color: #1A202C; 
+                    font-weight: 800;
+                    font-size: 11px; 
+                    color: #718096; 
                     margin-bottom: 8px;
                     text-transform: uppercase;
                 }
 
                 .custom-input {
-                    width: 100%; /* Ne dépassera plus grâce au border-box global */
-                    padding: 14px; 
+                    width: 100%;
+                    padding: 16px; 
                     border-radius: 8px; 
                     border: 2px solid #E2E8F0;
                     font-size: 16px;
                     background-color: #F8FAFC;
-                    transition: all 0.2s ease;
                     outline: none;
+                    color: ${DARK_TEXT};
                 }
 
-                .custom-input:focus {
-                    border-color: ${PRIMARY_COLOR};
-                    background-color: #FFF;
-                    box-shadow: 0 0 0 3px rgba(0, 112, 171, 0.1);
-                }
+                .custom-input:focus { border-color: ${SUCCESS_COLOR}; }
 
                 .btn-submit {
                     width: 100%; 
-                    padding: 16px; 
+                    padding: 20px; 
                     color: white; 
                     border: none; 
-                    border-radius: 10px; 
+                    border-radius: 12px; 
                     cursor: pointer; 
-                    font-weight: 800; 
+                    font-weight: 900; 
                     font-size: 16px; 
                     display: flex;
                     align-items: center; 
                     justify-content: center; 
-                    gap: 10px;
-                    margin-top: 20px;
+                    gap: 12px;
+                    margin-top: 30px;
+                    text-transform: uppercase;
+                    background-color: ${SUCCESS_COLOR};
+                    box-shadow: 0 4px 12px ${SUCCESS_COLOR}44;
                 }
             `}</style>
 
-            <button onClick={() => navigate(-1)} className="btn-back-modern">
-                <FiArrowLeft /> <span>RETOUR</span>
-            </button>
+            <div className="btn-back-container">
+                <button onClick={() => navigate(-1)} className="btn-back-circle">
+                    <FiArrowLeft size={20} /> <span>RETOUR</span>
+                </button>
+            </div>
 
             <form onSubmit={handleSubmit} className="form-card">
                 <header className="form-header">
                     <h2><FiTool /> Intervention</h2>
-                    <p style={{ color: '#718096', fontSize: '13px', marginTop: '5px', fontWeight: '600' }}>
-                        ID Équipement : <strong>{id}</strong>
-                    </p>
+                    <div style={{ marginTop: '10px' }}>
+                         <span style={{ background: '#F0FFF4', color: SUCCESS_COLOR, padding: '5px 12px', borderRadius: '4px', fontSize: '12px', fontWeight: '900', border: `1px solid ${SUCCESS_COLOR}33` }}>
+                            ID ÉQUIPEMENT : {id}
+                         </span>
+                    </div>
                 </header>
                 
                 <div className="responsive-grid">
-                    <div style={{gridColumn: '1 / -1'}} className="input-group">
+                    <div className="input-group full-width">
                         <label className="input-label"><FiUser /> MÉCANICIEN RESPONSABLE</label>
                         <select 
                             name="mechanicId" 
@@ -219,10 +241,10 @@ function RecordMaintenancePage() {
                             required 
                             className="custom-input"
                         >
-                            <option value="">-- Sélectionner l'intervenant ({mechanics.length}) --</option>
+                            <option value="">-- CHOISIR L'INTERVENANT --</option>
                             {mechanics.map(m => (
                                 <option key={m.id || m._id} value={m.id || m._id}>
-                                    {m.firstName} {m.lastName}
+                                    {m.firstName?.toUpperCase()} {m.lastName?.toUpperCase()}
                                 </option>
                             ))}
                         </select>
@@ -240,44 +262,47 @@ function RecordMaintenancePage() {
 
                     <div className="input-group">
                         <label className="input-label"><FiClock /> HEURES MOTEUR (H)</label>
-                        <input type="number" name="currentHours" value={formData.currentHours} onChange={handleChange} required className="custom-input" />
+                        <input type="number" name="currentHours" placeholder="0" value={formData.currentHours} onChange={handleChange} required className="custom-input" />
                     </div>
 
                     <div className="input-group">
                         <label className="input-label"><FiDollarSign /> COÛT TOTAL (XOF)</label>
-                        <input type="number" name="cost" value={formData.cost} onChange={handleChange} required className="custom-input" />
+                        <input type="number" name="cost" placeholder="0" value={formData.cost} onChange={handleChange} required className="custom-input" />
                     </div>
-                </div>
 
-                <div className="input-group">
-                    <label className="input-label">TYPE D'ENTRETIEN</label>
-                    <select name="type" value={formData.type} onChange={handleChange} className="custom-input">
-                        <option value="STANDARD_SERVICE">Vidange / Entretien Standard</option>
-                        <option value="REPAIR">Réparation Curative</option>
-                        <option value="CHECKUP">Inspection Visuelle</option>
-                    </select>
-                </div>
+                    <div className="input-group full-width">
+                        <label className="input-label"><FiSettings /> TYPE D'ENTRETIEN</label>
+                        <select name="type" value={formData.type} onChange={handleChange} className="custom-input">
+                            <option value="STANDARD_SERVICE">VIDANGE / ENTRETIEN STANDARD</option>
+                            <option value="REPAIR">RÉPARATION CURATIVE</option>
+                            <option value="CHECKUP">INSPECTION VISUELLE</option>
+                        </select>
+                    </div>
 
-                <div className="input-group">
-                    <label className="input-label"><FiFileText /> TRAVAUX EFFECTUÉS</label>
-                    <textarea 
-                        name="description" 
-                        value={formData.description} 
-                        onChange={handleChange} 
-                        required 
-                        className="custom-input"
-                        style={{ minHeight: '120px', resize: 'vertical' }} 
-                        placeholder="Détails des réparations..."
-                    />
+                    <div className="input-group full-width">
+                        <label className="input-label"><FiFileText /> TRAVAUX EFFECTUÉS</label>
+                        <textarea 
+                            name="description" 
+                            value={formData.description} 
+                            onChange={handleChange} 
+                            required 
+                            className="custom-input"
+                            style={{ minHeight: '150px', resize: 'none' }} 
+                            placeholder="Détails de l'intervention..."
+                        />
+                    </div>
                 </div>
 
                 <button 
                     type="submit" 
                     disabled={loading} 
                     className="btn-submit"
-                    style={{ backgroundColor: loading ? '#CBD5E0' : SUCCESS_COLOR }}
+                    style={{ 
+                        backgroundColor: loading ? '#A0AEC0' : SUCCESS_COLOR,
+                        boxShadow: loading ? 'none' : '0 4px 12px rgba(46, 204, 113, 0.3)'
+                    }}
                 >
-                    {loading ? 'EN COURS...' : <><FiSave /> ENREGISTRER</>}
+                    {loading ? 'ENREGISTREMENT...' : <><FiSave size={20} /> ENREGISTRER L'ENTRETIEN</>}
                 </button>
             </form>
         </div>

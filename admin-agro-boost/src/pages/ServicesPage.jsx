@@ -7,24 +7,12 @@ import {
     FaWrench 
 } from "react-icons/fa";
 
-const PRIMARY_COLOR = '#0070AB';
+// Constantes de style pour cohérence globale
+const PRIMARY_COLOR = '#3A7C35'; 
 const SUCCESS_COLOR = '#4CAF50';
 const DANGER_COLOR = '#E53E3E';
 const WARNING_COLOR = '#F59E0B'; 
-
-const buttonStyle = {
-    padding: '10px 16px',
-    borderRadius: '8px',
-    border: 'none',
-    cursor: 'pointer',
-    fontWeight: '600',
-    fontSize: '14px',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    transition: 'all 0.2s ease',
-};
+const BACKGROUND_COLOR = '#FDFAF8';
 
 function ServicesPage() {
     const [services, setServices] = useState([]);
@@ -67,25 +55,25 @@ function ServicesPage() {
     };
 
     return (
-        <div className="main-page-wrapper" style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
-            <div className="content-card">
+        <div className="main-page-wrapper">
+            <div className="container-card">
                 
                 {/* Header */}
-                <div className="header-container" style={{ marginBottom: '25px' }}>
+                <div className="header-container">
                     <div>
-                        <h1 style={{ color: PRIMARY_COLOR, margin: 0, fontSize: 'clamp(1.3rem, 5vw, 1.8rem)', fontWeight: '800', display: 'flex', alignItems: 'center' }}>
-                            <FaTractor style={{ marginRight: 12 }} /> Catalogue
+                        <h1 className="page-title">
+                            <FaTractor style={{ color: PRIMARY_COLOR }} /> Catalogue Services
                         </h1>
-                        <p style={{ color: '#64748b', marginTop: '5px', fontSize: '14px' }}>Gestion des prestations agricoles</p>
+                        <p className="page-subtitle">Gestion des prestations agricoles et maintenance</p>
                     </div>
                 </div>
 
-                {/* Filtres */}
-                <div className="filters-container">
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', width: '100%' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#475569' }}><FaFilter /> Type</label>
-                            <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="custom-select">
+                {/* Section Filtres - */}
+                <div className="filters-section">
+                    <div className="filters-grid">
+                        <div className="filter-group">
+                            <label><FaFilter /> Type de service</label>
+                            <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
                                 <option value="">Tous les types</option>
                                 <option value="tractor">Tracteur</option>
                                 <option value="semoir">Semoir</option>
@@ -93,9 +81,9 @@ function ServicesPage() {
                             </select>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#475569' }}><FaToggleOn /> Statut</label>
-                            <select value={availabilityFilter} onChange={(e) => setAvailabilityFilter(e.target.value)} className="custom-select">
+                        <div className="filter-group">
+                            <label><FaToggleOn /> Disponibilité</label>
+                            <select value={availabilityFilter} onChange={(e) => setAvailabilityFilter(e.target.value)}>
                                 <option value="">Tous les statuts</option>
                                 <option value="true">Disponible</option>
                                 <option value="false">Indisponible</option>
@@ -104,144 +92,218 @@ function ServicesPage() {
                     </div>
                     {(typeFilter || availabilityFilter) && (
                         <button onClick={() => { setTypeFilter(''); setAvailabilityFilter(''); }} className="reset-btn">
-                            <FaUndo /> Réinitialiser
+                            <FaUndo /> Réinitialiser les filtres
                         </button>
                     )}
                 </div>
 
                 {loading ? (
-                    <div style={{ textAlign: 'center', padding: '50px', color: '#64748b' }}>Chargement...</div>
+                    <div className="loading-state">Chargement du catalogue...</div>
                 ) : (
-                    <>
+                    <div className="table-responsive">
                         {/* VERSION DESKTOP */}
-                        <div className="hide-mobile" style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead>
-                                    <tr style={{ textAlign: 'left', borderBottom: '2px solid #f1f5f9' }}>
-                                        <th style={thStyle}>Service</th>
-                                        <th style={thStyle}>Type</th>
-                                        <th style={thStyle}>Prix</th>
-                                        <th style={thStyle}>Dispo</th>
-                                        <th style={{ ...thStyle, textAlign: 'right' }}>Actions</th>
+                        <table className="custom-table hide-mobile">
+                            <thead>
+                                <tr>
+                                    <th>Service</th>
+                                    <th>Type</th>
+                                    <th>Tarif</th>
+                                    <th>Statut</th>
+                                    <th style={{ textAlign: 'right' }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {services.map(service => (
+                                    <tr key={service.id}>
+                                        <td>
+                                            <div className="service-name">{service.name}</div>
+                                            <div className="provider-name">{service.provider?.businessName || 'Indépendant'}</div>
+                                        </td>
+                                        <td><span className="badge">{service.serviceType}</span></td>
+                                        <td><strong style={{color: '#1e293b'}}>{service.pricePerHour || service.pricePerDay} FCFA</strong></td>
+                                        <td>
+                                            {service.availability ? 
+                                                <span className="status-pill available"><FaCheckCircle /> Prêt</span> : 
+                                                <span className="status-pill unavailable"><FaTimesCircle /> Indisponible</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div className="action-buttons">
+                                                <Link to={`/maintenance/record/${service.id}`} className="action-btn maintenance" title="Intervention">
+                                                    <FaWrench />
+                                                </Link>
+                                                <Link to={`/services/${service.id}`} className="action-btn view" title="Voir">
+                                                    <FaEye />
+                                                </Link>
+                                                {/*<Link to={`/services/edit/${service.id}`} className="action-btn edit" title="Modifier">
+                                                    <FaEdit />
+                                                </Link>*/}
+                                                <button onClick={() => handleDelete(service.id)} className="action-btn delete" title="Supprimer">
+                                                    <FaTrash />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {services.map(service => (
-                                        <tr key={service.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                            <td style={tdStyle}>
-                                                <div style={{ fontWeight: '700' }}>{service.name}</div>
-                                                <div style={{ fontSize: '12px', color: '#94a3b8' }}>{service.provider?.businessName || 'Indépendant'}</div>
-                                            </td>
-                                            <td style={tdStyle}><span className="badge">{service.serviceType}</span></td>
-                                            <td style={tdStyle}><strong>{service.pricePerHour || service.pricePerDay} F</strong></td>
-                                            <td style={tdStyle}>
-                                                {service.availability ? <FaCheckCircle color={SUCCESS_COLOR} /> : <FaTimesCircle color={DANGER_COLOR} />}
-                                            </td>
-                                            <td style={{ ...tdStyle, textAlign: 'right' }}>
-                                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                                                    <Link to={`/maintenance/record/${service.id}`} title="Intervention">
-                                                        <button style={{ ...actionBtnStyle, color: WARNING_COLOR, backgroundColor: '#FFFBEB' }}><FaWrench /></button>
-                                                    </Link>
-                                                    <Link to={`/services/${service.id}`} title="Voir"><button style={actionBtnStyle}><FaEye /></button></Link>
-                                                    <Link to={`/services/edit/${service.id}`} title="Modifier"><button style={{ ...actionBtnStyle, color: PRIMARY_COLOR }}><FaEdit /></button></Link>
-                                                    <button onClick={() => handleDelete(service.id)} style={{ ...actionBtnStyle, color: DANGER_COLOR }} title="Supprimer"><FaTrash /></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
 
-                        {/* VERSION MOBILE (Corrigée avec bouton Voir) */}
+                        {/* VERSION MOBILE */}
                         <div className="show-only-mobile">
                             {services.map(service => (
-                                <div key={service.id} className="service-card">
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                                <div key={service.id} className="mobile-service-card">
+                                    <div className="card-header">
                                         <span className="badge">{service.serviceType}</span>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{fontSize: '11px', fontWeight: 'bold', color: service.availability ? SUCCESS_COLOR : DANGER_COLOR}}>
-                                                {service.availability ? 'DISPONIBLE' : 'INDISPO'}
-                                            </span>
-                                            {service.availability ? <FaCheckCircle color={SUCCESS_COLOR} /> : <FaTimesCircle color={DANGER_COLOR} />}
+                                        <div className={`mobile-status ${service.availability ? 'text-success' : 'text-danger'}`}>
+                                            {service.availability ? <FaCheckCircle /> : <FaTimesCircle />}
                                         </div>
                                     </div>
                                     
-                                    <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#1e293b' }}>{service.name}</h3>
+                                    <h3 className="card-title">{service.name}</h3>
                                     
-                                    <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '15px', backgroundColor: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
-                                        <div style={{marginBottom: '4px'}}><FaUser size={11} style={{marginRight: '6px'}}/> {service.provider?.businessName || 'Prestataire'}</div>
-                                        <div><FaTag size={11} style={{marginRight: '6px'}}/> <span style={{fontWeight: 'bold', color: '#1e293b'}}>{service.pricePerHour || service.pricePerDay} FCFA</span></div>
+                                    <div className="card-info-box">
+                                        <div><FaUser size={12} /> {service.provider?.businessName || 'Prestataire'}</div>
+                                        <div className="price-tag"><FaTag size={12} /> {service.pricePerHour || service.pricePerDay} FCFA</div>
                                     </div>
 
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        {/* Action Principale */}
-                                        <Link to={`/maintenance/record/${service.id}`} style={{ width: '100%', textDecoration: 'none' }}>
-                                            <button style={{ ...buttonStyle, width: '100%', background: '#FFFBEB', color: WARNING_COLOR, border: `1px solid ${WARNING_COLOR}`, padding: '12px' }}>
-                                                <FaWrench /> Nouvelle Intervention
-                                            </button>
+                                    <div className="card-actions">
+                                        <Link to={`/maintenance/record/${service.id}`} className="btn-mobile-main">
+                                            <FaWrench /> Maintenance
                                         </Link>
-
-                                        {/* Actions Secondaires */}
-                                        <div style={{ display: 'flex', gap: '8px' }}>
-                                            <Link to={`/services/${service.id}`} style={{ flex: 1, textDecoration: 'none' }}>
-                                                <button style={{ ...buttonStyle, width: '100%', background: '#f1f5f9', color: '#475569', padding: '12px' }}>
-                                                    <FaEye /> Voir
-                                                </button>
-                                            </Link>
-                                            <Link to={`/services/edit/${service.id}`} style={{ flex: 1, textDecoration: 'none' }}>
-                                                <button style={{ ...buttonStyle, width: '100%', background: '#f0f9ff', color: PRIMARY_COLOR, padding: '12px' }}>
-                                                    <FaEdit /> Éditer
-                                                </button>
-                                            </Link>
-                                            <button onClick={() => handleDelete(service.id)} style={{ ...buttonStyle, flex: 1, background: '#fef2f2', color: DANGER_COLOR, padding: '12px' }}>
-                                                <FaTrash />
-                                            </button>
+                                        <div className="btn-mobile-grid">
+                                            <Link to={`/services/${service.id}`} className="btn-mobile-sub"><FaEye /></Link>
+                                           {/* <Link to={`/services/edit/${service.id}`} className="btn-mobile-sub"><FaEdit /></Link>*/}
+                                            <button onClick={() => handleDelete(service.id)} className="btn-mobile-sub delete"><FaTrash /></button>
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    </>
+                    </div>
                 )}
             </div>
 
             <style>{`
-                .main-page-wrapper { padding: 20px; }
-                .content-card { 
-                    background-color: white; padding: 25px; border-radius: 16px; 
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-                }
-                .hide-mobile { display: block; }
-                .show-only-mobile { display: none; }
-                .badge { padding: 4px 10px; background: #f1f5f9; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; color: #475569; }
-                .custom-select { padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
-                .reset-btn { background: none; border: none; color: #64748b; cursor: pointer; font-size: 13px; font-weight: bold; text-decoration: underline; display: flex; align-items: center; gap: 5px; margin-top: 5px; }
-                .service-card { border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px; margin-bottom: 15px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-                .filters-container { display: flex; flex-direction: column; gap: 15px; padding: 20px; background-color: #F8FAFC; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 25px; }
-                
-                @media (max-width: 768px) {
-                    .main-page-wrapper { padding: 0 !important; }
-                    .content-card { 
-                        padding: 12px !important; border-radius: 0 !important; 
-                        box-shadow: none !important; width: 100% !important; box-sizing: border-box;
-                    }
-                    .hide-mobile { display: none; }
-                    .show-only-mobile { display: block; }
-                    .filters-container { padding: 15px !important; margin-bottom: 20px !important; border-radius: 8px !important; }
-                    .service-card { margin: 0 0 15px 0 !important; width: 100% !important; box-sizing: border-box; }
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@600&display=swap');
+
+                .main-page-wrapper {
+                    background-color: ${BACKGROUND_COLOR};
+                    min-height: 100vh;
+                    padding: clamp(10px, 3vw, 25px);
+                    font-family: 'Inter', sans-serif;
                 }
 
+                .container-card {
+                    background: white;
+                    padding: clamp(15px, 4vw, 35px);
+                    border-radius: 16px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+
+                .page-title {
+                    font-family: 'Poppins', sans-serif;
+                    color: ${PRIMARY_COLOR};
+                    font-size: clamp(1.4rem, 5vw, 1.8rem);
+                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                }
+
+                .page-subtitle { color: #64748b; font-size: 14px; margin-top: 5px; }
+
+                /* FILTRES */
+                .filters-section {
+                    background: #F8FAFC;
+                    padding: 20px;
+                    border-radius: 12px;
+                    border: 1px solid #E2E8F0;
+                    margin: 25px 0;
+                }
+                .filters-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 20px;
+                }
+                .filter-group { display: flex; flex-direction: column; gap: 8px; }
+                .filter-group label { font-size: 13px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 6px; }
+                .filter-group select {
+                    padding: 12px; border-radius: 10px; border: 1px solid #E2E8F0;
+                    font-size: 14px; outline: none; background: white;
+                }
+
+                .reset-btn {
+                    margin-top: 15px; background: none; border: none; color: ${PRIMARY_COLOR};
+                    font-weight: 600; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 5px;
+                }
+
+                /* TABLE DESKTOP */
+                .custom-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                .custom-table th {
+                    text-align: left; padding: 16px; border-bottom: 2px solid #F1F5F9;
+                    color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+                }
+                .custom-table td { padding: 16px; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
+                
+                .service-name { font-weight: 700; color: #1e293b; font-size: 15px; }
+                .provider-name { font-size: 12px; color: #94a3b8; }
+
+                .badge { padding: 4px 10px; background: #E8F5E9; color: ${PRIMARY_COLOR}; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+
+                .status-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px; }
+                .status-pill.available { background: #ECFDF5; color: #059669; }
+                .status-pill.unavailable { background: #FEF2F2; color: #DC2626; }
+
+                /* ACTIONS */
+                .action-buttons { display: flex; gap: 8px; justify-content: flex-end; }
+                .action-btn {
+                    width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+                    border-radius: 10px; border: none; cursor: pointer; transition: 0.2s; background: #F8FAFC; color: #64748b;
+                }
+                .action-btn.maintenance { color: ${WARNING_COLOR}; background: #FFFBEB; }
+                .action-btn.edit { color: ${PRIMARY_COLOR}; background: #E8F5E9; }
+                .action-btn.delete { color: ${DANGER_COLOR}; background: #FEF2F2; }
+                .action-btn:hover { transform: translateY(-2px); filter: brightness(0.95); }
+
+                /* MOBILE CARDS */
+                .mobile-service-card {
+                    background: white; border: 1px solid #E2E8F0; padding: 18px;
+                    border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+                }
+                .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+                .card-title { margin: 0 0 10px 0; font-size: 17px; color: #1e293b; font-family: 'Poppins', sans-serif; }
+                .card-info-box { background: #F8FAFC; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 13px; color: #64748b; }
+                .price-tag { margin-top: 6px; font-weight: 700; color: #1e293b; font-size: 14px; }
+                
+                .card-actions { display: flex; flex-direction: column; gap: 10px; }
+                .btn-mobile-main {
+                    background: ${PRIMARY_COLOR}; color: white; padding: 12px; border-radius: 10px;
+                    text-align: center; font-weight: 600; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;
+                }
+                .btn-mobile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+                .btn-mobile-sub {
+                    background: #F1F5F9; color: #475569; padding: 12px; border-radius: 10px;
+                    display: flex; align-items: center; justify-content: center; text-decoration: none; border: none;
+                }
+                .btn-mobile-sub.delete { color: ${DANGER_COLOR}; background: #FEF2F2; }
+
+                .loading-state { text-align: center; padding: 60px; color: #94a3b8; font-style: italic; }
+
+                @media (max-width: 768px) {
+                    .main-page-wrapper { padding: 8px; }
+                    .container-card { padding: 15px; border-radius: 12px; }
+                    .hide-mobile { display: none; }
+                    .show-only-mobile { display: block; }
+                    .filters-grid { grid-template-columns: 1fr; }
+                }
                 @media (min-width: 769px) {
-                    .header-container { display: flex; flex-direction: row; justify-content: space-between; align-items: center; }
+                    .show-only-mobile { display: none; }
                 }
             `}</style>
         </div>
     );
 }
-
-const thStyle = { padding: '15px', color: '#64748b', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' };
-const tdStyle = { padding: '15px', color: '#1e293b', fontSize: '14px' };
-const actionBtnStyle = { border: 'none', background: '#f8fafc', padding: '10px', borderRadius: '8px', cursor: 'pointer', color: '#64748b', transition: 'all 0.2s' };
 
 export default ServicesPage;

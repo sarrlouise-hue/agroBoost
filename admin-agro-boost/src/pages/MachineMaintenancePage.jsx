@@ -1,20 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api'; 
 import { Link } from 'react-router-dom';
+import api from '../services/api'; 
 import { 
-    FiTool, FiFilter, FiPlusCircle, FiEye, 
-    FiXCircle, FiRefreshCw
+    FiTool, FiPlusCircle, FiEye, 
+    FiRefreshCw, FiCalendar, FiSettings
 } from 'react-icons/fi';
+import { FaFilter, FaSync } from "react-icons/fa";
 
-const PRIMARY_COLOR = '#0070AB';
-const SUCCESS_COLOR = '#4CAF50';
-const BG_COLOR = '#F7FAFC';
+// Thème Agricole
+const PRIMARY_COLOR = '#3A7C35';
+const SECONDARY_COLOR = '#709D54';
+const BACKGROUND_COLOR = '#FDFAF8'; 
+
+const getStatusBadgeStyle = (status) => {
+    const s = status?.toLowerCase();
+    let config = { color: '#64748B', bg: '#F1F5F9', border: '#E2E8F0' }; 
+
+    if (s === 'completed') {
+        config = { color: '#3A7C35', bg: '#E6FFFA', border: '#3A7C35' };
+    } else if (s === 'cancelled') {
+        config = { color: '#E53E3E', bg: '#FFF5F5', border: '#FEB2B2' };
+    } else if (s === 'pending') {
+        config = { color: '#9A3412', bg: '#FFFBEB', border: '#FEF3C7' };
+    } else if (s === 'in_progress') {
+        config = { color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' };
+    }
+
+    return {
+        display: 'inline-block',
+        padding: '6px 14px',
+        borderRadius: '20px',
+        fontSize: '11px',
+        fontWeight: '700',
+        color: config.color,
+        backgroundColor: config.bg,
+        border: `1px solid ${config.border}`,
+        textTransform: 'uppercase',
+        whiteSpace: 'nowrap'
+    };
+};
 
 function MachineMaintenancePage() {
     const [maintenances, setMaintenances] = useState([]);
     const [servicesList, setServicesList] = useState([]);
     const [loading, setLoading] = useState(true);
-    
     const [selectedService, setSelectedService] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("");
 
@@ -43,177 +72,239 @@ function MachineMaintenancePage() {
 
     const formatDateTime = (dateStr) => {
         if (!dateStr || dateStr === "-") return "-";
-        return new Date(dateStr).toLocaleString('fr-FR', {
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit'
+        return new Date(dateStr).toLocaleDateString('fr-FR', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
         });
     };
 
-    const resetFilters = () => {
-        setSelectedService("");
-        setSelectedStatus("");
-    };
-
-    // Helper pour afficher le label du statut avec icône sans background large
-    const renderStatus = (status) => {
-        let color = '#4A5568';
-        let label = status || 'N/A';
-        if(status?.toLowerCase() === 'pending') { color = '#D97706'; label = "⏳ En attente"; }
-        else if(status?.toLowerCase() === 'in_progress') { color = '#2563EB'; label = "⚙️ En cours"; }
-        else if(status?.toLowerCase() === 'completed') { color = '#059669'; label = "✅ Terminé"; }
-        else if(status?.toLowerCase() === 'cancelled') { color = '#DC2626'; label = "❌ Annulé"; }
-        
-        return <span style={{ color, fontWeight: '700', fontSize: '13px' }}>{label}</span>;
-    };
-
     return (
-        <div className="maintenance-page">
+        <div className="page-wrapper">
             <style>{`
-                .maintenance-page { 
-                    padding: 20px; 
-                    background-color: ${BG_COLOR}; 
+                .page-wrapper { 
+                    background-color: ${BACKGROUND_COLOR}; 
                     min-height: 100vh; 
+                    padding: 30px; 
+                    width: 100%; 
+                    box-sizing: border-box;
                     font-family: 'Inter', sans-serif;
                 }
-                .header-section { 
-                    display: flex; 
-                    justify-content: space-between; 
-                    align-items: center; 
-                    margin-bottom: 25px; 
+                .container-card {
+                    background-color: white; 
+                    border-radius: 16px; 
+                    padding: 30px; 
+                    box-shadow: 0 4px 25px rgba(0,0,0,0.04); 
+                    width: 100%;
+                    max-width: 1400px;
+                    margin: 0 auto;
                 }
-                .filter-bar { 
-                    background: white; 
-                    padding: 15px; 
-                    border-radius: 12px; 
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
-                    margin-bottom: 20px; 
+                .header-flex {
                     display: flex;
+                    justify-content: space-between;
+                    align-items: center;
                     flex-wrap: wrap;
                     gap: 15px;
-                    align-items: flex-end;
+                    margin-bottom: 30px;
                 }
-                .table-wrapper { 
-                    background: white;
+                .filters-grid { 
+                    display: grid; 
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+                    gap: 20px; 
+                    margin-bottom: 25px;
+                    background: #F8FAFC;
+                    padding: 20px;
                     border-radius: 12px;
-                    overflow: hidden;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
                 }
-                table { width: 100%; border-collapse: collapse; }
                 
-                @media screen and (max-width: 768px) {
-                    .header-section { flex-direction: column; gap: 15px; }
-                    thead { display: none; }
-                    tr { display: block; border-bottom: 8px solid ${BG_COLOR}; padding: 15px; }
-                    td { 
-                        display: flex; 
-                        justify-content: space-between; 
-                        padding: 8px 0; 
-                        border: none !important;
-                    }
-                    td:before { content: attr(data-label); font-weight: bold; color: #718096; }
-                    .btn-details { width: 100%; justify-content: center; margin-top: 10px; }
+                table { 
+                    width: 100%; 
+                    border-collapse: separate; 
+                    border-spacing: 0 12px; 
+                }
+                .th-style { 
+                    padding: 10px 20px; 
+                    color: #64748B; 
+                    font-size: 11px; 
+                    font-weight: 700; 
+                    text-transform: uppercase; 
+                    text-align: left;
+                }
+                .table-row { 
+                    background: white;
+                    transition: all 0.2s; 
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+                }
+                .table-row td {
+                    padding: 20px; 
+                    border-top: 1px solid #F1F5F9;
+                    border-bottom: 1px solid #F1F5F9;
+                }
+                .table-row td:first-child {
+                    border-left: 1px solid #F1F5F9;
+                    border-top-left-radius: 12px;
+                    border-bottom-left-radius: 12px;
+                }
+                .table-row td:last-child {
+                    border-right: 1px solid #F1F5F9;
+                    border-top-right-radius: 12px;
+                    border-bottom-right-radius: 12px;
+                }
+                .table-row:hover { 
+                    background: #F8FAFC; 
+                    transform: scale(1.002);
                 }
 
-                .spin { animation: rotate 1s linear infinite; }
-                @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+                .action-btn { 
+                    width: 38px; height: 38px; border-radius: 10px; border: none; cursor: pointer; 
+                    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+                    background: #EBF8FF; color: #3182CE; text-decoration: none;
+                }
+                .action-btn:hover { background: #BEE3F8; }
+
+                .btn-add { 
+                    background-color: ${PRIMARY_COLOR}; 
+                    color: white; border: none; 
+                    padding: 12px 24px; border-radius: 12px; 
+                    font-weight: 700; cursor: pointer; 
+                    display: flex; align-items: center; gap: 8px;
+                    transition: all 0.2s;
+                }
+
+                .spin { animation: spin 1s linear infinite; }
+                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+                @media (max-width: 900px) {
+                    .page-wrapper { padding: 0; }
+                    .container-card { padding: 15px; border-radius: 0; }
+                    table, thead, tbody, th, td, tr { display: block; width: 100%; }
+                    thead { display: none; }
+                    tr {
+                        margin-bottom: 20px;
+                        border: 1px solid #E2E8F0 !important;
+                        border-radius: 15px !important;
+                        padding: 15px;
+                        background: #fff;
+                        box-sizing: border-box;
+                    }
+                    .table-row td {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 12px 5px !important;
+                        border: none !important;
+                        font-size: 14px;
+                    }
+                    .table-row td:not(:last-child) { border-bottom: 1px solid #F1F5F9 !important; }
+                    .table-row td:before {
+                        content: attr(data-label);
+                        font-weight: 800;
+                        color: #94A3B8;
+                        font-size: 10px;
+                    }
+                }
             `}</style>
 
-            <div className="header-section">
-                <h1 style={{ margin: 0, color: PRIMARY_COLOR, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <FiTool /> Gestion Maintenances
-                </h1>
-                <Link to="/services" style={{ textDecoration: 'none' }}>
-                    <button style={btnCreateStyle}>
-                        <FiPlusCircle /> Programmer une maintenance
-                    </button>
-                </Link>
-            </div>
-
-            <div className="filter-bar">
-                <div style={{ flex: 1, minWidth: '200px' }}>
-                    <label style={labelStyle}>Filtrer par Équipement</label>
-                    <select value={selectedService} onChange={(e) => setSelectedService(e.target.value)} style={selectStyle}>
-                        <option value="">Toutes les machines</option>
-                        {servicesList.map(s => <option key={s._id || s.id} value={s._id || s.id}>{s.name}</option>)}
-                    </select>
+            <div className="container-card">
+                <div className="header-flex">
+                    <h1 style={{ color: PRIMARY_COLOR, fontWeight: '800', display: 'flex', alignItems: 'center', gap: '12px', margin: 0, fontSize: '24px' }}>
+                        <FiTool /> Gestion Maintenances
+                    </h1>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button onClick={fetchData} className="btn-add" style={{ backgroundColor: '#F1F5F9', color: '#64748B' }}>
+                            <FaSync className={loading ? 'spin' : ''} />
+                        </button>
+                        <Link to="/services" style={{ textDecoration: 'none' }}>
+                            <button className="btn-add">
+                                <FiPlusCircle size={20} /> Programmer
+                            </button>
+                        </Link>
+                    </div>
                 </div>
 
-                <div style={{ flex: 1, minWidth: '200px' }}>
-                    <label style={labelStyle}>Filtrer par Statut</label>
-                    <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} style={selectStyle}>
-                        <option value="">Tous les statuts</option>
-                        <option value="pending">En attente</option>
-                        <option value="in_progress">En cours</option>
-                        <option value="completed">Terminé</option>
-                        <option value="cancelled">Annulé</option>
-                    </select>
+                <div className="filters-grid">
+                    <div>
+                        <label style={labelStyle}><FiSettings /> Équipement</label>
+                        <select style={selectStyle} value={selectedService} onChange={(e) => setSelectedService(e.target.value)}>
+                            <option value="">Toutes les machines</option>
+                            {servicesList.map(s => <option key={s._id || s.id} value={s._id || s.id}>{s.name}</option>)}
+                        </select>
+                    </div>
+                    <div>
+                        <label style={labelStyle}><FaFilter /> Statut</label>
+                        <select style={selectStyle} value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
+                            <option value="">Tous les statuts</option>
+                            <option value="pending">⏳ En attente</option>
+                            <option value="in_progress">⚙️ En cours</option>
+                            <option value="completed">✅ Terminé</option>
+                            <option value="cancelled">❌ Annulé</option>
+                        </select>
+                    </div>
                 </div>
-                
-                <div style={{ display: 'flex', gap: '8px' }}>
-                    <button onClick={fetchData} style={btnRefreshStyle}>
-                        <FiRefreshCw className={loading ? 'spin' : ''} />
-                    </button>
-                    {(selectedService || selectedStatus) && (
-                        <button onClick={resetFilters} style={btnResetStyle}><FiXCircle /> Reset</button>
-                    )}
-                </div>
-            </div>
 
-            <div className="table-wrapper">
-                <table>
-                    <thead>
-                        <tr style={theadStyle}>
-                            <th style={thStyle}>Équipement</th>
-                            <th style={thStyle}>Date de début</th>
-                            <th style={thStyle}>Date de fin</th>
-                            <th style={thStyle}>Statut</th>
-                            <th style={{ ...thStyle, textAlign: 'center' }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {!loading && maintenances.map(m => (
-                            <tr key={m._id || m.id} style={trStyle}>
-                                <td data-label="Équipement" style={{ ...tdStyle, fontWeight: 'bold', color: '#1A202C' }}>
-                                    {m.service?.name || "N/A"}
-                                </td>
-                                <td data-label="Date de début" style={tdStyle}>
-                                    {formatDateTime(m.startDate)}
-                                </td>
-                                <td data-label="Date de fin" style={tdStyle}>
-                                    {formatDateTime(m.endDate)}
-                                </td>
-                                <td data-label="Statut" style={tdStyle}>
-                                    {renderStatus(m.status)}
-                                </td>
-                                <td style={{ ...tdStyle, textAlign: 'center' }}>
-                                    <Link to={`/maintenance/${m.serviceId || m.service?._id}`} style={{ textDecoration: 'none' }}>
-                                        <button style={btnDetailsStyle} className="btn-details">
-                                            <FiEye /> Voir Détails
-                                        </button>
-                                    </Link>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {loading && <div style={emptyStateStyle}>Chargement...</div>}
-                {!loading && maintenances.length === 0 && <div style={emptyStateStyle}>Aucune maintenance trouvée.</div>}
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '100px', color: PRIMARY_COLOR }}>
+                         <FaSync className="spin" size={30} /> <br/><br/> Chargement...
+                    </div>
+                ) : (
+                    <div className="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th className="th-style">Équipement</th>
+                                    <th className="th-style">Date Début</th>
+                                    <th className="th-style">Date Fin</th>
+                                    <th className="th-style">Statut</th>
+                                    <th className="th-style" style={{ textAlign: 'right' }}>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {maintenances.map(m => (
+                                    <tr key={m._id || m.id} className="table-row">
+                                        <td data-label="ÉQUIPEMENT">
+                                            <div style={{ fontWeight: '800', color: PRIMARY_COLOR, fontSize: '15px' }}>
+                                                {m.service?.name || "N/A"}
+                                            </div>
+                                        </td>
+                                        <td data-label="DATE DÉBUT" style={{ color: '#475569', fontWeight: '500' }}>
+                                            <FiCalendar style={{ marginRight: '5px' }} /> {formatDateTime(m.startDate)}
+                                        </td>
+                                        <td data-label="DATE FIN" style={{ color: '#475569' }}>
+                                            {formatDateTime(m.endDate)}
+                                        </td>
+                                        <td data-label="STATUT">
+                                            <span style={getStatusBadgeStyle(m.status)}>{m.status || 'pending'}</span>
+                                        </td>
+                                        <td style={{ textAlign: 'right' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                                <Link title="Voir Détails" className="action-btn" to={`/maintenance/${m.serviceId || m.service?._id}`}>
+                                                    <FiEye />
+                                                </Link>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {maintenances.length === 0 && (
+                            <div style={{ textAlign: 'center', padding: '60px', color: '#94A3B8', fontSize: '14px' }}>
+                                Aucune maintenance trouvée.
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
 }
 
-// Styles
-const labelStyle = { display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#4A5568', marginBottom: '5px' };
-const selectStyle = { width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #E2E8F0', outline: 'none' };
-const theadStyle = { backgroundColor: '#EDF2F7' };
-const thStyle = { padding: '15px', textAlign: 'left', fontSize: '13px', color: '#4A5568', textTransform: 'uppercase', letterSpacing: '0.05em' };
-const trStyle = { borderBottom: '1px solid #F1F5F9' };
-const tdStyle = { padding: '15px', fontSize: '14px', color: '#4A5568' };
-const btnCreateStyle = { backgroundColor: SUCCESS_COLOR, color: 'white', border: 'none', padding: '12px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' };
-const btnDetailsStyle = { border: `1px solid ${PRIMARY_COLOR}`, background: 'white', color: PRIMARY_COLOR, padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px' };
-const btnResetStyle = { backgroundColor: '#FED7D7', color: '#C53030', border: 'none', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' };
-const btnRefreshStyle = { background: 'white', border: '1px solid #E2E8F0', padding: '10px', borderRadius: '8px', cursor: 'pointer', color: PRIMARY_COLOR };
-const emptyStateStyle = { padding: '40px', textAlign: 'center', color: '#A0AEC0', fontWeight: 'bold' };
+const labelStyle = { 
+    fontSize: '11px', fontWeight: '800', marginBottom: '10px', display: 'flex', 
+    alignItems: 'center', gap: '6px', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.5px'
+};
+
+const selectStyle = { 
+    width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid #E2E8F0', 
+    backgroundColor: 'white', outline: 'none', fontSize: '14px', color: '#334155',
+    boxSizing: 'border-box'
+};
 
 export default MachineMaintenancePage;
