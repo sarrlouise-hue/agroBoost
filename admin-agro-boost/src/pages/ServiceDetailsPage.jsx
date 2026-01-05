@@ -3,10 +3,12 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { 
     FaArrowLeft, FaEdit, FaMapMarkerAlt, 
-    FaCalendarCheck, FaMoneyBillWave, FaIdCard, FaInfoCircle 
+    FaCalendarCheck, FaMoneyBillWave, FaIdCard, FaInfoCircle, FaTractor
 } from "react-icons/fa";
 
-const PRIMARY_COLOR = '#0070AB';
+// Constantes de style harmonisées
+const PRIMARY_COLOR = '#3A7C35'; 
+const BACKGROUND_COLOR = '#FDFAF8';
 
 function ServiceDetailsPage() {
     const { id } = useParams();
@@ -28,23 +30,23 @@ function ServiceDetailsPage() {
         fetchServiceDetails();
     }, [id]);
 
-    if (loading) return <div style={{ padding: '100px', textAlign: 'center', color: '#64748b' }}>Chargement...</div>;
-    if (!service) return <div style={{ padding: '100px', textAlign: 'center' }}>Service introuvable.</div>;
+    if (loading) return <div className="loading-state">Chargement des détails...</div>;
+    if (!service) return <div className="loading-state">Service introuvable.</div>;
 
     return (
         <div className="details-page-wrapper">
             <div className="container-max">
                 
-                {/* Barre de navigation : On garde un peu de marge ici pour les boutons */}
+                {/* Barre de navigation */}
                 <div className="nav-bar">
-                    <button onClick={() => navigate(-1)} style={backButtonStyle}>
-                        <FaArrowLeft /> <span className="hide-mobile">Retour</span>
+                    <button onClick={() => navigate(-1)} className="back-btn">
+                        <FaArrowLeft /> <span>Retour</span>
                     </button>
-                    <Link to={`/services/edit/${id}`} style={{ textDecoration: 'none' }}>
-                        <button style={editButtonStyle}>
-                            <FaEdit /> Modifier
+                    {/*<Link to={`/services/edit/${id}`} className="edit-link">
+                        <button className="edit-btn">
+                            <FaEdit /> Modifier le service
                         </button>
-                    </Link>
+                    </Link>*/}
                 </div>
 
                 {/* Conteneur Principal */}
@@ -57,8 +59,8 @@ function ServiceDetailsPage() {
                                 <img src={service.images[0]} alt={service.name} className="main-image" />
                             ) : (
                                 <div className="image-placeholder">
-                                    <FaInfoCircle size={40} color="#cbd5e1" />
-                                    <p>Aucune image disponible</p>
+                                    <FaTractor size={50} color="#e2e8f0" />
+                                    <p>Aucun visuel disponible</p>
                                 </div>
                             )}
                         </div>
@@ -66,7 +68,7 @@ function ServiceDetailsPage() {
                         {service.images?.length > 1 && (
                             <div className="thumbnail-list">
                                 {service.images.map((img, i) => (
-                                    <img key={i} src={img} alt="" style={thumbnailStyle} />
+                                    <img key={i} src={img} alt="" className="thumbnail-img" />
                                 ))}
                             </div>
                         )}
@@ -74,42 +76,43 @@ function ServiceDetailsPage() {
 
                     {/* Colonne Droite : Infos */}
                     <div className="info-section">
-                        <span style={typeBadgeStyle}>
-                            {service.serviceType}
-                        </span>
+                        <div className="badge-type">{service.serviceType}</div>
                         
-                        <h1 style={titleStyle}>{service.name}</h1>
+                        <h1 className="service-title">{service.name}</h1>
                         
-                        <div style={statusBadgeStyle(service.availability)}>
-                            <FaCalendarCheck /> {service.availability ? 'Disponible' : 'Indisponible'}
+                        <div className={`status-pill ${service.availability ? 'available' : 'unavailable'}`}>
+                            <FaCalendarCheck /> {service.availability ? 'Disponible immédiatement' : 'Actuellement indisponible'}
                         </div>
 
-                        <p style={descriptionStyle}>{service.description || "Aucune description fournie."}</p>
+                        <div className="description-box">
+                            <h3 className="section-label">Description</h3>
+                            <p>{service.description || "Aucune description détaillée n'a été fournie pour ce service."}</p>
+                        </div>
 
-                        <div style={detailsGridStyle}>
-                            <div style={infoRowStyle}>
-                                <div className="icon-box"><FaMoneyBillWave color={PRIMARY_COLOR} /></div>
-                                <div>
-                                    <div className="label">Tarification</div>
-                                    <div className="value">
-                                        {service.pricePerHour ? `${service.pricePerHour} F / h` : `${service.pricePerDay} F / jour`}
-                                    </div>
+                        <div className="details-grid">
+                            <div className="info-item">
+                                <div className="icon-wrapper price"><FaMoneyBillWave /></div>
+                                <div className="info-content">
+                                    <span className="label">Tarification</span>
+                                    <span className="value">
+                                        {service.pricePerHour ? `${service.pricePerHour} FCFA / heure` : `${service.pricePerDay} FCFA / jour`}
+                                    </span>
                                 </div>
                             </div>
 
-                            <div style={infoRowStyle}>
-                                <div className="icon-box"><FaMapMarkerAlt color="#ef4444" /></div>
-                                <div>
-                                    <div className="label">Localisation</div>
-                                    <div className="value">{service.locationName || "Zone non spécifiée"}</div>
+                            <div className="info-item">
+                                <div className="icon-wrapper geo"><FaMapMarkerAlt /></div>
+                                <div className="info-content">
+                                    <span className="label">Zone d'intervention</span>
+                                    <span className="value">{service.locationName || "Non spécifiée"}</span>
                                 </div>
                             </div>
 
-                            <div style={infoRowStyle}>
-                                <div className="icon-box"><FaIdCard color="#64748b" /></div>
-                                <div>
-                                    <div className="label">Prestataire</div>
-                                    <div className="value">{service.provider?.businessName || 'Indépendant'}</div>
+                            <div className="info-item">
+                                <div className="icon-wrapper provider"><FaIdCard /></div>
+                                <div className="info-content">
+                                    <span className="label">Prestataire</span>
+                                    <span className="value">{service.provider?.businessName || 'Indépendant'}</span>
                                 </div>
                             </div>
                         </div>
@@ -118,97 +121,172 @@ function ServiceDetailsPage() {
             </div>
 
             <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap');
+
                 .details-page-wrapper {
-                    background-color: #f8fafc;
+                    background-color: ${BACKGROUND_COLOR};
                     min-height: 100vh;
-                    padding: 20px;
+                    padding: clamp(10px, 3vw, 30px);
+                    font-family: 'Inter', sans-serif;
                 }
+
                 .container-max {
                     max-width: 1100px;
                     margin: 0 auto;
                 }
+
                 .nav-bar {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    margin-bottom: 20px;
+                    margin-bottom: 25px;
                 }
+
+                .back-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    border: 1px solid #E2E8F0;
+                    background: white;
+                    padding: 10px 18px;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    color: #64748b;
+                    font-weight: 600;
+                    transition: all 0.2s;
+                }
+                .back-btn:hover { background: #f8fafc; color: ${PRIMARY_COLOR}; }
+
+                .edit-btn {
+                    background-color: ${PRIMARY_COLOR};
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 12px;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 12px rgba(58, 124, 53, 0.2);
+                }
+
                 .details-card {
                     display: flex;
                     flex-direction: column;
                     background: white;
-                    border-radius: 20px;
+                    border-radius: 24px;
                     overflow: hidden;
-                    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+                    border: 1px solid #F1F5F9;
                 }
-                .image-section { flex: 1; }
+
+                /* IMAGE SECTION */
+                .image-section { flex: 1; padding: 25px; }
                 .main-image-container {
                     width: 100%;
-                    height: 450px;
+                    height: 400px;
+                    border-radius: 18px;
                     overflow: hidden;
-                    background: #f1f5f9;
+                    background: #f8fafc;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
                 .main-image { width: 100%; height: 100%; object-fit: cover; }
+                .image-placeholder { text-align: center; color: #94a3b8; }
+                
                 .thumbnail-list {
-                    display: flex; gap: 10px; margin: 15px; overflow-x: auto; padding-bottom: 10px;
+                    display: flex; gap: 12px; margin-top: 15px; overflow-x: auto; padding-bottom: 5px;
                 }
-                .info-section { padding: 40px; flex: 1; background: #fff; }
-                .icon-box {
-                    width: 40px; height: 40px; border-radius: 10px;
-                    background: #f8fafc; display: flex; align-items: center; justify-content: center;
+                .thumbnail-img {
+                    width: 70px; height: 70px; border-radius: 10px; 
+                    object-fit: cover; border: 2px solid #F1F5F9; cursor: pointer;
                 }
-                .label { font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
-                .value { font-size: 15px; color: #1e293b; font-weight: 600; }
 
-                @media (min-width: 850px) {
+                /* INFO SECTION */
+                .info-section { padding: 40px; flex: 1; display: flex; flex-direction: column; }
+                
+                .badge-type {
+                    background: #E8F5E9;
+                    color: ${PRIMARY_COLOR};
+                    padding: 6px 14px;
+                    border-radius: 8px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    align-self: flex-start;
+                }
+
+                .service-title {
+                    font-family: 'Poppins', sans-serif;
+                    font-size: clamp(1.8rem, 4vw, 2.4rem);
+                    color: #1e293b;
+                    margin: 15px 0 10px 0;
+                    line-height: 1.2;
+                }
+
+                .status-pill {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 6px 16px;
+                    border-radius: 30px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    margin-bottom: 25px;
+                    align-self: flex-start;
+                }
+                .status-pill.available { background: #ECFDF5; color: #059669; }
+                .status-pill.unavailable { background: #FEF2F2; color: #DC2626; }
+
+                .section-label { font-size: 14px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+                .description-box p { color: #475569; lineHeight: 1.7; font-size: 15px; margin: 0; }
+                .description-box { margin-bottom: 30px; }
+
+                /* GRID INFO */
+                .details-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 20px;
+                    margin-top: auto;
+                    padding-top: 20px;
+                    border-top: 1px solid #F1F5F9;
+                }
+
+                .info-item { display: flex; align-items: center; gap: 15px; }
+                .icon-wrapper {
+                    width: 45px; height: 45px; border-radius: 12px;
+                    display: flex; align-items: center; justify-content: center; font-size: 18px;
+                }
+                .icon-wrapper.price { background: #E8F5E9; color: ${PRIMARY_COLOR}; }
+                .icon-wrapper.geo { background: #FFF1F2; color: #E11D48; }
+                .icon-wrapper.provider { background: #F1F5F9; color: #64748b; }
+
+                .info-content { display: flex; flex-direction: column; }
+                .info-content .label { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; }
+                .info-content .value { font-size: 15px; color: #1e293b; font-weight: 600; }
+
+                .loading-state { padding: 100px; text-align: center; color: #64748b; font-weight: 600; }
+
+                /* RESPONSIVE */
+                @media (min-width: 900px) {
                     .details-card { flex-direction: row; }
-                    .image-section { max-width: 50%; padding: 20px; }
-                    .main-image-container { border-radius: 15px; }
+                    .image-section { max-width: 450px; border-right: 1px solid #F1F5F9; }
                 }
 
                 @media (max-width: 768px) {
-                    .details-page-wrapper { padding: 0 !important; }
-                    .nav-bar { padding: 15px 15px 10px 15px; margin-bottom: 0; }
-                    .details-card { border-radius: 0 !important; box-shadow: none; }
-                    .main-image-container { height: 280px; }
-                    .info-section { padding: 20px !important; }
-                    .hide-mobile { display: none; }
-                    .thumbnail-list { margin: 10px 15px; }
+                    .details-page-wrapper { padding: 10px; }
+                    .nav-bar { padding: 5px; }
+                    .details-card { border-radius: 16px; }
+                    .info-section { padding: 25px; }
+                    .main-image-container { height: 300px; }
+                    .back-btn span { display: none; }
+                    .edit-btn { font-size: 14px; padding: 10px 15px; }
                 }
             `}</style>
         </div>
     );
 }
-
-const backButtonStyle = {
-    display: 'flex', alignItems: 'center', gap: '8px', border: 'none', 
-    background: 'white', padding: '10px 15px', borderRadius: '10px',
-    cursor: 'pointer', color: '#64748b', fontWeight: '600', boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-};
-
-const editButtonStyle = {
-    padding: '10px 20px', backgroundColor: PRIMARY_COLOR, color: 'white', 
-    border: 'none', borderRadius: '10px', cursor: 'pointer', 
-    display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600'
-};
-
-const typeBadgeStyle = {
-    backgroundColor: '#f0f9ff', color: PRIMARY_COLOR, padding: '6px 14px', 
-    borderRadius: '8px', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase'
-};
-
-const titleStyle = { fontSize: '1.8rem', color: '#0f172a', margin: '12px 0 8px 0', fontWeight: '800' };
-const descriptionStyle = { color: '#475569', lineHeight: '1.6', marginBottom: '25px', fontSize: '14px' };
-const detailsGridStyle = { display: 'grid', gap: '18px' };
-const infoRowStyle = { display: 'flex', alignItems: 'center', gap: '15px' };
-const thumbnailStyle = { width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #f1f5f9' };
-
-const statusBadgeStyle = (isAvail) => ({
-    display: 'inline-flex', alignItems: 'center', gap: '6px',
-    padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '600',
-    backgroundColor: isAvail ? '#ecfdf5' : '#fef2f2',
-    color: isAvail ? '#10b981' : '#ef4444',
-    marginBottom: '15px'
-});
 
 export default ServiceDetailsPage;

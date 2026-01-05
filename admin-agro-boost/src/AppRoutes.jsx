@@ -17,7 +17,11 @@ import RecordMaintenancePage from './pages/RecordMaintenancePage';
 import MaintenanceReportsPage from './pages/MaintenanceReportsPage';
 import ServiceDetailsPage from './pages/ServiceDetailsPage';
 import NotFoundPage from './pages/NotFoundPage';
-
+import SettingsPage from './pages/SettingsPage'; 
+import NotificationsPage from './pages/NotificationsPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
+import AdminProfilePage from './pages/AdminProfilePage';
+import LanguageSettingsPage from './pages/LanguageSettingsPage';
 
 function AppRoutes() {
   return (
@@ -46,6 +50,12 @@ function AppRoutes() {
             
             {/* Alias pour equipments si nécessaire, mais relatif aussi */}
             <Route path="equipments" element={<MachineMaintenancePage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/profile" element={<AdminProfilePage />} />
+            <Route path="/language" element={<LanguageSettingsPage />} />
+            <Route path="/change-password" element={<ChangePasswordPage />} />
           </Route>
       </Route>
 

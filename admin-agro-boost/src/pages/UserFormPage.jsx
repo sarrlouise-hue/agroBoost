@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
-import { FaArrowLeft, FaSave, FaUserPlus } from "react-icons/fa";
+import { FaArrowLeft, FaSave, FaUserPlus, FaEye, FaEyeSlash, FaPhoneAlt } from "react-icons/fa";
 
-const PRIMARY_COLOR = '#0070AB';
-const SUCCESS_COLOR = '#4CAF50';
+const PRIMARY_COLOR = '#3A7C35';
+const BACKGROUND_COLOR = '#FDFAF8';
 
 export default function UserFormPage() {
     const { userId } = useParams();
@@ -12,251 +12,196 @@ export default function UserFormPage() {
     const isEditMode = !!userId;
 
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "", 
-        role: "user", 
-        password: "",
+        firstName: "", lastName: "", email: "", phoneNumber: "", role: "user", password: "",
     });
 
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [submitError, setSubmitError] = useState(null);
 
     useEffect(() => {
         if (isEditMode) {
             setLoading(true);
-            const fetchUser = async () => {
-                try {
-                    const response = await api.get(`/users/${userId}`); 
-                    const userData = response.data.data || response.data; 
-
-                    setFormData({
-                        firstName: userData.firstName || "",
-                        lastName: userData.lastName || "",
-                        email: userData.email || "",
-                        phoneNumber: userData.phoneNumber || "",
-                        role: userData.role || "user",
-                        password: "", 
-                    });
-                } catch (err) {
-                    setSubmitError("Impossible de charger les données.");
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchUser();
+            api.get(`/users/${userId}`).then(res => {
+                const data = res.data.data || res.data;
+                setFormData({ ...data, password: "" });
+            }).finally(() => setLoading(false));
         }
     }, [userId, isEditMode]);
-
-    const handleFormChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setSubmitError(null);
-
-        const url = isEditMode ? `/users/${userId}` : "/users"; 
-        const method = isEditMode ? "put" : "post";
-        const dataToSend = { ...formData };
-        if (isEditMode && !dataToSend.password) delete dataToSend.password; 
-
         try {
-            await api[method](url, dataToSend);
+            const method = isEditMode ? "put" : "post";
+            const url = isEditMode ? `/users/${userId}` : "/users";
+            await api[method](url, formData);
             navigate("/users");
         } catch (err) {
-            setSubmitError(err.response?.data?.message || "Erreur lors de l'enregistrement.");
-        } finally {
-            setLoading(false);
-        }
+            setSubmitError("Erreur lors de l'enregistrement.");
+        } finally { setLoading(false); }
     };
 
     return (
-        /* responsive-container-form : on gère l'espace extérieur ici */
-        <div className="responsive-container-form" style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}> 
-            
-            {/* BOUTON RETOUR  */}
-            <div style={{ maxWidth: '800px', margin: '0 auto 15px auto' }}>
-                <button 
-                    onClick={() => navigate("/users")}
-                    className="btn-back"
-                    style={backButtonStyle}
-                >
+        <div className="form-page-wrapper">
+            <div className="header-actions">
+                <button onClick={() => navigate("/users")} className="back-btn">
                     <FaArrowLeft /> <span className="hide-mobile">Retour à la liste</span>
                 </button>
             </div>
 
-            <div className="form-main-card" style={containerStyle}>
-                <h1 style={titleStyle}>
-                    {isEditMode ? <><FaSave /> Modifier l'utilisateur</> : <><FaUserPlus /> Ajouter un utilisateur</>}
+            <div className="container-card">
+                <h1 className="form-title">
+                    {isEditMode ? <><FaSave /> Modifier l'utilisateur</> : <><FaUserPlus /> Nouveau Utilisateur</>}
                 </h1>
 
-                {submitError && (
-                    <div style={errorBannerStyle}>
-                        ⚠️ {submitError}
-                    </div>
-                )}
+                {submitError && <div className="error-banner">{submitError}</div>}
 
-                <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '20px' }}>
-                    
+                <form onSubmit={handleSubmit}>
                     <div className="form-grid">
                         <div className="form-group">
-                            <label style={labelStyle}>Prénom</label>
-                            <input type="text" name="firstName" value={formData.firstName} onChange={handleFormChange} required style={modernInputStyle} placeholder="Ex: Moussa" />
+                            <label>Prénom</label>
+                            <input type="text" value={formData.firstName} onChange={(e) => setFormData({...formData, firstName: e.target.value})} required placeholder="Ex: Jean" />
                         </div>
-                        <div className="form-group">
-                            <label style={labelStyle}>Nom de famille</label>
-                            <input type="text" name="lastName" value={formData.lastName} onChange={handleFormChange} required style={modernInputStyle} placeholder="Ex: Diop" />
-                        </div>
-                    </div>
 
-                    <div className="form-grid">
                         <div className="form-group">
-                            <label style={labelStyle}>Email</label>
-                            <input type="email" name="email" value={formData.email} onChange={handleFormChange} required style={modernInputStyle} placeholder="exemple@mail.com" />
+                            <label>Nom</label>
+                            <input type="text" value={formData.lastName} onChange={(e) => setFormData({...formData, lastName: e.target.value})} required placeholder="Ex: Dupont" />
                         </div>
-                        <div className="form-group">
-                            <label style={labelStyle}>Téléphone</label>
-                            <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleFormChange} style={modernInputStyle} placeholder="+221 ..." />
-                        </div>
-                    </div>
 
-                    <div className="form-grid">
                         <div className="form-group">
-                            <label style={labelStyle}>Rôle</label>
-                            <select name="role" value={formData.role} onChange={handleFormChange} required style={modernInputStyle}>
-                                <option value="user">Producteur (User)</option>
-                                <option value="provider">Prestataire (Provider)</option>
-                                <option value="admin">Administrateur (Admin)</option>
+                            <label>Email</label>
+                            <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required placeholder="exemple@mail.com" />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Numéro de téléphone</label>
+                            <div className="input-with-icon">
+                                <FaPhoneAlt className="input-icon" />
+                                <input 
+                                    type="tel" 
+                                    value={formData.phoneNumber} 
+                                    onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})} 
+                                    required 
+                                    placeholder="Ex: +221 77..." 
+                                    style={{ paddingLeft: '40px' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Rôle sur la plateforme</label>
+                            <select value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})}>
+                                <option value="user">Producteur (Agriculteur)</option>
+                                <option value="provider">Prestataire de services</option>
+                                <option value="mechanic">Mécanicien</option>
+                                <option value="admin">Administrateur</option>
                             </select>
                         </div>
-                        <div className="form-group">
-                            <label style={labelStyle}>
-                                Mot de passe {isEditMode && <span style={{ fontWeight: 'normal', color: '#94a3b8', fontSize: '12px' }}>(Optionnel)</span>}
-                            </label>
-                            <input 
-                                type="password" name="password" 
-                                value={formData.password} onChange={handleFormChange} 
-                                required={!isEditMode} style={modernInputStyle} 
-                                placeholder={isEditMode ? "Laisser vide" : "Min. 6 caractères"}
-                            />
+
+                        <div className="form-group password-group">
+                            <label>Mot de passe</label>
+                            <div className="input-with-icon">
+                                <input 
+                                    type={showPassword ? "text" : "password"} 
+                                    placeholder={isEditMode ? "Laisser vide si inchangé" : "6 caractères min."}
+                                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                    required={!isEditMode}
+                                />
+                                <div className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div style={actionContainerStyle}>
-                        <button 
-                            type="submit" 
-                            disabled={loading} 
-                            style={{ 
-                                ...btnPrimary,
-                                background: loading ? '#94a3b8' : SUCCESS_COLOR, 
-                                cursor: loading ? 'not-allowed' : 'pointer',
-                            }}
-                        >
+                    <div className="form-actions">
+                        <button type="submit" disabled={loading} className="btn-submit">
                             {loading ? "Chargement..." : isEditMode ? "Enregistrer" : "Créer l'utilisateur"}
                         </button>
-                        
-                        <button 
-                            type="button" 
-                            onClick={() => navigate("/users")}
-                            style={btnSecondary}
-                        >
+                        <button type="button" onClick={() => navigate("/users")} className="btn-cancel">
                             Annuler
                         </button>
                     </div>
                 </form>
             </div>
 
-            <style>
-                {`
-                    .responsive-container-form { padding: 20px; }
-                    .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-                    
-                    @media (min-width: 640px) { 
-                        .form-grid { grid-template-columns: 1fr 1fr; gap: 20px; } 
-                    }
-                    
-                    @media (max-width: 768px) {
-                        .responsive-container-form { padding: 8px; }
-                        .form-main-card { padding: 15px !important; border-radius: 10px !important; }
-                        .hide-mobile { display: none; }
-                    }
+            <style>{`
+                .form-page-wrapper {
+                    background-color: ${BACKGROUND_COLOR};
+                    min-height: 100vh;
+                    padding: 20px;
+                }
 
-                    .btn-back:hover { 
-                        border-color: ${PRIMARY_COLOR} !important; 
-                        color: ${PRIMARY_COLOR} !important;
-                        background-color: #f0f9ff !important;
-                    }
+                .header-actions { margin-bottom: 20px; }
 
-                    input:focus, select:focus {
-                        border-color: ${PRIMARY_COLOR} !important;
-                        box-shadow: 0 0 0 3px rgba(0, 112, 171, 0.1);
-                    }
+                /* Style bouton retour harmonisé */
+                .back-btn {
+                    display: flex; align-items: center; gap: 8px; background: white; 
+                    border: 1px solid #E2E8F0; padding: 10px 18px; border-radius: 10px; 
+                    cursor: pointer; font-weight: 500; color: #64748B; transition: 0.2s;
+                }
+                .back-btn:hover { background: #F8FAFC; border-color: ${PRIMARY_COLOR}; color: ${PRIMARY_COLOR}; }
 
-                    button:active { transform: scale(0.98); }
-                `}
-            </style>
+                /* Carte identique à la page liste */
+                .container-card {
+                    background: white;
+                    padding: clamp(20px, 5vw, 40px);
+                    border-radius: 16px; /* Arrondi conservé partout */
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+                    width: 100%;
+                }
+
+                .form-title { 
+                    color: ${PRIMARY_COLOR}; 
+                    font-size: clamp(1.4rem, 5vw, 1.8rem); 
+                    margin-bottom: 30px; 
+                    display: flex; align-items: center; gap: 15px;
+                }
+
+                .form-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 25px;
+                    margin-bottom: 35px;
+                }
+
+                .form-group { display: flex; flex-direction: column; gap: 8px; }
+                .form-group label { font-size: 14px; font-weight: 600; color: #475569; }
+
+                input, select {
+                    width: 100%; padding: 12px; border-radius: 10px; 
+                    border: 1px solid #E2E8F0; font-size: 15px; outline: none;
+                    transition: 0.2s;
+                }
+                input:focus { border-color: ${PRIMARY_COLOR}; box-shadow: 0 0 0 3px rgba(58, 124, 53, 0.1); }
+
+                .input-with-icon { position: relative; width: 100%; }
+                .input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94A3B8; }
+                .eye-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94A3B8; }
+
+                .form-actions { display: flex; gap: 15px; flex-wrap: wrap; }
+
+                .btn-submit {
+                    flex: 1.5; padding: 14px; background: ${PRIMARY_COLOR}; color: white;
+                    border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
+                    font-size: 16px; transition: 0.2s;
+                }
+                .btn-cancel {
+                    flex: 1.5; padding: 14px; background: #F1F5F9; color: #64748B;
+                    border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
+                    font-size: 16px;
+                }
+
+                @media (max-width: 850px) {
+                    .form-page-wrapper { padding: 10px; }
+                    .container-card { border-radius: 12px; padding: 20px; } /* Arrondi légèrement réduit mais présent */
+                    .form-grid { grid-template-columns: 1fr; gap: 15px; }
+                    .hide-mobile { display: none; }
+                    .btn-submit, .btn-cancel { flex: 1 1 100%; }
+                }
+            `}</style>
         </div>
     );
 }
-
-// STYLES OBJETS (Mis à jour pour flexibilité mobile)
-const backButtonStyle = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    backgroundColor: 'white',
-    color: '#475569',
-    border: '1px solid #cbd5e1', 
-    borderRadius: '8px',
-    padding: '8px 14px',
-    fontSize: '13px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease'
-};
-
-const modernInputStyle = {
-    width: '100%', padding: '12px 15px', border: '1px solid #e2e8f0', 
-    borderRadius: '10px', outline: 'none', fontSize: '16px', boxSizing: 'border-box'
-};
-
-const labelStyle = {
-    display: 'block', fontSize: '14px', fontWeight: '600', color: '#475569', marginBottom: '8px'
-};
-
-const containerStyle = {
-    backgroundColor: 'white', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05)', 
-    borderRadius: '16px', padding: '40px', 
-    maxWidth: '800px', margin: '0 auto', boxSizing: 'border-box', width: '100%'
-};
-
-const titleStyle = { 
-    fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: '800', 
-    marginBottom: '25px', color: PRIMARY_COLOR, textAlign: 'center',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
-};
-
-const errorBannerStyle = { 
-    color: '#E53E3E', textAlign: 'center', marginBottom: '20px', 
-    padding: '10px', backgroundColor: '#FFF5F5', 
-    borderRadius: '10px', border: '1px solid #FEB2B2', fontSize: '13px'
-};
-
-const actionContainerStyle = { 
-    display: 'flex', gap: '10px', marginTop: '10px', flexDirection: 'column' 
-};
-
-const btnPrimary = { 
-    padding: '14px', color: 'white', borderRadius: '10px', fontWeight: '700', 
-    border: 'none', fontSize: '16px', transition: 'all 0.2s'
-};
-
-const btnSecondary = { 
-    padding: '12px', background: '#f1f5f9', color: '#64748b', 
-    borderRadius: '10px', fontWeight: '600', border: 'none', 
-    cursor: 'pointer', fontSize: '14px', transition: 'all 0.2s'
-};
