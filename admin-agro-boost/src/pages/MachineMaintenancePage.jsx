@@ -7,7 +7,6 @@ import {
 } from 'react-icons/fi';
 import { FaFilter, FaSync } from "react-icons/fa";
 
-// Thème Agricole
 const PRIMARY_COLOR = '#3A7C35';
 const SECONDARY_COLOR = '#709D54';
 const BACKGROUND_COLOR = '#FDFAF8'; 
@@ -16,15 +15,10 @@ const getStatusBadgeStyle = (status) => {
     const s = status?.toLowerCase();
     let config = { color: '#64748B', bg: '#F1F5F9', border: '#E2E8F0' }; 
 
-    if (s === 'completed') {
-        config = { color: '#3A7C35', bg: '#E6FFFA', border: '#3A7C35' };
-    } else if (s === 'cancelled') {
-        config = { color: '#E53E3E', bg: '#FFF5F5', border: '#FEB2B2' };
-    } else if (s === 'pending') {
-        config = { color: '#9A3412', bg: '#FFFBEB', border: '#FEF3C7' };
-    } else if (s === 'in_progress') {
-        config = { color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' };
-    }
+    if (s === 'completed') config = { color: '#3A7C35', bg: '#E6FFFA', border: '#3A7C35' };
+    else if (s === 'cancelled') config = { color: '#E53E3E', bg: '#FFF5F5', border: '#FEB2B2' };
+    else if (s === 'pending') config = { color: '#9A3412', bg: '#FFFBEB', border: '#FEF3C7' };
+    else if (s === 'in_progress') config = { color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' };
 
     return {
         display: 'inline-block',
@@ -90,12 +84,13 @@ function MachineMaintenancePage() {
                 }
                 .container-card {
                     background-color: white; 
-                    border-radius: 16px; 
+                    border-radius: 20px; 
                     padding: 30px; 
                     box-shadow: 0 4px 25px rgba(0,0,0,0.04); 
                     width: 100%;
                     max-width: 1400px;
                     margin: 0 auto;
+                    box-sizing: border-box;
                 }
                 .header-flex {
                     display: flex;
@@ -114,11 +109,12 @@ function MachineMaintenancePage() {
                     padding: 20px;
                     border-radius: 12px;
                 }
-                
+
                 table { 
                     width: 100%; 
                     border-collapse: separate; 
                     border-spacing: 0 12px; 
+                    table-layout: fixed;
                 }
                 .th-style { 
                     padding: 10px 20px; 
@@ -137,6 +133,7 @@ function MachineMaintenancePage() {
                     padding: 20px; 
                     border-top: 1px solid #F1F5F9;
                     border-bottom: 1px solid #F1F5F9;
+                    word-break: break-word;
                 }
                 .table-row td:first-child {
                     border-left: 1px solid #F1F5F9;
@@ -172,43 +169,49 @@ function MachineMaintenancePage() {
                 .spin { animation: spin 1s linear infinite; }
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+                /* MOBILE RESPONSIVE */
                 @media (max-width: 900px) {
-                    .page-wrapper { padding: 0; }
-                    .container-card { padding: 15px; border-radius: 0; }
+                    .page-wrapper { padding: 15px; }
+                    .container-card { 
+                        padding: 20px; 
+                        border-radius: 20px; /* garde les arrondis sur mobile */
+                    }
+
                     table, thead, tbody, th, td, tr { display: block; width: 100%; }
                     thead { display: none; }
                     tr {
                         margin-bottom: 20px;
-                        border: 1px solid #E2E8F0 !important;
-                        border-radius: 15px !important;
-                        padding: 15px;
                         background: #fff;
-                        box-sizing: border-box;
+                        border-radius: 15px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                        padding: 12px;
                     }
                     .table-row td {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
-                        padding: 12px 5px !important;
-                        border: none !important;
+                        padding: 8px 0;
+                        border: none;
                         font-size: 14px;
+                        word-break: break-word;
                     }
-                    .table-row td:not(:last-child) { border-bottom: 1px solid #F1F5F9 !important; }
                     .table-row td:before {
                         content: attr(data-label);
                         font-weight: 800;
                         color: #94A3B8;
                         font-size: 10px;
+                        margin-right: 10px;
+                        flex-shrink: 0;
                     }
                 }
             `}</style>
 
             <div className="container-card">
                 <div className="header-flex">
-                    <h1 style={{ color: PRIMARY_COLOR, fontWeight: '800', display: 'flex', alignItems: 'center', gap: '12px', margin: 0, fontSize: '24px' }}>
+                    <h1 style={{ color: PRIMARY_COLOR, fontWeight: '800', display: 'flex', alignItems: 'center', gap: '12px', margin: 0, fontSize: '24px', flex: '1 1 auto' }}>
                         <FiTool /> Gestion Maintenances
                     </h1>
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                         <button onClick={fetchData} className="btn-add" style={{ backgroundColor: '#F1F5F9', color: '#64748B' }}>
                             <FaSync className={loading ? 'spin' : ''} />
                         </button>
@@ -260,7 +263,7 @@ function MachineMaintenancePage() {
                                 {maintenances.map(m => (
                                     <tr key={m._id || m.id} className="table-row">
                                         <td data-label="ÉQUIPEMENT">
-                                            <div style={{ fontWeight: '800', color: PRIMARY_COLOR, fontSize: '15px' }}>
+                                            <div style={{ fontWeight: '800', color: PRIMARY_COLOR, fontSize: '15px', overflowWrap: 'break-word' }}>
                                                 {m.service?.name || "N/A"}
                                             </div>
                                         </td>

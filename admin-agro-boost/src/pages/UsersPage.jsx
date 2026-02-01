@@ -189,31 +189,104 @@ function UsersPage() {
             </div>
 
             <style>{`
-                .th-style { padding: 12px; color: #64748B; font-size: 11px; font-weight: 600; text-transform: uppercase; }
-                .table-row { border-bottom: 1px solid #F1F5F9; }
-                .search-input { 
-                    width: 100%; padding: 10px 10px 10px 40px; border-radius: 8px; 
-                    border: 1px solid #E2E8F0; font-size: 14px; outline: none;
-                }
-                .action-btn { padding: 8px; border-radius: 6px; border: none; cursor: pointer; }
-                .action-btn.edit { background: #EBF8FF; color: #3182CE; }
-                .action-btn.delete { background: #FFF5F5; color: #E53E3E; }
+                html, body, #root {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                overflow-x: hidden;
+            }
 
-                .mobile-view { display: none; }
+            /* garantit que padding ne dépasse pas */
+            *, *::before, *::after {
+                box-sizing: border-box;
+            }
 
-                @media (max-width: 850px) {
-                    .desktop-view { display: none; }
-                    .mobile-view { display: block; }
-                    .user-mobile-card {
-                        background: #fff; border: 1px solid #EDF2F7; border-radius: 10px; padding: 15px; margin-bottom: 10px;
-                    }
-                    .contact-info-mobile { font-size: 13px; color: #4A5568; margin-bottom: 10px; background: #F7FAFC; padding: 8px; border-radius: 6px; }
-                    .card-actions-mobile { display: flex; gap: 8px; }
-                    .mobile-action-btn { flex: 1; padding: 8px; border-radius: 6px; border: none; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 12px; font-weight: 600; }
-                    .edit-m { background: #EBF8FF; color: #3182CE; }
-                    .delete-m { background: #FFF5F5; color: #E53E3E; }
-                    .hide-mobile { display: none; }
+
+            /* force pleine largeur */
+            .page-wrapper {
+                width: 100%;
+                max-width: 100vw;
+                overflow-x: hidden;
+            }
+
+
+            /* empêche la table desktop de forcer largeur */
+            .desktop-view {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+
+            /* styles existants conservés */
+            .th-style { padding: 12px; color: #64748B; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+            .table-row { border-bottom: 1px solid #F1F5F9; }
+
+            .search-input { 
+                width: 100%;
+                padding: 10px 10px 10px 40px;
+                border-radius: 8px; 
+                border: 1px solid #E2E8F0;
+                font-size: 14px;
+                outline: none;
+            }
+
+            .action-btn { padding: 8px; border-radius: 6px; border: none; cursor: pointer; }
+            .action-btn.edit { background: #EBF8FF; color: #3182CE; }
+            .action-btn.delete { background: #FFF5F5; color: #E53E3E; }
+
+            .mobile-view { display: none; }
+
+
+            @media (max-width: 850px) {
+                .desktop-view { display: none; }
+                .mobile-view { display: block; }
+
+                /* FULL WIDTH MOBILE */
+                .page-wrapper {
+                    padding: 8px; /* petit padding seulement */
                 }
+
+                .user-mobile-card {
+                    background: #fff;
+                    border: 1px solid #EDF2F7;
+                    border-radius: 10px;
+                    padding: 15px;
+                    margin-bottom: 10px;
+                    width: 100%;
+                }
+
+                .contact-info-mobile {
+                    font-size: 13px;
+                    color: #4A5568;
+                    margin-bottom: 10px;
+                    background: #F7FAFC;
+                    padding: 8px;
+                    border-radius: 6px;
+                }
+
+                .card-actions-mobile {
+                    display: flex;
+                    gap: 8px;
+                }
+
+                .mobile-action-btn {
+                    flex: 1;
+                    padding: 8px;
+                    border-radius: 6px;
+                    border: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 5px;
+                    font-size: 12px;
+                    font-weight: 600;
+                }
+
+                .edit-m { background: #EBF8FF; color: #3182CE; }
+                .delete-m { background: #FFF5F5; color: #E53E3E; }
+
+                .hide-mobile { display: none; }
+            }
             `}</style>
         </div>
     );

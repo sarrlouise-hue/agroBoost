@@ -84,7 +84,7 @@ function RecordMaintenancePage() {
     return (
         <div className="record-page-container">
             <style>{`
-                .record-page-container { 
+                /*.record-page-container { 
                     padding: 0; 
                     width: 100%;
                     max-width: 1000px; 
@@ -92,7 +92,7 @@ function RecordMaintenancePage() {
                     background-color: ${BG_COLOR};
                     min-height: 100vh;
                     font-family: 'Inter', sans-serif;
-                }
+                }*/
                 
                 /* Bouton retour : icône seule sur mobile, avec texte sur desktop */
                 .btn-back-container {

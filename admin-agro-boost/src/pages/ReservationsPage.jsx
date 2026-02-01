@@ -121,6 +121,25 @@ function ReservationsPage() {
     return (
         <div className="page-wrapper">
             <style>{`
+                /* ===== GLOBAL MOBILE SAFE ===== */
+                html, body, #root {
+                    margin: 0;
+                    padding: 0;
+                    width: 100%;
+                    overflow-x: hidden;
+                }
+
+                *, *::before, *::after {
+                    box-sizing: border-box;
+                }
+
+                .page-wrapper,
+                .container-card,
+                .table-container {
+                    width: 100%;
+                    max-width: 100%;
+                    overflow-x: hidden;
+                }
                 .page-wrapper { 
                     background-color: ${BACKGROUND_COLOR}; 
                     min-height: 100vh; 
@@ -227,42 +246,79 @@ function ReservationsPage() {
 
                 /* FULL SCREEN MOBILE OPTIMIZATION */
                 @media (max-width: 900px) {
-                    .page-wrapper { padding: 0; } /* Supprime l'espace autour sur mobile */
-                    .container-card { 
-                        padding: 15px; 
-                        border-radius: 0; /* Prend tout l'espace */
-                        box-shadow: none; 
+
+                    .page-wrapper {
+                        padding: 8px;
                     }
-                    .header-flex { padding: 10px; }
-                    
-                    table, thead, tbody, th, td, tr { display: block; width: 100%; }
-                    thead { display: none; }
-                    tr {
-                        margin-bottom: 20px;
-                        border: 1px solid #E2E8F0 !important;
-                        border-radius: 15px !important;
+
+                    .container-card {
                         padding: 15px;
+                        border-radius: 12px; /* ← petit arrondi comme demandé */
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+                    }
+
+                    .header-flex {
+                        padding: 5px 5px 10px 5px;
+                    }
+
+                    /* TABLE → CARD MODE */
+                    table, thead, tbody, th, td, tr {
+                        display: block;
+                        width: 100%;
+                    }
+
+                    thead {
+                        display: none;
+                    }
+
+                    tr {
+                        margin-bottom: 18px;
+                        border: 1px solid #E2E8F0 !important;
+                        border-radius: 14px !important;
+                        padding: 14px;
                         background: #fff;
                         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-                        box-sizing: border-box;
                     }
+
                     .table-row td {
                         display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        padding: 12px 5px !important;
+                        flex-direction: column;   /* ← empile label + valeur */
+                        align-items: flex-start;
+                        gap: 6px;
+                        padding: 10px 0 !important;
                         border: none !important;
                         font-size: 14px;
+                        width: 100%;
                     }
-                    .table-row td:not(:last-child) { border-bottom: 1px solid #F1F5F9 !important; }
+
+                    /* label au dessus */
                     .table-row td:before {
                         content: attr(data-label);
                         font-weight: 800;
                         color: #94A3B8;
                         font-size: 10px;
+                        letter-spacing: 0.5px;
                     }
-                    .action-group { justify-content: center; width: 100%; margin-top: 15px; gap: 12px; }
-                    .action-btn { width: 45px; height: 45px; } /* Boutons plus gros pour le tactile */
+
+                    /*FIX NOM SERVICE LONG */
+                    .table-row td div {
+                        width: 100%;
+                        word-break: break-word;
+                        overflow-wrap: anywhere;
+                    }
+
+                    .action-group {
+                        justify-content: center;
+                        width: 100%;
+                        margin-top: 15px;
+                        gap: 12px;
+                        flex-wrap: wrap;
+                    }
+
+                    .action-btn {
+                        width: 46px;
+                        height: 46px;
+                    }
                 }
             `}</style>
 

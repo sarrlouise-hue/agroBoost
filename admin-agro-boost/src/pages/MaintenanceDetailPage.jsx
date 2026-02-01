@@ -2,15 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../services/api'; 
 import { 
-    FiArrowLeft, FiTool, FiPlusCircle, FiCalendar, 
-    FiHash, FiUser, FiDollarSign, FiFileText, FiClock
+    FiTool, FiPlusCircle, FiCalendar, FiUser, FiDollarSign, FiFileText
 } from 'react-icons/fi';
+import { FaArrowLeft } from 'react-icons/fa';
 
-// Palette de couleurs cohérente
-const SUCCESS_COLOR = '#2ECC71';
-const DARK_ACCENT = '#2D3748';
-const BG_COLOR = '#F1F5F9';
+const SUCCESS_COLOR = '#3A7C35';
 const DARK_TEXT = '#1A202C';
+const BG_PAGE = '#F1F5F9';
 
 function MaintenanceDetailPage() {
     const { id } = useParams(); 
@@ -41,219 +39,134 @@ function MaintenanceDetailPage() {
     };
 
     return (
-        <div className="maintenance-detail-container">
-            <style>{`
-                .maintenance-detail-container { 
-                    padding: 0; 
-                    max-width: 1000px; 
-                    margin: 0 auto; 
-                    font-family: 'Inter', sans-serif;
-                    background-color: ${BG_COLOR};
-                    min-height: 100vh;
-                }
-                
-                /* Bouton retour circulaire mobile */
-                .btn-back-container { padding: 15px; }
-                .btn-back-circle {
-                    display: flex; align-items: center; justify-content: center;
-                    width: 40px; height: 40px; background-color: white;
-                    color: ${DARK_ACCENT}; border: 1px solid #E2E8F0;
-                    border-radius: 50%; cursor: pointer;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-                }
-                .btn-back-circle span { display: none; }
-
-                .header-section { 
-                    padding: 0 15px 20px 15px;
-                }
-
-                .title-group h1 { 
-                    color: ${SUCCESS_COLOR}; 
-                    font-weight: 900; 
-                    text-transform: uppercase;
-                    font-size: 1.4rem;
-                    margin: 0;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                }
-
-                .id-badge {
-                    display: inline-block;
-                    background: #EDF2F7;
-                    color: ${DARK_ACCENT};
-                    padding: 4px 10px;
-                    border-radius: 4px;
-                    font-size: 11px;
-                    font-weight: 800;
-                    margin-top: 8px;
-                }
-
-                .btn-add-new {
-                    width: 100%;
-                    background-color: ${SUCCESS_COLOR};
-                    color: white;
-                    border: none;
-                    padding: 16px;
-                    border-radius: 12px;
-                    font-weight: 900;
-                    font-size: 14px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    margin-top: 20px;
-                    text-decoration: none;
-                    text-transform: uppercase;
-                    box-shadow: 0 4px 12px ${SUCCESS_COLOR}44;
-                }
-
-                /* Transformation du tableau en CARTES sur Mobile */
-                .history-list { padding: 0 10px; }
-                
-                .maintenance-card {
-                    background: white;
-                    border-radius: 12px;
-                    padding: 20px;
-                    margin-bottom: 15px;
-                    border: 1px solid #E2E8F0;
-                    position: relative;
-                }
-
-                .card-row {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-bottom: 12px;
-                    font-size: 13px;
-                }
-
-                .card-label {
-                    color: #718096;
-                    font-weight: 800;
-                    font-size: 10px;
-                    text-transform: uppercase;
-                }
-
-                .card-value {
-                    color: ${DARK_TEXT};
-                    font-weight: 700;
-                    text-align: right;
-                }
-
-                .card-description {
-                    border-top: 1px solid #F1F5F9;
-                    padding-top: 12px;
-                    margin-top: 12px;
-                }
-
-                .status-pill {
-                    padding: 4px 8px;
-                    border-radius: 4px;
-                    font-size: 10px;
-                    font-weight: 900;
-                    text-transform: uppercase;
-                }
-                .status-completed { background: #DCFCE7; color: #166534; }
-                .status-pending { background: #FEF3C7; color: #92400E; }
-
-                /* Desktop Adaptations */
-                @media (min-width: 768px) {
-                    .maintenance-detail-container { padding: 20px; }
-                    .header-section { 
-                        display: flex; 
-                        justify-content: space-between; 
-                        align-items: center;
-                        padding: 0 0 30px 0;
-                    }
-                    .btn-add-new { width: auto; margin-top: 0; padding: 12px 24px; }
-                    .btn-back-container { padding: 0 0 20px 0; }
-                    .btn-back-circle { width: auto; height: auto; border-radius: 8px; padding: 10px 15px; gap: 8px; }
-                    .btn-back-circle span { display: inline; font-weight: 800; font-size: 12px; }
-                    
-                    /* Optionnel : remettre en tableau sur desktop si nécessaire */
-                    .history-grid {
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
-                        gap: 20px;
-                    }
-                }
-            `}</style>
-
-            {/* Retour */}
-            <div className="btn-back-container">
-                <button onClick={() => navigate('/maintenance')} className="btn-back-circle">
-                    <FiArrowLeft size={18} /> <span>RETOUR</span>
+        <div className="maintenance-page-wrapper">
+            {/* Bouton retour identique à UserFormPage */}
+            <div className="header-actions">
+                <button onClick={() => navigate('/maintenance')} className="back-btn">
+                    <FaArrowLeft /> <span className="hide-mobile">Retour à la liste</span>
                 </button>
             </div>
 
-            {/* Header */}
-            <div className="header-section">
-                <div className="title-group">
-                    <h1><FiTool /> Historique</h1>
-                    <div className="id-badge">ID ÉQUIPEMENT : {id}</div>
+            {/* Carte principale */}
+            <div className="container-card">
+                {/* Header */}
+                <div className="header-section" style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    marginBottom: '20px'
+                }}>
+                    {/* Titre et ID */}
+                    <div className="title-group" style={{ display: 'flex', flexDirection: 'column' }}>
+                        <h1 style={{ color: SUCCESS_COLOR, display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 900 }}>
+                            <FiTool /> Historique
+                        </h1>
+                        <div style={{
+                            background: '#EDF2F7',
+                            color: SUCCESS_COLOR,
+                            padding: '4px 10px',
+                            borderRadius: '4px',
+                            fontSize: '11px',
+                            fontWeight: 800,
+                            marginTop: '8px'
+                        }}>
+                            ID ÉQUIPEMENT : {id}
+                        </div>
+                    </div>
+
+                    {/* Bouton Nouvelle Intervention */}
+                    <Link to={`/maintenance/record/${id}`} className="btn-add-new" style={{
+                        backgroundColor: SUCCESS_COLOR,
+                        color: 'white',
+                        borderRadius: '12px',
+                        padding: '12px 20px',
+                        fontWeight: 900,
+                        textDecoration: 'none',
+                        display: 'flex',
+                        gap: '10px',
+                        alignItems: 'center',
+                        boxShadow: `0 4px 12px ${SUCCESS_COLOR}44`,
+                        marginTop: '10px' // pour mobile seulement
+                    }}>
+                        <FiPlusCircle size={18} /> Nouvelle Intervention
+                    </Link>
                 </div>
-
-                <Link to={`/maintenance/record/${id}`} className="btn-add-new">
-                    <FiPlusCircle size={20} /> Nouvelle Intervention
-                </Link>
-            </div>
-
-            {/* Liste d'historique */}
-            <div className="history-list">
-                {loading ? (
-                    <div style={{ textAlign: 'center', padding: '50px', color: '#A0AEC0' }}>Chargement...</div>
-                ) : history.length > 0 ? (
-                    <div className="history-grid">
-                        {history.map(item => (
-                            <div key={item._id || item.id} className="maintenance-card">
-                                <div className="card-row">
-                                    <div className="card-label"><FiCalendar /> Date</div>
-                                    <div className="card-value">{formatDate(item.startDate)}</div>
+                {/* Historique */}
+                <div className="history-list">
+                    {loading ? (
+                        <div style={{ textAlign: 'center', padding: '50px', color: '#A0AEC0' }}>Chargement...</div>
+                    ) : history.length > 0 ? (
+                        history.map(item => (
+                            <div key={item._id || item.id} style={{
+                                background: 'white', borderRadius: '12px', padding: '15px', marginBottom: '15px', border: '1px solid #E2E8F0'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                    <div style={{ color: '#718096', fontWeight: 800, fontSize: '10px', textTransform: 'uppercase' }}><FiCalendar /> Date</div>
+                                    <div style={{ color: DARK_TEXT, fontWeight: 700 }}>{formatDate(item.startDate)}</div>
                                 </div>
-                                
-                                <div className="card-row">
-                                    <div className="card-label"><FiUser /> Technicien</div>
-                                    <div className="card-value">
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                    <div style={{ color: '#718096', fontWeight: 800, fontSize: '10px', textTransform: 'uppercase' }}><FiUser /> Technicien</div>
+                                    <div style={{ color: DARK_TEXT, fontWeight: 700 }}>
                                         {item.mechanic?.name || (item.mechanic ? `${item.mechanic.firstName} ${item.mechanic.lastName}` : 'Admin')}
                                     </div>
                                 </div>
 
-                                <div className="card-row">
-                                    <div className="card-label"><FiDollarSign /> Coût</div>
-                                    <div className="card-value" style={{ color: SUCCESS_COLOR, fontWeight: '900' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                    <div style={{ color: '#718096', fontWeight: 800, fontSize: '10px', textTransform: 'uppercase' }}><FiDollarSign /> Coût</div>
+                                    <div style={{ color: SUCCESS_COLOR, fontWeight: 900 }}>
                                         {item.cost ? `${parseFloat(item.cost).toLocaleString()} XOF` : '---'}
                                     </div>
                                 </div>
 
-                                <div className="card-row">
-                                    <div className="card-label">Statut</div>
-                                    <div className={`status-pill status-${item.status || 'completed'}`}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                    <div style={{ color: '#718096', fontWeight: 800, fontSize: '10px', textTransform: 'uppercase' }}>Statut</div>
+                                    <div style={{
+                                        padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 900,
+                                        background: item.status === 'completed' ? '#DCFCE7' : '#FEF3C7',
+                                        color: item.status === 'completed' ? '#166534' : '#92400E',
+                                        textTransform: 'uppercase'
+                                    }}>
                                         {item.status === 'completed' ? 'Terminé' : 'En attente'}
                                     </div>
                                 </div>
 
-                                <div className="card-description">
-                                    <div className="card-label" style={{ marginBottom: '5px' }}><FiFileText /> Travaux effectués</div>
-                                    <div style={{ fontSize: '14px', color: DARK_TEXT, lineHeight: '1.4', fontWeight: '500' }}>
-                                        {item.description}
-                                    </div>
-                                </div>
-                                
-                                {item.notes && (
-                                    <div style={{ marginTop: '10px', fontSize: '12px', fontStyle: 'italic', color: '#718096' }}>
-                                        Note: {item.notes}
+                                {item.description && (
+                                    <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: '10px', marginTop: '10px', fontSize: '14px', color: DARK_TEXT, lineHeight: 1.4, fontWeight: 500 }}>
+                                        <FiFileText /> {item.description}
                                     </div>
                                 )}
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div style={{ textAlign: 'center', padding: '80px 20px', background: 'white', borderRadius: '12px', color: '#A0AEC0' }}>
-                        <FiFileText size={40} style={{ marginBottom: '10px' }} /><br />
-                        Aucune intervention enregistrée.
-                    </div>
-                )}
+                        ))
+                    ) : (
+                        <div style={{ textAlign: 'center', padding: '80px 20px', background: 'white', borderRadius: '12px', color: '#A0AEC0' }}>
+                            Aucune intervention enregistrée.
+                        </div>
+                    )}
+                </div>
             </div>
+
+            <style>{`
+                /*.maintenance-page-wrapper { background-color: ${BG_PAGE}; min-height: 100vh; padding: 20px; font-family: 'Inter', sans-serif; }*/
+
+                .back-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    background: white;
+                    border: 1px solid #E2E8F0;
+                    padding: 10px 18px;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    color: #64748B;
+                    transition: 0.2s;
+                }
+                .back-btn:hover { background: #F8FAFC; border-color: ${SUCCESS_COLOR}; color: ${SUCCESS_COLOR}; }
+                .hide-mobile { display: none; }
+                @media(min-width:768px){ .hide-mobile { display: inline; } }
+            `}</style>
         </div>
     );
 }

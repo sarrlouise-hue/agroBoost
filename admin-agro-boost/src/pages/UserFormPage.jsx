@@ -128,79 +128,212 @@ export default function UserFormPage() {
             </div>
 
             <style>{`
+                /* ===== RESET GLOBAL ANTI SCROLL HORIZONTAL ===== */
+                html, body, #root {
+                    margin: 0;
+                    padding: 0;
+                    width: 100%;
+                    overflow-x: hidden;
+                }
+
+                *, *::before, *::after {
+                    box-sizing: border-box;
+                }
+
+
+                /* ===== PAGE WRAPPER ===== */
                 .form-page-wrapper {
                     background-color: ${BACKGROUND_COLOR};
                     min-height: 100vh;
+                    width: 100%;
+                    max-width: 100vw;
+                    overflow-x: hidden;
                     padding: 20px;
                 }
 
-                .header-actions { margin-bottom: 20px; }
 
-                /* Style bouton retour harmonisé */
-                .back-btn {
-                    display: flex; align-items: center; gap: 8px; background: white; 
-                    border: 1px solid #E2E8F0; padding: 10px 18px; border-radius: 10px; 
-                    cursor: pointer; font-weight: 500; color: #64748B; transition: 0.2s;
+                /* ===== HEADER ===== */
+                .header-actions {
+                    margin-bottom: 20px;
                 }
-                .back-btn:hover { background: #F8FAFC; border-color: ${PRIMARY_COLOR}; color: ${PRIMARY_COLOR}; }
 
-                /* Carte identique à la page liste */
+
+                /* ===== BOUTON RETOUR ===== */
+                .back-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    background: white;
+                    border: 1px solid #E2E8F0;
+                    padding: 10px 18px;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    color: #64748B;
+                    transition: 0.2s;
+                }
+
+                .back-btn:hover {
+                    background: #F8FAFC;
+                    border-color: ${PRIMARY_COLOR};
+                    color: ${PRIMARY_COLOR};
+                }
+
+
+                /* ===== CARTE ===== */
                 .container-card {
                     background: white;
+                    width: 100%;
+                    max-width: 100%;
                     padding: clamp(20px, 5vw, 40px);
-                    border-radius: 16px; /* Arrondi conservé partout */
+                    border-radius: 16px;
                     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+                }
+
+
+                /* ===== TITRE ===== */
+                .form-title {
+                    color: ${PRIMARY_COLOR};
+                    font-size: clamp(1.4rem, 5vw, 1.8rem);
+                    margin-bottom: 30px;
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    flex-wrap: wrap;
+                }
+
+
+                /* ===== GRID ===== */
+                .form-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                    gap: 25px;
+                    margin-bottom: 35px;
                     width: 100%;
                 }
 
-                .form-title { 
-                    color: ${PRIMARY_COLOR}; 
-                    font-size: clamp(1.4rem, 5vw, 1.8rem); 
-                    margin-bottom: 30px; 
-                    display: flex; align-items: center; gap: 15px;
+
+                /* ===== GROUP ===== */
+                .form-group {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    width: 100%;
                 }
 
-                .form-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                    gap: 25px;
-                    margin-bottom: 35px;
+                .form-group label {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #475569;
                 }
 
-                .form-group { display: flex; flex-direction: column; gap: 8px; }
-                .form-group label { font-size: 14px; font-weight: 600; color: #475569; }
 
+                /* ===== INPUTS ===== */
                 input, select {
-                    width: 100%; padding: 12px; border-radius: 10px; 
-                    border: 1px solid #E2E8F0; font-size: 15px; outline: none;
+                    width: 100%;
+                    max-width: 100%;
+                    padding: 12px;
+                    border-radius: 10px;
+                    border: 1px solid #E2E8F0;
+                    font-size: 15px;
+                    outline: none;
                     transition: 0.2s;
                 }
-                input:focus { border-color: ${PRIMARY_COLOR}; box-shadow: 0 0 0 3px rgba(58, 124, 53, 0.1); }
 
-                .input-with-icon { position: relative; width: 100%; }
-                .input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94A3B8; }
-                .eye-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94A3B8; }
+                input:focus {
+                    border-color: ${PRIMARY_COLOR};
+                    box-shadow: 0 0 0 3px rgba(58, 124, 53, 0.1);
+                }
 
-                .form-actions { display: flex; gap: 15px; flex-wrap: wrap; }
+
+                /* ===== ICON INPUT ===== */
+                .input-with-icon {
+                    position: relative;
+                    width: 100%;
+                }
+
+                .input-icon {
+                    position: absolute;
+                    left: 15px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #94A3B8;
+                }
+
+                .eye-icon {
+                    position: absolute;
+                    right: 15px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    cursor: pointer;
+                    color: #94A3B8;
+                }
+
+
+                /* ===== ACTIONS ===== */
+                .form-actions {
+                    display: flex;
+                    gap: 15px;
+                    flex-wrap: wrap;
+                    width: 100%;
+                }
 
                 .btn-submit {
-                    flex: 1.5; padding: 14px; background: ${PRIMARY_COLOR}; color: white;
-                    border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
-                    font-size: 16px; transition: 0.2s;
-                }
-                .btn-cancel {
-                    flex: 1.5; padding: 14px; background: #F1F5F9; color: #64748B;
-                    border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
+                    flex: 1.5;
+                    padding: 14px;
+                    background: ${PRIMARY_COLOR};
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    font-weight: 600;
+                    cursor: pointer;
                     font-size: 16px;
                 }
 
-                @media (max-width: 850px) {
-                    .form-page-wrapper { padding: 10px; }
-                    .container-card { border-radius: 12px; padding: 20px; } /* Arrondi légèrement réduit mais présent */
-                    .form-grid { grid-template-columns: 1fr; gap: 15px; }
-                    .hide-mobile { display: none; }
-                    .btn-submit, .btn-cancel { flex: 1 1 100%; }
+                .btn-cancel {
+                    flex: 1.5;
+                    padding: 14px;
+                    background: #F1F5F9;
+                    color: #64748B;
+                    border: none;
+                    border-radius: 10px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 16px;
                 }
+
+
+                /* ===== MOBILE ===== */
+                @media (max-width: 850px) {
+
+                    .form-page-wrapper {
+                        padding: 10px;
+                    }
+
+                    .container-card {
+                        border-radius: 12px;
+                        padding: 18px;
+                    }
+
+                    .form-grid {
+                        grid-template-columns: 1fr;
+                        gap: 15px;
+                    }
+
+                    .form-actions {
+                        flex-direction: column;
+                    }
+
+                    .btn-submit,
+                    .btn-cancel {
+                        width: 100%;
+                    }
+
+                    .hide-mobile {
+                        display: none;
+                    }
+                }
+
             `}</style>
         </div>
     );

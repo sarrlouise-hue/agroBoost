@@ -185,6 +185,36 @@ function ServicesPage() {
 
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@600&display=swap');
+                html, body, #root {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                overflow-x: hidden;
+            }
+
+            *, *::before, *::after {
+                box-sizing: border-box;
+            }
+
+            .main-page-wrapper {
+                width: 100%;
+                max-width: 100vw;
+                overflow-x: hidden;
+            }
+
+            .container-card {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .table-responsive {
+                width: 100%;
+                overflow-x: hidden;
+            }
+
+            .mobile-service-card {
+                width: 100%;
+            }
 
                 .main-page-wrapper {
                     background-color: ${BACKGROUND_COLOR};

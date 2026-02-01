@@ -40,7 +40,7 @@ function ServiceDetailsPage() {
                 {/* Barre de navigation */}
                 <div className="nav-bar">
                     <button onClick={() => navigate(-1)} className="back-btn">
-                        <FaArrowLeft /> <span>Retour</span>
+                        <FaArrowLeft /> <span>Retour à la liste</span>
                     </button>
                     {/*<Link to={`/services/edit/${id}`} className="edit-link">
                         <button className="edit-btn">
@@ -121,6 +121,33 @@ function ServiceDetailsPage() {
             </div>
 
             <style>{`
+                html, body, #root {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                overflow-x: hidden;
+            }
+
+            *, *::before, *::after {
+                box-sizing: border-box;
+            }
+
+            .container-max,
+            .details-card,
+            .image-section,
+            .info-section {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            img {
+                max-width: 100%;
+                display: block;
+            }
+
+            .thumbnail-img {
+                flex-shrink: 0;
+            }
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap');
 
                 .details-page-wrapper {
@@ -241,7 +268,7 @@ function ServiceDetailsPage() {
                 .status-pill.unavailable { background: #FEF2F2; color: #DC2626; }
 
                 .section-label { font-size: 14px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-                .description-box p { color: #475569; lineHeight: 1.7; font-size: 15px; margin: 0; }
+                .description-box p { color: #475569; line-height: 1.7; font-size: 15px; margin: 0; }
                 .description-box { margin-bottom: 30px; }
 
                 /* GRID INFO */

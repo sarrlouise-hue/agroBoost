@@ -5,13 +5,12 @@ import api from "../services/api";
 import logo from "../assets/logo.png";
 
 const COLORS = {
-    primary: "#3A7C35", // Vert principal
+    primary: "#3A7C35",
     darkGreen: "#2B7133",
-    lightGreen: "#E8F5E9",
-    lightBg: "#FDFAF8",
+    lightBg: "#F9FAF9",
     textDark: "#1A1A1A",
-    textLight: "#8C8C8C",
-    border: "#E8E8E8",
+    textLight: "#7A7A7A",
+    border: "#E0E0E0",
     white: "#FFFFFF",
     error: "#E74C3C"
 };
@@ -29,10 +28,7 @@ const LoginPage = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await api.post("/auth/login", {
-                phoneNumber: phone,
-                password,
-            });
+            const response = await api.post("/auth/login", { phoneNumber: phone, password });
             const token = response.data.data.token;
             if (!token) throw new Error("Token non reçu.");
             localStorage.setItem("agroboost_admin_token", token);
@@ -48,18 +44,16 @@ const LoginPage = () => {
     return (
         <div style={styles.pageWrapper}>
             <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap');
                 input:focus {
                     outline: none;
                     border-color: ${COLORS.primary} !important;
-                    background-color: ${COLORS.white} !important;
                     box-shadow: 0 0 0 4px rgba(58, 124, 53, 0.15);
                 }
                 button:active { transform: scale(0.98); }
             `}</style>
 
             <div style={styles.card}>
-                {/* Section Header avec Logo Agrandi */}
                 <div style={styles.headerSection}>
                     <div style={styles.logoCircle}>
                         <img src={logo} alt="Logo" style={styles.logoImg} />
@@ -75,7 +69,6 @@ const LoginPage = () => {
                         </div>
                     )}
 
-                    {/* Champ Téléphone */}
                     <div style={styles.inputGroup}>
                         <label style={styles.label}>Numéro de téléphone</label>
                         <div style={styles.inputWrapper}>
@@ -91,7 +84,6 @@ const LoginPage = () => {
                         </div>
                     </div>
 
-                    {/* Champ Mot de passe */}
                     <div style={styles.inputGroup}>
                         <label style={styles.label}>Mot de passe</label>
                         <div style={styles.inputWrapper}>
@@ -137,48 +129,49 @@ const styles = {
         alignItems: "center",
         minHeight: "100vh",
         backgroundColor: COLORS.lightBg,
-        padding: "24px",
+        padding: "16px",
         fontFamily: "'Inter', sans-serif",
     },
     card: {
         width: "100%",
-        maxWidth: "460px",
+        maxWidth: "400px",
         backgroundColor: COLORS.white,
-        borderRadius: "32px",
-        padding: "50px 40px",
-        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.05)",
+        borderRadius: "24px",
+        padding: "40px 30px",
+        boxShadow: "0 15px 40px rgba(0,0,0,0.05)",
         textAlign: "center",
+        boxSizing: "border-box",
     },
     headerSection: {
-        marginBottom: "45px",
+        marginBottom: "35px",
     },
     logoCircle: {
-        width: "110px", // Agrandissement du logo
-        height: "110px",
+        width: "90px",
+        height: "90px",
         margin: "0 auto 20px",
-        backgroundColor: COLORS.lightWhite, 
+        backgroundColor: COLORS.white,
         borderRadius: "50%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "15px",
-        border: `2px solid ${COLORS.primary}20`, 
+        border: `2px solid ${COLORS.primary}30`,
+        boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+        padding: "8px",
     },
     logoImg: {
-        width: "100%",
-        height: "100%",
+        width: "70px",
+        height: "70px",
         objectFit: "contain",
     },
     title: {
         fontFamily: "'Poppins', sans-serif",
-        fontSize: "28px", 
-        fontWeight: "800",
-        color: COLORS.primary, 
+        fontSize: "24px",
+        fontWeight: "700",
+        color: COLORS.primary,
         margin: "0 0 5px 0",
-        letterSpacing: "-0.5px",
     },
     subtitle: {
-        fontSize: "15px",
+        fontSize: "14px",
         fontWeight: "500",
         color: COLORS.textLight,
         margin: 0,
@@ -187,15 +180,14 @@ const styles = {
         textAlign: "left",
     },
     inputGroup: {
-        marginBottom: "28px",
+        marginBottom: "22px",
     },
     label: {
-        fontSize: "14px",
+        fontSize: "13px",
         fontWeight: "600",
         color: COLORS.textDark,
-        marginBottom: "10px",
+        marginBottom: "6px",
         display: "block",
-        marginLeft: "4px",
     },
     inputWrapper: {
         position: "relative",
@@ -204,15 +196,15 @@ const styles = {
     },
     inputIcon: {
         position: "absolute",
-        left: "16px",
-        color: COLORS.primary, 
-        fontSize: "20px",
+        left: "14px",
+        color: COLORS.primary,
+        fontSize: "18px",
     },
     input: {
         width: "100%",
-        padding: "16px 16px 16px 52px",
-        fontSize: "16px",
-        borderRadius: "16px",
+        padding: "14px 14px 14px 46px",
+        fontSize: "15px",
+        borderRadius: "12px",
         border: `1.5px solid ${COLORS.border}`,
         backgroundColor: "#F9F9F9",
         transition: "all 0.3s ease",
@@ -220,7 +212,7 @@ const styles = {
     },
     eyeIcon: {
         position: "absolute",
-        right: "16px",
+        right: "14px",
         cursor: "pointer",
         color: COLORS.textLight,
         display: "flex",
@@ -228,36 +220,36 @@ const styles = {
     },
     submitBtn: {
         width: "100%",
-        padding: "18px",
-        borderRadius: "16px",
+        padding: "16px",
+        borderRadius: "12px",
         border: "none",
         color: COLORS.white,
-        fontSize: "16px",
+        fontSize: "15px",
         fontWeight: "700",
         fontFamily: "'Poppins', sans-serif",
         marginTop: "15px",
         cursor: "pointer",
         transition: "all 0.3s ease",
-        boxShadow: `0 8px 20px rgba(58, 124, 53, 0.25)`,
+        boxShadow: `0 6px 18px rgba(58, 124, 53, 0.2)`,
     },
     errorAlert: {
         backgroundColor: "#FDEDEC",
         color: COLORS.error,
-        padding: "14px",
+        padding: "12px",
         borderRadius: "12px",
         fontSize: "13px",
-        marginBottom: "25px",
+        marginBottom: "20px",
         border: `1px solid rgba(231, 76, 60, 0.1)`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
     },
     footer: {
-        marginTop: "50px",
+        marginTop: "35px",
         fontSize: "12px",
         color: COLORS.textLight,
         fontWeight: "500",
-    }
+    },
 };
 
 export default LoginPage;

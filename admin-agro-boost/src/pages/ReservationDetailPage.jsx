@@ -5,7 +5,6 @@ import {
     FiArrowLeft, FiTruck, FiUser, FiCalendar, FiRefreshCcw, FiMail, FiMapPin, FiCreditCard, FiFileText
 } from 'react-icons/fi';
 
-// Palette de couleurs Agricole 
 const PRIMARY_COLOR = '#3A7C35';
 const SECONDARY_COLOR = '#709D54';
 const BACKGROUND_COLOR = '#FDFAF8';
@@ -15,7 +14,7 @@ function ReservationDetailPage() {
     const navigate = useNavigate();
     const [reservation, setReservation] = useState(null);
     const [servicesList, setServicesList] = useState([]);
-    const [usersList, setUsersList] = useState([]); 
+    const [usersList, setUsersList] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -25,9 +24,8 @@ function ReservationDetailPage() {
                 const [resDetail, resServices, resUsers] = await Promise.all([
                     api.get(`/bookings/${id}`),
                     api.get('/services?limit=100'),
-                    api.get('/users?limit=1000') 
+                    api.get('/users?limit=1000')
                 ]);
-
                 setReservation(resDetail.data.data || resDetail.data);
                 setServicesList(resServices.data.data || resServices.data || []);
                 setUsersList(resUsers.data.data || resUsers.data || []);
@@ -46,7 +44,7 @@ function ReservationDetailPage() {
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
     );
-    
+
     if (!reservation) return <div style={{ textAlign: 'center', padding: '100px', color: '#64748B' }}>Réservation introuvable.</div>;
 
     const serviceName = servicesList.find(s => (s._id || s.id) === reservation.serviceId)?.name || "Service inconnu";
@@ -69,8 +67,9 @@ function ReservationDetailPage() {
                 .back-btn {
                     display: flex;
                     align-items: center;
+                    justify-content: center;
                     gap: 8px;
-                    padding: 12px 20px;
+                    padding: 12px 14px;
                     background-color: white;
                     border: 1px solid #E2E8F0;
                     border-radius: 12px;
@@ -81,6 +80,7 @@ function ReservationDetailPage() {
                     margin-bottom: 25px;
                     transition: all 0.2s;
                     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+                    width: fit-content;
                 }
                 .back-btn:hover {
                     color: ${PRIMARY_COLOR};
@@ -139,26 +139,28 @@ function ReservationDetailPage() {
                 .data-row label { color: #94A3B8; font-weight: 600; }
                 .data-row value { text-align: right; color: #1E293B; font-weight: 700; }
 
-                /* RESPONSIVE MOBILE */
                 @media (max-width: 900px) {
-                    .page-wrapper { padding: 0; }
+                    .page-wrapper { padding: 15px; }
                     .detail-card { 
-                        border-radius: 0; 
+                        border-radius: 20px; 
                         padding: 20px; 
-                        min-height: 100vh;
+                        min-height: auto;
                     }
                     .info-grid { grid-template-columns: 1fr; gap: 20px; }
                     .header-flex { flex-direction: column; align-items: flex-start; gap: 15px; }
                     .data-row { flex-direction: column; gap: 5px; }
                     .data-row value { text-align: left; }
+                    .back-btn span { display: none; } /* masque le texte sur mobile */
                 }
             `}</style>
 
-            <div className="detail-card">
-                <button className="back-btn" onClick={() => navigate('/reservations')}>
-                    <FiArrowLeft size={18} /> Retour aux réservations
-                </button>
+            {/* BOUTON RETOUR EN DEHORS DE LA CARTE */}
+            <button className="back-btn" onClick={() => navigate('/reservations')}>
+                <FiArrowLeft size={18} />
+                <span>Retour aux réservations</span>
+            </button>
 
+            <div className="detail-card">
                 <div className="header-flex">
                     <div>
                         <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', color: '#1E293B', margin: 0, fontWeight: '800' }}>
@@ -175,7 +177,6 @@ function ReservationDetailPage() {
                 </div>
 
                 <div className="info-grid">
-                    {/* COLONNE GAUCHE : SERVICE & PAIEMENT */}
                     <div className="section-box">
                         <h3 className="section-title"><FiTruck /> Service & Paiement</h3>
                         <div className="data-row">
@@ -196,7 +197,6 @@ function ReservationDetailPage() {
                         </div>
                     </div>
 
-                    {/* COLONNE DROITE : CLIENT */}
                     <div className="section-box">
                         <h3 className="section-title"><FiUser /> Informations Client</h3>
                         <div className="data-row">
@@ -216,7 +216,6 @@ function ReservationDetailPage() {
                     </div>
                 </div>
 
-                {/* LOGISTIQUE & LOCALISATION */}
                 <div className="section-box" style={{ marginTop: '30px' }}>
                     <h3 className="section-title"><FiMapPin /> Logistique & Localisation</h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
