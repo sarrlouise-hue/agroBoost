@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _isBalanceHidden = false;
 
-  bool _isMapView = true;
+  bool _isMapView = false;
 
   String _selectedFilter = 'all';
 

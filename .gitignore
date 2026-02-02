@@ -23,6 +23,18 @@ migrate_working_dir/
 # is commented out by default.
 #.vscode/
 
+# Signing files and build artifacts
+/ios/Flutter/Generated.xcconfig
+/ios/Flutter/flutter_export_environment.sh
+/ios/Flutter/App.framework
+/ios/Flutter/Flutter.framework
+/ios/Flutter/Flutter.podspec
+/android/key.properties
+/android/app/*.jks
+*.jks
+*.keystore
+/android/local.properties
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id

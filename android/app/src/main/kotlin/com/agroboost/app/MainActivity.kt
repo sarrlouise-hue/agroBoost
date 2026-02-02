@@ -1,4 +1,4 @@
-package com.example.hallo
+package com.agroboost.app
 
 import io.flutter.embedding.android.FlutterActivity
 
