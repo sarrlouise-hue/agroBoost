@@ -1,10 +1,10 @@
 require("dotenv").config();
 
 module.exports = {
-	NODE_ENV: process.env.NODE_ENV || "development",
+	NODE_ENV: process.env.NODE_ENV || "production",
 	PORT: process.env.PORT || 3000,
 
-	// Database PostgreSQL
+	// Database PostgreSQL (SUPABASE / PROD)
 	DB: {
 		URI:
 			process.env.DATABASE_URL ||
@@ -12,25 +12,26 @@ module.exports = {
 			(() => {
 				const user = process.env.DB_USER || "postgres";
 				const password = String(process.env.DB_PASSWORD || "");
-				const host = process.env.DB_HOST || "127.0.0.1";
+				const host = process.env.DB_HOST || "db.gyhtitfioznegorynesn.supabase.co";
 				const port = process.env.DB_PORT || 5432;
-				const name = process.env.DB_NAME || "agroboost";
-				// Encoder le mot de passe pour l'URL si nécessaire
+				const name = process.env.DB_NAME || "postgres";
+
 				const encodedPassword = encodeURIComponent(password);
+
 				return `postgresql://${user}:${encodedPassword}@${host}:${port}/${name}`;
 			})(),
-		HOST: process.env.DB_HOST || "127.0.0.1",
+		HOST: process.env.DB_HOST || "db.gyhtitfioznegorynesn.supabase.co",
 		PORT: process.env.DB_PORT || 5432,
 		USER: process.env.DB_USER || "postgres",
-		PASSWORD: String(process.env.DB_PASSWORD || ""), // S'assurer que c'est toujours une chaîne
-		NAME: process.env.DB_NAME || "agroboost",
+		PASSWORD: String(process.env.DB_PASSWORD || ""),
+		NAME: process.env.DB_NAME || "postgres",
 	},
 
 	// JWT
 	JWT: {
-		SECRET: process.env.JWT_SECRET || "your-secret-key",
+		SECRET: process.env.JWT_SECRET || "CHANGE_ME_STRONG_SECRET",
 		EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",
-		REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || "your-refresh-secret",
+		REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || "CHANGE_ME_REFRESH_SECRET",
 		REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || "30d",
 	},
 
@@ -40,17 +41,17 @@ module.exports = {
 		LENGTH: parseInt(process.env.OTP_LENGTH, 10) || 6,
 	},
 
-	// Redis
+	// Redis (optionnel prod)
 	REDIS: {
-		URL: process.env.REDIS_URL || "redis://localhost:6379",
+		URL: process.env.REDIS_URL || "",
 	},
 
-	// PayTech Mobile Money
+	// PayTech
 	PAYTECH: {
 		API_KEY: process.env.PAYTECH_API_KEY || "",
 		API_SECRET: process.env.PAYTECH_API_SECRET || "",
 		BASE_URL: process.env.PAYTECH_BASE_URL || "https://paytech.sn",
-		ENV: process.env.PAYTECH_ENV || "test",
+		ENV: process.env.PAYTECH_ENV || "production",
 		IPN_URL: process.env.PAYTECH_IPN_URL || "",
 		SUCCESS_URL: process.env.PAYTECH_SUCCESS_URL || "",
 		CANCEL_URL: process.env.PAYTECH_CANCEL_URL || "",
@@ -67,9 +68,9 @@ module.exports = {
 		PROJECT_ID: process.env.FIREBASE_PROJECT_ID || "",
 	},
 
-	// File Upload
+	// Upload
 	UPLOAD: {
-		MAX_FILE_SIZE: parseInt(process.env.MAX_FILE_SIZE, 10) || 5242880, // 5MB
+		MAX_FILE_SIZE: parseInt(process.env.MAX_FILE_SIZE, 10) || 5242880,
 		PATH: process.env.UPLOAD_PATH || "./uploads",
 	},
 
@@ -80,29 +81,28 @@ module.exports = {
 		API_SECRET: process.env.CLOUDINARY_API_SECRET || "",
 	},
 
-	// Rate Limiting
+	// Rate Limit
 	RATE_LIMIT: {
-		WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 900000, // 15 minutes
+		WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 900000,
 		MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS, 10) || 100,
 	},
 
-	// URLs
-	API_URL: process.env.API_URL || "http://localhost:3000",
-	FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:3001",
-	ADMIN_URL: process.env.ADMIN_URL || "http://localhost:3002",
+	// URLs PRODUCTION
+	API_URL: process.env.API_URL || "https://agro-boost-ruddy.vercel.app",
+	FRONTEND_URL: process.env.FRONTEND_URL || "https://allotracteur.com",
+	ADMIN_URL: process.env.ADMIN_URL || "https://admin.allotracteur.com",
 
-	// Email
+	// Email (PRODUCTION)
 	EMAIL: {
 		HOST: process.env.EMAIL_HOST || "smtp.gmail.com",
 		PORT: parseInt(process.env.EMAIL_PORT, 10) || 587,
-		SECURE: process.env.EMAIL_SECURE === "true" || false, // true pour 465, false pour les autres ports
+		SECURE: process.env.EMAIL_SECURE === "true",
 		USER: process.env.EMAIL_USER || "",
 		PASSWORD: process.env.EMAIL_PASSWORD || "",
 		FROM_EMAIL: process.env.EMAIL_FROM_EMAIL || process.env.EMAIL_USER || "",
 		FROM_NAME: process.env.EMAIL_FROM_NAME || "AlloTracteur",
 		APP_NAME: process.env.EMAIL_APP_NAME || "AlloTracteur",
-		SUPPORT_EMAIL:
-			process.env.EMAIL_SUPPORT_EMAIL || process.env.EMAIL_USER || "",
-		FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:3001",
+		SUPPORT_EMAIL: process.env.EMAIL_SUPPORT_EMAIL || "",
+		FRONTEND_URL: process.env.FRONTEND_URL || "https://allotracteur.com",
 	},
 };
