@@ -90,7 +90,7 @@ module.exports = {
 	// URLs PRODUCTION
 	API_URL: process.env.API_URL || "https://agro-boost-ruddy.vercel.app",
 	FRONTEND_URL: process.env.FRONTEND_URL || "https://allotracteur.com",
-	ADMIN_URL: process.env.ADMIN_URL || "https://admin.allotracteur.com",
+	ADMIN_URL: process.env.ADMIN_URL || "https://admin.allotracteur.com/",
 
 	// Email (PRODUCTION)
 	EMAIL: {
