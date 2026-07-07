@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "../../router";
 import { useAuth } from "../../contexts/AuthContext";
-import { Menu, X, Tractor, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard } from "lucide-react";
 
 export const Header: React.FC = () => {
 	const { user, profile, signOut } = useAuth();
@@ -24,8 +24,13 @@ export const Header: React.FC = () => {
 					<Link to="/" className="flex items-center space-x-3 group">
 						<div className="relative">
 							<div className="absolute inset-0 bg-green-600 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity"></div>
-							<div className="relative bg-gradient-to-br from-green-500 to-green-700 p-2 rounded-xl shadow-lg transform group-hover:scale-110 transition-transform">
-								<Tractor className="w-7 h-7 text-white" />
+							<div className="relative bg-gradient-to-br from-green-500 to-green-700 p-2 rounded-xl shadow-lg transform group-hover:scale-110 transition-transform overflow-hidden">
+								<img
+									src="/TRACTLOGO.jpg"
+									alt="TRACTLOGO"
+									className="w-7 h-7 object-contain rounded"
+									style={{ filter: "brightness(1.05) saturate(1.05)" }}
+								/>
 							</div>
 						</div>
 						<div className="flex flex-col">
