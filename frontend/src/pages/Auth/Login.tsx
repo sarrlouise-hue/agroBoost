@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useRouter } from "../../router";
 import { useAuth } from "../../contexts/AuthContext";
-import { Tractor, Mail, Lock, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export const Login: React.FC = () => {
 	const { signIn } = useAuth();
@@ -21,26 +21,45 @@ export const Login: React.FC = () => {
 		try {
 			await signIn(email, password);
 			navigate("/dashboard");
-		} catch (err: any) {
-			setError(err.message || "Email ou mot de passe incorrect");
+		} catch (err: unknown) {
+			const message =
+				typeof err === "object" && err !== null && "message" in err
+					? String((err as { message?: unknown }).message ?? "")
+					: "";
+			setError(message || "Email ou mot de passe incorrect");
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	return (
-		<div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
-			<div className="max-w-[420px] w-full bg-white rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-gray-100 p-8 sm:p-10">
+		<div className="min-h-screen relative overflow-hidden flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
+			{/* Background */}
+			<div
+				aria-hidden="true"
+				className="absolute inset-0"
+				style={{
+					backgroundImage: "url('/TRACTOR.jpg')",
+					backgroundSize: "cover",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+					filter: "saturate(1.05)",
+				}}
+			/>
+			{/* Overlay */}
+			<div
+				aria-hidden="true"
+				className="absolute inset-0"
+				style={{ background: "rgba(255, 255, 255, 0.82)" }}
+			/>
+
+			<div className="relative z-10 max-w-[420px] w-full bg-white rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-gray-100 p-8 sm:p-10">
 				{/* Header Section */}
 				<div className="text-center mb-8">
 					<Link
 						to="/"
 						className="flex items-center justify-center gap-2 mb-6 group"
 					>
-						<Tractor
-							className="w-8 h-8 text-green-600 group-hover:scale-110 transition-transform"
-							strokeWidth={2.5}
-						/>
 						<span className="text-2xl font-bold text-gray-900">
 							AlloTracteur
 						</span>
