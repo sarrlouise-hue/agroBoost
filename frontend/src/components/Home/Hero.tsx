@@ -8,97 +8,98 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ totalCount }) => {
   return (
-    <section className="relative overflow-hidden min-h-[92vh] lg:min-h-[720px] flex items-center">
+    <section className="relative h-[calc(100vh-80px)] min-h-[700px] overflow-hidden">
 
-      {/* Background */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/trac.png')",
-        }}
+      {/* Image */}
+      <img
+        src="/trac.png"
+        alt="Tracteur"
+        className="absolute inset-0 h-full w-full object-cover object-[78%_center] lg:object-right"
       />
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/45 lg:bg-gradient-to-r lg:from-white/90 lg:via-white/55 lg:to-black/25" />
+      {/* Overlay Mobile */}
+      <div className="absolute inset-0 bg-black/45 lg:hidden" />
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6">
+      {/* Overlay Desktop */}
+      <div className="absolute inset-0 hidden lg:block bg-gradient-to-r from-white/90 via-white/55 to-transparent" />
 
-        <div className="max-w-2xl py-16 lg:py-24">
+      {/* Contenu */}
+      <div className="relative z-10 flex h-full items-center">
+        <div className="mx-auto w-full max-w-7xl px-6">
 
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 font-semibold shadow">
-            <Star className="w-4 h-4 fill-current" />
-            Plateforme N°1 au Sénégal
-          </div>
+          <div className="max-w-xl">
 
-          {/* Title */}
-          <h1 className="mt-6 text-[44px] sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-white lg:text-gray-900">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 rounded-full bg-green-100 px-5 py-2 font-medium text-green-700 shadow-lg">
+              <Star className="h-4 w-4 fill-current" />
+              Plateforme N°1 au Sénégal
+            </div>
 
-            Louez du matériel agricole
+            {/* Titre */}
+            <h1 className="mt-8 text-5xl font-black leading-tight text-white lg:text-6xl lg:text-gray-900">
+              Louez du matériel agricole
 
-            <span className="block text-green-300 lg:text-green-600">
-              en toute simplicité
-            </span>
+              <span className="mt-2 block text-green-300 lg:text-green-600">
+                en toute simplicité
+              </span>
+            </h1>
 
-          </h1>
+            {/* Description */}
+            <p className="mt-6 text-xl leading-relaxed text-white lg:text-gray-700">
+              La première place de marché pour l'agriculture au Sénégal.
+            </p>
 
-          {/* Subtitle */}
-          <p className="mt-6 text-lg lg:text-xl leading-relaxed text-white lg:text-gray-700 max-w-xl">
-            La première place de marché pour l'agriculture au Sénégal.
-          </p>
+            {/* Boutons */}
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
 
-          {/* Buttons */}
-          <div className="mt-10 flex flex-col sm:flex-row gap-4">
+              <Link to="/machines" className="w-full sm:w-auto">
+                <button className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-green-600 px-8 font-semibold text-white shadow-xl transition hover:bg-green-700 hover:scale-[1.02]">
 
-            <Link to="/machines" className="w-full sm:w-auto">
-              <button className="w-full sm:w-auto h-14 px-8 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold flex items-center justify-center gap-3 shadow-xl transition-all duration-300 hover:scale-105">
+                  <Search className="h-5 w-5" />
 
-                <Search className="w-5 h-5" />
+                  Rechercher du matériel
 
-                Rechercher du matériel
+                  <ArrowRight className="h-5 w-5" />
 
-                <ArrowRight className="w-5 h-5" />
+                </button>
+              </Link>
 
-              </button>
-            </Link>
+              <Link to="/register" className="w-full sm:w-auto">
+                <button className="h-14 w-full rounded-xl bg-white px-8 font-semibold text-green-700 shadow-xl transition hover:bg-green-50 hover:scale-[1.02]">
 
-            <Link to="/register" className="w-full sm:w-auto">
-              <button className="w-full sm:w-auto h-14 px-8 rounded-xl bg-white/90 backdrop-blur border border-white hover:bg-white text-green-700 font-semibold shadow-xl transition-all duration-300 hover:scale-105">
+                  Devenir prestataire
 
-                Devenir prestataire
-
-              </button>
-            </Link>
-
-          </div>
-
-          {/* Card */}
-          {totalCount > 0 && (
-
-            <div className="mt-10 inline-flex items-center gap-4 bg-white/95 backdrop-blur-xl rounded-2xl px-5 py-4 shadow-2xl">
-
-              <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-                <Tractor className="w-6 h-6 text-green-600" />
-              </div>
-
-              <div>
-
-                <h3 className="text-2xl font-bold text-gray-900">
-                  {totalCount}+
-                </h3>
-
-                <p className="text-gray-500 text-sm">
-                  Machines disponibles
-                </p>
-
-              </div>
+                </button>
+              </Link>
 
             </div>
 
-          )}
+            {/* Statistique */}
+            {totalCount > 0 && (
+              <div className="mt-10 inline-flex items-center gap-4 rounded-2xl bg-white p-5 shadow-2xl">
+
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-green-100">
+                  <Tractor className="h-7 w-7 text-green-600" />
+                </div>
+
+                <div>
+
+                  <div className="text-3xl font-bold">
+                    {totalCount}+
+                  </div>
+
+                  <div className="text-gray-500">
+                    Machines disponibles
+                  </div>
+
+                </div>
+
+              </div>
+            )}
+
+          </div>
 
         </div>
-
       </div>
 
     </section>
