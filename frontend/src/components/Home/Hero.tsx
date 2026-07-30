@@ -1,90 +1,94 @@
 import React from "react";
 import { Link } from "../../router";
-import { Search, Tractor, Star } from "lucide-react";
+import { Search, Tractor, Star, ArrowRight } from "lucide-react";
 
 interface HeroProps {
-	totalCount: number;
+  totalCount: number;
 }
 
 export const Hero: React.FC<HeroProps> = ({ totalCount }) => {
-	return (
-		<section className="relative overflow-hidden">
-			{/* Background tractor image, full-bleed like the production site */}
-			<div
-				aria-hidden="true"
-				className="absolute inset-0"
-				style={{
-					backgroundImage: "url('https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6Im1fNmE0ZDRkYWJjZjcwODE5MWEyMzg0YzExYmRiNzdmYzU6ZmlsZV8wMDAwMDAwMGI1Mzg3MWY0OWY0YTViMGQyNjExMDc2YSIsImdpem1vX2lkIjpudWxsLCJ3aWQiOm51bGwsIm9pZCI6bnVsbCwidHMiOiIyMDY2NCIsInAiOiJweWkiLCJjaWQiOiIxIiwic2lnIjoiYjFiYjdkOGIzMTdhY2JhNTM0OTdjNmViYzExMjY5YjgyM2QxYTgxMzUyNzc4ZTE4MzU1MmJkNzQ1OTMzYjVmNiIsInYiOiIwIiwiY3MiOm51bGwsImNkbiI6bnVsbCwiZm4iOm51bGwsImNkIjpudWxsLCJjcCI6bnVsbCwibWEiOm51bGx9')",
-					backgroundSize: "cover",
-					backgroundPosition: "center",
-					backgroundRepeat: "no-repeat",
-					filter: "saturate(1.05)",
-				}}
-			/>
+  return (
+    <section className="relative overflow-hidden min-h-[700px] flex items-center">
 
-			{/* Overlay for text readability, lighter at top (behind badge/heading), darker toward bottom (behind text/buttons) */}
-			<div
-				aria-hidden="true"
-				className="absolute inset-0"
-				style={{
-					background:
-						"linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 35%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0.55) 100%)",
-				}}
-			/>
+      {/* Background */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            "url('https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6Im1fNmE0ZDRkYWJjZjcwODE5MWEyMzg0YzExYmRiNzdmYzU6ZmlsZV8wMDAwMDAwMGI1Mzg3MWY0OWY0YTViMGQyNjExMDc2YSIsImdpem1vX2lkIjpudWxsLCJ3aWQiOm51bGwsIm9pZCI6bnVsbCwidHMiOiIyMDY2NCIsInAiOiJweWkiLCJjaWQiOiIxIiwic2lnIjoiYjFiYjdkOGIzMTdhY2JhNTM0OTdjNmViYzExMjY5YjgyM2QxYTgxMzUyNzc4ZTE4MzU1MmJkNzQ1OTMzYjVmNiIsInYiOiIwIiwiY3MiOm51bGwsImNkbiI6bnVsbCwiZm4iOm51bGwsImNkIjpudWxsLCJjcCI6bnVsbCwibWEiOm51bGx9')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
 
-			<div className="relative z-10">
-				<div className="max-w-3xl mx-auto px-4 py-10 sm:py-16 lg:py-24 text-center sm:text-left">
-					<div className="space-y-6">
-						<div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full text-green-700 text-sm font-medium">
-							<Star className="w-4 h-4 fill-current" />
-							<span>Plateforme N° 1 au Sénégal</span>
-						</div>
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/55 to-black/20"></div>
 
-						<h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-							Louez du matériel agricole
-							<span className="block text-green-600 mt-1">
-								en toute simplicité
-							</span>
-						</h1>
+      <div className="relative z-10 max-w-7xl mx-auto w-full px-6">
+        <div className="max-w-2xl">
 
-						<p className="text-lg sm:text-xl text-white font-medium leading-relaxed drop-shadow-sm">
-							La première place de marché pour l'agriculture au Sénégal
-						</p>
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 font-medium text-sm shadow">
+            <Star className="w-4 h-4 fill-current" />
+            Plateforme N°1 au Sénégal
+          </div>
 
-						<div className="flex flex-col gap-4 pt-2">
-							<Link to="/machines" className="w-full">
-								<button className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
-									<Search className="w-5 h-5" />
-									Rechercher du matériel
-									<span aria-hidden="true">→</span>
-								</button>
-							</Link>
+          {/* Title */}
+          <h1 className="mt-6 text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900">
+            Louez du matériel agricole
+            <span className="block text-green-600 mt-2">
+              en toute simplicité
+            </span>
+          </h1>
 
-							<Link to="/register" className="w-full">
-								<button className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
-									Devenir prestataire
-								</button>
-							</Link>
-						</div>
+          {/* Subtitle */}
+          <p className="mt-6 text-xl text-gray-700 leading-relaxed">
+            La première plateforme de location de matériel agricole
+            reliant propriétaires et agriculteurs partout au Sénégal.
+          </p>
 
-						{totalCount > 0 && (
-							<div className="inline-flex items-center gap-3 pt-2 bg-white/90 backdrop-blur-sm px-4 py-3 rounded-xl shadow-md">
-								<div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-									<Tractor className="w-5 h-5 text-green-600" />
-								</div>
-								<div className="text-left">
-									<p className="text-lg font-bold text-gray-900 leading-none">
-										{totalCount}+
-									</p>
-									<p className="text-xs text-gray-600 mt-0.5">
-										Machines disponibles
-									</p>
-								</div>
-							</div>
-						)}
-					</div>
-				</div>
-			</div>
-		</section>
-	);
+          {/* Buttons */}
+          <div className="mt-10 flex flex-col sm:flex-row gap-4">
+
+            <Link to="/machines">
+              <button className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg transition-all hover:scale-105">
+                <Search size={20} />
+                Rechercher du matériel
+                <ArrowRight size={18} />
+              </button>
+            </Link>
+
+            <Link to="/register">
+              <button className="flex items-center justify-center gap-2 border-2 border-green-600 text-green-700 hover:bg-green-600 hover:text-white font-semibold px-8 py-3 rounded-xl transition-all">
+                Devenir prestataire
+              </button>
+            </Link>
+
+          </div>
+
+          {/* Stats */}
+          {totalCount > 0 && (
+            <div className="mt-12 inline-flex items-center gap-4 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-5">
+
+              <div className="w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center">
+                <Tractor className="w-7 h-7 text-green-600" />
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {totalCount}+
+                </h3>
+
+                <p className="text-gray-600">
+                  Machines disponibles
+                </p>
+              </div>
+
+            </div>
+          )}
+
+        </div>
+      </div>
+    </section>
+  );
 };
