@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "../../router";
-import { Search, Tractor, ArrowRight, Star } from "lucide-react";
+import { Search, Tractor, Star } from "lucide-react";
 
 interface HeroProps {
 	totalCount: number;
@@ -9,7 +9,7 @@ interface HeroProps {
 export const Hero: React.FC<HeroProps> = ({ totalCount }) => {
 	return (
 		<section className="relative overflow-hidden">
-			{/* Background tractor for the whole HERO */}
+			{/* Background tractor image, full-bleed like the production site */}
 			<div
 				aria-hidden="true"
 				className="absolute inset-0"
@@ -22,132 +22,66 @@ export const Hero: React.FC<HeroProps> = ({ totalCount }) => {
 				}}
 			/>
 
-			{/* Overlay for readability */}
+			{/* Overlay for text readability, lighter at top (behind badge/heading), darker toward bottom (behind text/buttons) */}
 			<div
 				aria-hidden="true"
 				className="absolute inset-0"
-				style={{ background: "rgba(253, 250, 248, 0.45)" }}
+				style={{
+					background:
+						"linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 35%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0.55) 100%)",
+				}}
 			/>
 
-			{/* Decorative glowing blobs */}
-			<div className="absolute inset-0 opacity-10">
-				<div className="absolute top-0 left-0 w-96 h-96 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
-				<div
-					className="absolute top-0 right-0 w-96 h-96 bg-emerald-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"
-					style={{ animationDelay: "2s" }}
-				/>
-				<div
-					className="absolute bottom-0 left-1/2 w-96 h-96 bg-teal-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"
-					style={{ animationDelay: "4s" }}
-				/>
-			</div>
-
 			<div className="relative z-10">
-				<div className="max-w-7xl mx-auto px-4 py-10 sm:py-8">
-					<div className="grid lg:grid-cols-2 gap-12 items-center">
-						<div className="space-y-8">
-							<div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full text-green-700 text-sm font-medium">
-								<Star className="w-4 h-4 fill-current" />
-								<span>Plateforme N°1 au Sénégal</span>
-							</div>
+				<div className="max-w-3xl mx-auto px-4 py-10 sm:py-16 lg:py-24 text-center sm:text-left">
+					<div className="space-y-6">
+						<div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full text-green-700 text-sm font-medium">
+							<Star className="w-4 h-4 fill-current" />
+							<span>Plateforme N° 1 au Sénégal</span>
+						</div>
 
-							<h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-								Louez du matériel agricole
-								<span className="block text-green-600 mt-2">
-									en toute simplicité
-								</span>
-							</h1>
+						<h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+							Louez du matériel agricole
+							<span className="block text-green-600 mt-1">
+								en toute simplicité
+							</span>
+						</h1>
 
-							<p className="text-xl text-gray-600 leading-relaxed">
-								ALLOTRACTEUR connecte les producteurs agricoles aux prestataires
-								de services partout au Sénégal. Trouvez, réservez et utilisez le
-								matériel dont vous avez besoin.
-							</p>
+						<p className="text-lg sm:text-xl text-white font-medium leading-relaxed drop-shadow-sm">
+							La première place de marché pour l'agriculture au Sénégal
+						</p>
 
-							<div className="flex flex-col sm:flex-row gap-4">
-								<Link to="/machines">
-									<button className="group flex items-center justify-center gap-2 px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-										<Search className="w-5 h-5" />
-										Rechercher du matériel
-										<ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-									</button>
-								</Link>
+						<div className="flex flex-col gap-4 pt-2">
+							<Link to="/machines" className="w-full">
+								<button className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+									<Search className="w-5 h-5" />
+									Rechercher du matériel
+									<span aria-hidden="true">→</span>
+								</button>
+							</Link>
 
-								<Link to="/register">
-									<button className="flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-xl shadow-lg border-2 border-gray-200 hover:border-green-300 transition-all duration-200">
-										Devenir prestataire
-									</button>
-								</Link>
-							</div>
+							<Link to="/register" className="w-full">
+								<button className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+									Devenir prestataire
+								</button>
+							</Link>
+						</div>
 
-							<div className="flex items-center gap-8 pt-4">
-								<div className="flex -space-x-3">
-									<img
-										src="https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100"
-										alt="User"
-										className="w-10 h-10 rounded-full border-2 border-white object-cover"
-									/>
-									<img
-										src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
-										alt="User"
-										className="w-10 h-10 rounded-full border-2 border-white object-cover"
-									/>
-									<img
-										src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=100"
-										alt="User"
-										className="w-10 h-10 rounded-full border-2 border-white object-cover"
-									/>
-									<div className="w-10 h-10 rounded-full border-2 border-white bg-green-600 flex items-center justify-center text-white text-sm font-bold">
-										+500
-									</div>
+						{totalCount > 0 && (
+							<div className="inline-flex items-center gap-3 pt-2 bg-white/90 backdrop-blur-sm px-4 py-3 rounded-xl shadow-md">
+								<div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+									<Tractor className="w-5 h-5 text-green-600" />
 								</div>
-
-								<div>
-									<div className="flex gap-1">
-										{[...Array(5)].map((_, i) => (
-											<Star
-												key={i}
-												className="w-4 h-4 fill-yellow-400 text-yellow-400"
-											/>
-										))}
-									</div>
-									<p className="text-sm text-gray-600 mt-1">
-										500+ producteurs satisfaits
+								<div className="text-left">
+									<p className="text-lg font-bold text-gray-900 leading-none">
+										{totalCount}+
+									</p>
+									<p className="text-xs text-gray-600 mt-0.5">
+										Machines disponibles
 									</p>
 								</div>
 							</div>
-						</div>
-
-						{/* Right side decorative panel */}
-						<div className="relative">
-							<div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-600 rounded-3xl transform rotate-3" />
-
-							<div
-								aria-hidden="true"
-								className="relative rounded-3xl shadow-2xl w-full h-[500px] overflow-hidden"
-								style={{
-									backgroundImage: "url('/TRACTOR.jpg')",
-									backgroundSize: "cover",
-									backgroundPosition: "center",
-									backgroundRepeat: "no-repeat",
-								}}
-							/>
-
-							<div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl">
-								<div className="flex items-center gap-4">
-									<div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-										<Tractor className="w-6 h-6 text-green-600" />
-									</div>
-
-									<div>
-										<p className="text-2xl font-bold text-gray-900">
-											{totalCount || 0}+
-										</p>
-										<p className="text-sm text-gray-600">Machines disponibles</p>
-									</div>
-								</div>
-							</div>
-						</div>
+						)}
 					</div>
 				</div>
 			</div>
