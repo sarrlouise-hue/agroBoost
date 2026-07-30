@@ -56,7 +56,7 @@ export const Hero: React.FC<HeroProps> = ({ totalCount }) => {
 						{/* Boutons */}
 						<div className="flex flex-col gap-3 pt-3 max-w-md">
 
-							<Link to="/machines" className="w-full">
+							<Link to="/services" className="w-full">
 								<button className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
 
 									<Search className="w-4 h-4" />
