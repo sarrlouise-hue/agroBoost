@@ -14,7 +14,7 @@ export const Hero: React.FC<HeroProps> = ({ totalCount }) => {
 				aria-hidden="true"
 				className="absolute inset-0"
 				style={{
-					backgroundImage: "url('/TRACTOR.jpg')",
+					backgroundImage: "url('https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6Im1fNmE0ZDRkYWJjZjcwODE5MWEyMzg0YzExYmRiNzdmYzU6ZmlsZV8wMDAwMDAwMGI1Mzg3MWY0OWY0YTViMGQyNjExMDc2YSIsImdpem1vX2lkIjpudWxsLCJ3aWQiOm51bGwsIm9pZCI6bnVsbCwidHMiOiIyMDY2NCIsInAiOiJweWkiLCJjaWQiOiIxIiwic2lnIjoiYjFiYjdkOGIzMTdhY2JhNTM0OTdjNmViYzExMjY5YjgyM2QxYTgxMzUyNzc4ZTE4MzU1MmJkNzQ1OTMzYjVmNiIsInYiOiIwIiwiY3MiOm51bGwsImNkbiI6bnVsbCwiZm4iOm51bGwsImNkIjpudWxsLCJjcCI6bnVsbCwibWEiOm51bGx9')",
 					backgroundSize: "cover",
 					backgroundPosition: "center",
 					backgroundRepeat: "no-repeat",
