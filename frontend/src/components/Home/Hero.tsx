@@ -1,107 +1,94 @@
 import React from "react";
 import { Link } from "../../router";
-import { Search, Tractor, Star, ArrowRight } from "lucide-react";
+import { Search, Tractor, Star } from "lucide-react";
 
 interface HeroProps {
-  totalCount: number;
+	totalCount: number;
 }
 
 export const Hero: React.FC<HeroProps> = ({ totalCount }) => {
-  return (
-    <section className="relative h-[calc(100vh-80px)] min-h-[700px] overflow-hidden">
+	return (
+		<section className="relative overflow-hidden min-h-[650px] lg:min-h-[720px]">
+			{/* Background */}
+			<div
+				aria-hidden="true"
+				className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+				style={{
+					backgroundImage: "url('/trac.png')",
+				}}
+			/>
 
-      {/* Image */}
-      <img
-        src="/trac.png"
-        alt="Tracteur"
-        className="absolute inset-0 h-full w-full object-cover object-[78%_center] lg:object-right"
-      />
+			{/* Overlay */}
+			<div
+				aria-hidden="true"
+				className="absolute inset-0"
+				style={{
+					background:
+						"linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 35%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0.55) 100%)",
+				}}
+			/>
 
-      {/* Overlay Mobile */}
-      <div className="absolute inset-0 bg-black/45 lg:hidden" />
+			<div className="relative z-10">
+				<div className="max-w-3xl mx-auto px-4 py-12 sm:py-16 lg:py-24 text-center sm:text-left">
+					<div className="space-y-6">
+						{/* Badge */}
+						<div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full text-green-700 text-sm font-medium">
+							<Star className="w-4 h-4 fill-current" />
+							<span>Plateforme N° 1 au Sénégal</span>
+						</div>
 
-      {/* Overlay Desktop */}
-      <div className="absolute inset-0 hidden lg:block bg-gradient-to-r from-white/90 via-white/55 to-transparent" />
+						{/* Titre */}
+						<h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+							Louez du matériel agricole
+							<span className="block text-green-600 mt-2">
+								en toute simplicité
+							</span>
+						</h1>
 
-      {/* Contenu */}
-      <div className="relative z-10 flex h-full items-center">
-        <div className="mx-auto w-full max-w-7xl px-6">
+						{/* Description */}
+						<p className="text-lg sm:text-xl text-white font-medium leading-relaxed drop-shadow-sm">
+							La première place de marché pour l'agriculture au Sénégal
+						</p>
 
-          <div className="max-w-xl">
+						{/* Boutons */}
+						 <div className="flex flex-col gap-3 pt-3 max-w-md">
+	<Link to="/machines" className="w-full">
+		<button className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+			<Search className="w-4 h-4" />
+			Rechercher du matériel
+			<span className="text-lg">→</span>
+		</button>
+	</Link>
 
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-green-100 px-5 py-2 font-medium text-green-700 shadow-lg">
-              <Star className="h-4 w-4 fill-current" />
-              Plateforme N°1 au Sénégal
-            </div>
+	<Link to="/register" className="w-full">
+		<button className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white hover:bg-green-50 border-2 border-green-600 text-green-600 text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+			Devenir prestataire
+			<span className="text-lg">→</span>
+		</button>
+	</Link>
+</div>
 
-            {/* Titre */}
-            <h1 className="mt-8 text-5xl font-black leading-tight text-white lg:text-6xl lg:text-gray-900">
-              Louez du matériel agricole
+						{/* Statistiques */}
+						{totalCount > 0 && (
+							<div className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-sm px-4 py-3 rounded-xl shadow-md">
+								<div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+									<Tractor className="w-5 h-5 text-green-600" />
+								</div>
 
-              <span className="mt-2 block text-green-300 lg:text-green-600">
-                en toute simplicité
-              </span>
-            </h1>
+								<div className="text-left">
+									<p className="text-lg font-bold text-gray-900">
+										{totalCount}+
+									</p>
 
-            {/* Description */}
-            <p className="mt-6 text-xl leading-relaxed text-white lg:text-gray-700">
-              La première place de marché pour l'agriculture au Sénégal.
-            </p>
-
-            {/* Boutons */}
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-
-              <Link to="/machines" className="w-full sm:w-auto">
-                <button className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-green-600 px-8 font-semibold text-white shadow-xl transition hover:bg-green-700 hover:scale-[1.02]">
-
-                  <Search className="h-5 w-5" />
-
-                  Rechercher du matériel
-
-                  <ArrowRight className="h-5 w-5" />
-
-                </button>
-              </Link>
-
-              <Link to="/register" className="w-full sm:w-auto">
-                <button className="h-14 w-full rounded-xl bg-white px-8 font-semibold text-green-700 shadow-xl transition hover:bg-green-50 hover:scale-[1.02]">
-
-                  Devenir prestataire
-
-                </button>
-              </Link>
-
-            </div>
-
-            {/* Statistique */}
-            {totalCount > 0 && (
-              <div className="mt-10 inline-flex items-center gap-4 rounded-2xl bg-white p-5 shadow-2xl">
-
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-green-100">
-                  <Tractor className="h-7 w-7 text-green-600" />
-                </div>
-
-                <div>
-
-                  <div className="text-3xl font-bold">
-                    {totalCount}+
-                  </div>
-
-                  <div className="text-gray-500">
-                    Machines disponibles
-                  </div>
-
-                </div>
-
-              </div>
-            )}
-
-          </div>
-
-        </div>
-      </div>
-
-    </section>
-  );
+									<p className="text-xs text-gray-600">
+										Machines disponibles
+									</p>
+								</div>
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
+		</section>
+	);
 };
