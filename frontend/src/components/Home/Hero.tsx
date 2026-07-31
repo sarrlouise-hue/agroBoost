@@ -22,20 +22,20 @@ export const Hero: React.FC<HeroProps> = ({ totalCount }) => {
 				}}
 			/>
 
-			{/* Subtle dark scrim: a bit stronger at top (behind heading) and bottom (behind paragraph/buttons), lighter in the middle so the tractor photo stays clearly visible */}
+			{/* Light readability scrim — much subtler than before since the bright sky already gives good contrast, like on the live site */}
 			<div
 				aria-hidden="true"
 				className="absolute inset-0"
 				style={{
 					background:
-						"linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.05) 32%, rgba(0,0,0,0.05) 55%, rgba(0,0,0,0.5) 100%)",
+						"linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 40%, rgba(255,255,255,0) 60%)",
 				}}
 			/>
 
 			<div className="relative z-10">
 				<span className="sr-only">{totalCount} machines disponibles</span>
 				<div className="max-w-3xl mx-auto px-4 py-10 sm:py-16 lg:py-24">
-					<div className="space-y-6">
+					<div className="space-y-6 text-left">
 						<div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full text-green-700 text-sm font-medium">
 							<Star className="w-4 h-4 fill-current" />
 							<span>Plateforme N° 1 au Sénégal</span>
@@ -50,17 +50,17 @@ export const Hero: React.FC<HeroProps> = ({ totalCount }) => {
 							La première place de marché pour l'agriculture au Sénégal
 						</p>
 
-						<div className="flex flex-col items-center sm:items-start gap-4 pt-2">
-							<Link to="/services" className="w-[85%] sm:w-auto">
-								<button className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+						<div className="flex flex-col items-start gap-4 pt-2">
+							<Link to="/services">
+								<button className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
 									<Search className="w-5 h-5" />
 									Rechercher du matériel
 									<span aria-hidden="true">→</span>
 								</button>
 							</Link>
 
-							<Link to="/register" className="w-[85%] sm:w-auto">
-								<button className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+							<Link to="/register">
+								<button className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
 									Devenir prestataire
 								</button>
 							</Link>
