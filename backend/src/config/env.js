@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 module.exports = {
-	NODE_ENV: process.env.NODE_ENV || "production",
+	NODE_ENV: process.env.NODE_ENV || "prod",
 	PORT: process.env.PORT || 3000,
 
 	// Database PostgreSQL (SUPABASE / PROD)
