@@ -74,7 +74,7 @@ class PayTechService {
 				currency: "XOF",
 				ref_command: bookingId,
 				command_name: `Réservation ${bookingId}`,
-				env: PAYTECH.ENV || "test",
+				env: PAYTECH.ENV || "prod",
 				ipn_url: PAYTECH.IPN_URL,
 				success_url: successUrl,
 				cancel_url: cancelUrl,
