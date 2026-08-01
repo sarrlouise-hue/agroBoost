@@ -166,7 +166,7 @@ npm run install:all
 
 ## 👥 Équipe
 
-- **Backend :** Revhieno
+- **Backend :** PAPE NDIOGOU NIANG
 - **Admin Panel :** Gaston
 - **Projet :** ALLO TRACTEUR
 
