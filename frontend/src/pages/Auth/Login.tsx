@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Link, useRouter } from "../../router";
 import { useAuth } from "../../contexts/AuthContext";
+import { useLanguage } from "../../contexts/LanguageContext";
 import { Mail, Lock, AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export const Login: React.FC = () => {
 	const { signIn } = useAuth();
 	const { navigate } = useRouter();
+	const { t } = useLanguage();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
@@ -26,7 +28,7 @@ export const Login: React.FC = () => {
 				typeof err === "object" && err !== null && "message" in err
 					? String((err as { message?: unknown }).message ?? "")
 					: "";
-			setError(message || "Email ou mot de passe incorrect");
+			setError(message || t("auth.login.error"));
 		} finally {
 			setLoading(false);
 		}
@@ -39,7 +41,7 @@ export const Login: React.FC = () => {
 				aria-hidden="true"
 				className="absolute inset-0"
 				style={{
-					backgroundImage: "url('/TRACTOR.jpg')",
+					backgroundImage: "url('/trac.png')",
 					backgroundSize: "cover",
 					backgroundPosition: "center",
 					backgroundRepeat: "no-repeat",
@@ -64,10 +66,10 @@ export const Login: React.FC = () => {
 							AlloTracteur
 						</span>
 					</Link>
-					<h2 className="text-2xl font-bold text-gray-900 mb-2">Connexion</h2>
-					<p className="text-gray-500 text-sm">
-						Connectez-vous à votre compte pour continuer
-					</p>
+					<h2 className="text-2xl font-bold text-gray-900 mb-2">
+						{t("auth.login.title")}
+					</h2>
+					<p className="text-gray-500 text-sm">{t("auth.login.subtitle")}</p>
 				</div>
 
 				{error && (
@@ -82,7 +84,7 @@ export const Login: React.FC = () => {
 								onClick={() => navigate("/verify-otp", { state: { email } })}
 								className="text-sm font-bold text-red-700 hover:text-red-900 hover:underline ml-8"
 							>
-								→ Aller à la page code de validation
+								{t("auth.login.goToVerify")}
 							</button>
 						)}
 					</div>
@@ -91,7 +93,7 @@ export const Login: React.FC = () => {
 				<form onSubmit={handleSubmit} className="space-y-5">
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">
-							Email
+							{t("auth.login.email")}
 						</label>
 						<div className="relative">
 							<Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 stroke-[1.5]" />
@@ -108,7 +110,7 @@ export const Login: React.FC = () => {
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">
-							Mot de passe
+							{t("auth.login.password")}
 						</label>
 						<div className="relative">
 							<Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 stroke-[1.5]" />
@@ -142,13 +144,13 @@ export const Login: React.FC = () => {
 								onChange={(e) => setRememberMe(e.target.checked)}
 								className="rounded border-gray-300 text-green-600 focus:ring-green-500 mr-2 h-4 w-4"
 							/>
-							Se souvenir de moi
+							{t("auth.login.rememberMe")}
 						</label>
 						<Link
 							to="/forgot-password"
 							className="text-sm font-medium text-green-600 hover:text-green-700 hover:underline"
 						>
-							Mot de passe oublié ?
+							{t("auth.login.forgotPassword")}
 						</Link>
 					</div>
 
@@ -157,18 +159,18 @@ export const Login: React.FC = () => {
 						disabled={loading}
 						className="w-full bg-green-600 text-white py-3.5 rounded-lg hover:bg-green-700 transition-all font-bold text-base shadow-sm disabled:opacity-50 mt-4"
 					>
-						{loading ? "Connexion..." : "Se connecter"}
+						{loading ? t("auth.login.submitting") : t("auth.login.submit")}
 					</button>
 				</form>
 
 				<div className="pt-6 text-center text-sm">
 					<p className="text-gray-500">
-						Vous n'avez pas de compte ?{" "}
+						{t("auth.login.noAccount")}{" "}
 						<Link
 							to="/register"
 							className="text-green-600 hover:text-green-700 font-medium hover:underline"
 						>
-							S'inscrire
+							{t("auth.login.signUp")}
 						</Link>
 					</p>
 				</div>

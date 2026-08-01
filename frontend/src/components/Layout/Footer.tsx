@@ -9,9 +9,11 @@ import {
 	Twitter,
 	Instagram,
 } from "lucide-react";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 export const Footer: React.FC = () => {
 	const currentYear = new Date().getFullYear();
+	const { t } = useLanguage();
 
 	return (
 		<footer className="bg-gray-900 text-gray-300">
@@ -25,11 +27,7 @@ export const Footer: React.FC = () => {
 								AlloTracteur
 							</span>
 						</div>
-						<p className="text-gray-400 mb-4">
-							La plateforme de location de matériel agricole au Sénégal.
-							Connectez producteurs et prestataires pour une agriculture moderne
-							et efficace.
-						</p>
+						<p className="text-gray-400 mb-4">{t("footer.about")}</p>
 						<div className="flex space-x-4">
 							<a
 								href="https://facebook.com"
@@ -61,7 +59,7 @@ export const Footer: React.FC = () => {
 					{/* Quick Links */}
 					<div>
 						<h3 className="text-white font-semibold text-lg mb-4">
-							Liens rapides
+							{t("footer.quickLinks")}
 						</h3>
 						<ul className="space-y-2">
 							<li>
@@ -69,15 +67,15 @@ export const Footer: React.FC = () => {
 									to="/"
 									className="text-gray-400 hover:text-green-500 transition-colors"
 								>
-									Accueil
+									{t("nav.home")}
 								</Link>
 							</li>
 							<li>
 								<Link
-									to="/machines"
+									to="/services"
 									className="text-gray-400 hover:text-green-500 transition-colors"
 								>
-									Machines disponibles
+									{t("footer.availableMachines")}
 								</Link>
 							</li>
 							<li>
@@ -85,7 +83,7 @@ export const Footer: React.FC = () => {
 									to="/register"
 									className="text-gray-400 hover:text-green-500 transition-colors"
 								>
-									S'inscrire
+									{t("nav.register")}
 								</Link>
 							</li>
 							<li>
@@ -93,7 +91,7 @@ export const Footer: React.FC = () => {
 									to="/login"
 									className="text-gray-400 hover:text-green-500 transition-colors"
 								>
-									Connexion
+									{t("nav.login")}
 								</Link>
 							</li>
 						</ul>
@@ -101,14 +99,16 @@ export const Footer: React.FC = () => {
 
 					{/* Services */}
 					<div>
-						<h3 className="text-white font-semibold text-lg mb-4">Services</h3>
+						<h3 className="text-white font-semibold text-lg mb-4">
+							{t("footer.services")}
+						</h3>
 						<ul className="space-y-2">
 							<li>
 								<a
 									href="#"
 									className="text-gray-400 hover:text-green-500 transition-colors"
 								>
-									Location de tracteurs
+									{t("footer.tractorRental")}
 								</a>
 							</li>
 							<li>
@@ -116,7 +116,7 @@ export const Footer: React.FC = () => {
 									href="#"
 									className="text-gray-400 hover:text-green-500 transition-colors"
 								>
-									Location de moissonneuses
+									{t("footer.harvesterRental")}
 								</a>
 							</li>
 							<li>
@@ -124,7 +124,7 @@ export const Footer: React.FC = () => {
 									href="#"
 									className="text-gray-400 hover:text-green-500 transition-colors"
 								>
-									Équipements d'irrigation
+									{t("footer.irrigation")}
 								</a>
 							</li>
 							<li>
@@ -132,7 +132,7 @@ export const Footer: React.FC = () => {
 									href="#"
 									className="text-gray-400 hover:text-green-500 transition-colors"
 								>
-									Outils agricoles
+									{t("footer.tools")}
 								</a>
 							</li>
 						</ul>
@@ -140,7 +140,9 @@ export const Footer: React.FC = () => {
 
 					{/* Contact */}
 					<div>
-						<h3 className="text-white font-semibold text-lg mb-4">Contact</h3>
+						<h3 className="text-white font-semibold text-lg mb-4">
+							{t("footer.contact")}
+						</h3>
 						<ul className="space-y-3">
 							<li className="flex items-start space-x-3">
 								<MapPin className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
@@ -175,26 +177,26 @@ export const Footer: React.FC = () => {
 				{/* Bottom Bar */}
 				<div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
 					<p className="text-gray-400 text-sm mb-4 md:mb-0">
-						&copy; {currentYear} AlloTracteur. Tous droits réservés.
+						&copy; {currentYear} AlloTracteur. {t("footer.rights")}
 					</p>
 					<div className="flex space-x-6">
 						<a
 							href="#"
 							className="text-gray-400 hover:text-green-500 transition-colors text-sm"
 						>
-							Conditions d'utilisation
+							{t("footer.terms")}
 						</a>
 						<a
 							href="#"
 							className="text-gray-400 hover:text-green-500 transition-colors text-sm"
 						>
-							Politique de confidentialité
+							{t("footer.privacy")}
 						</a>
 						<a
 							href="#"
 							className="text-gray-400 hover:text-green-500 transition-colors text-sm"
 						>
-							CGV
+							{t("footer.cgv")}
 						</a>
 					</div>
 				</div>

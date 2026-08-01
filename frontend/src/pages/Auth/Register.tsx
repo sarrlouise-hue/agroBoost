@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useRouter } from "../../router";
 import { useAuth } from "../../contexts/AuthContext";
+import { useLanguage } from "../../contexts/LanguageContext";
 import {
 	Tractor,
 	Mail,
@@ -16,6 +17,7 @@ import {
 export const Register: React.FC = () => {
 	const { signUp } = useAuth();
 	const { navigate } = useRouter();
+	const { t } = useLanguage();
 	const [formData, setFormData] = useState({
 		firstName: "",
 		lastName: "",
@@ -45,22 +47,22 @@ export const Register: React.FC = () => {
 		setError("");
 
 		if (formData.password !== formData.confirmPassword) {
-			setError("Les mots de passe ne correspondent pas");
+			setError(t("auth.register.error.passwordMismatch"));
 			return;
 		}
 
 		if (formData.password.length < 6) {
-			setError("Le mot de passe doit contenir au moins 6 caractères");
+			setError(t("auth.register.error.passwordLength"));
 			return;
 		}
 
 		if (!formData.phoneNumber) {
-			setError("Le numéro de téléphone est requis");
+			setError(t("auth.register.error.phoneRequired"));
 			return;
 		}
 
 		if (!formData.acceptedTerms) {
-			setError("Veuillez accepter les conditions d'utilisation");
+			setError(t("auth.register.error.termsRequired"));
 			return;
 		}
 
@@ -77,15 +79,34 @@ export const Register: React.FC = () => {
 			);
 			navigate("/verify-otp", { state: { email: formData.email } });
 		} catch (err: any) {
-			setError(err.message || "Une erreur est survenue lors de l'inscription");
+			setError(err.message || t("auth.register.error.generic"));
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	return (
-		<div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
-			<div className="max-w-[480px] w-full">
+		<div className="min-h-screen relative overflow-hidden flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
+			{/* Background */}
+			<div
+				aria-hidden="true"
+				className="absolute inset-0"
+				style={{
+					backgroundImage: "url('/trac.png')",
+					backgroundSize: "cover",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+					filter: "saturate(1.05)",
+				}}
+			/>
+			{/* Overlay */}
+			<div
+				aria-hidden="true"
+				className="absolute inset-0"
+				style={{ background: "rgba(255, 255, 255, 0.82)" }}
+			/>
+
+			<div className="relative z-10 max-w-[480px] w-full bg-white rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-gray-100 p-8 sm:p-10">
 				<div className="text-center mb-8">
 					<div className="flex items-center justify-center gap-2 mb-6">
 						<Tractor className="w-8 h-8 text-green-600" strokeWidth={2.5} />
@@ -94,10 +115,10 @@ export const Register: React.FC = () => {
 						</span>
 					</div>
 					<h2 className="text-2xl font-bold text-gray-900 mb-2">
-						Créer un compte
+						{t("auth.register.title")}
 					</h2>
 					<p className="text-gray-500 text-sm">
-						Rejoignez notre plateforme dès maintenant
+						{t("auth.register.subtitle")}
 					</p>
 				</div>
 
@@ -111,7 +132,7 @@ export const Register: React.FC = () => {
 				<form onSubmit={handleSubmit} className="space-y-5">
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-3 ml-1">
-							Je suis
+							{t("auth.register.iAm")}
 						</label>
 						<div className="grid grid-cols-2 gap-4">
 							<button
@@ -130,10 +151,10 @@ export const Register: React.FC = () => {
 											: "text-gray-600"
 									}`}
 								>
-									Producteur
+									{t("auth.register.producer")}
 								</span>
 								<span className="text-xs text-gray-500">
-									Je loue des machines
+									{t("auth.register.producerDesc")}
 								</span>
 								{formData.role === "producteur" && (
 									<div className="mt-2">
@@ -160,10 +181,10 @@ export const Register: React.FC = () => {
 											: "text-gray-600"
 									}`}
 								>
-									Prestataire
+									{t("auth.register.provider")}
 								</span>
 								<span className="text-xs text-gray-500">
-									Je propose des machines
+									{t("auth.register.providerDesc")}
 								</span>
 								{formData.role === "prestataire" && (
 									<div className="mt-2">
@@ -177,7 +198,7 @@ export const Register: React.FC = () => {
 					<div className="grid grid-cols-2 gap-4">
 						<div>
 							<label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">
-								Prénom
+								{t("auth.register.firstName")}
 							</label>
 							<div className="relative">
 								<User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 stroke-[1.5]" />
@@ -188,13 +209,13 @@ export const Register: React.FC = () => {
 									value={formData.firstName}
 									onChange={handleChange}
 									className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-1 focus:ring-green-600 focus:border-green-600 transition-all outline-none placeholder-gray-400"
-									placeholder="Prénom"
+									placeholder={t("auth.register.firstName")}
 								/>
 							</div>
 						</div>
 						<div>
 							<label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">
-								Nom
+								{t("auth.register.lastName")}
 							</label>
 							<div className="relative">
 								<User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 stroke-[1.5]" />
@@ -205,7 +226,7 @@ export const Register: React.FC = () => {
 									value={formData.lastName}
 									onChange={handleChange}
 									className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-1 focus:ring-green-600 focus:border-green-600 transition-all outline-none placeholder-gray-400"
-									placeholder="Nom"
+									placeholder={t("auth.register.lastName")}
 								/>
 							</div>
 						</div>
@@ -213,7 +234,7 @@ export const Register: React.FC = () => {
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">
-							Email
+							{t("auth.register.email")}
 						</label>
 						<div className="relative">
 							<Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 stroke-[1.5]" />
@@ -231,7 +252,7 @@ export const Register: React.FC = () => {
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">
-							Téléphone (optionnel)
+							{t("auth.register.phone")}
 						</label>
 						<div className="relative">
 							<Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 stroke-[1.5]" />
@@ -248,7 +269,7 @@ export const Register: React.FC = () => {
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">
-							Mot de passe
+							{t("auth.register.password")}
 						</label>
 						<div className="relative">
 							<Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 stroke-[1.5]" />
@@ -277,7 +298,7 @@ export const Register: React.FC = () => {
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">
-							Confirmer le mot de passe
+							{t("auth.register.confirmPassword")}
 						</label>
 						<div className="relative">
 							<Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 stroke-[1.5]" />
@@ -318,19 +339,19 @@ export const Register: React.FC = () => {
 						</div>
 						<div className="ml-2 text-sm">
 							<label htmlFor="acceptedTerms" className="text-gray-500">
-								J'accepte les{" "}
+								{t("auth.register.acceptTerms1")}{" "}
 								<a
 									href="#"
 									className="font-medium text-green-600 hover:text-green-500"
 								>
-									conditions d'utilisation
+									{t("auth.register.terms")}
 								</a>{" "}
-								et la{" "}
+								{t("auth.register.acceptTerms2")}{" "}
 								<a
 									href="#"
 									className="font-medium text-green-600 hover:text-green-500"
 								>
-									politique de confidentialité
+									{t("auth.register.privacy")}
 								</a>
 							</label>
 						</div>
@@ -341,17 +362,19 @@ export const Register: React.FC = () => {
 						disabled={loading}
 						className="w-full bg-green-600 text-white py-3.5 rounded-lg hover:bg-green-700 transition-all font-bold text-base shadow-sm disabled:opacity-50 mt-6"
 					>
-						{loading ? "Création du compte..." : "S'inscrire"}
+						{loading
+							? t("auth.register.submitting")
+							: t("auth.register.submit")}
 					</button>
 
 					<div className="pt-2 text-center text-sm">
 						<p className="text-gray-500">
-							Vous avez déjà un compte ?{" "}
+							{t("auth.register.haveAccount")}{" "}
 							<Link
 								to="/login"
 								className="text-green-600 hover:text-green-700 font-medium"
 							>
-								Se connecter
+								{t("auth.register.logIn")}
 							</Link>
 						</p>
 					</div>

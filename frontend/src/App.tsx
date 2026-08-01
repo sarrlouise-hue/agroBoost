@@ -1,5 +1,6 @@
 import { Router, Route, useRouter } from "./router";
 import { AuthProvider } from "./contexts/AuthContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import { Header } from "./components/Layout/Header";
 import { Footer } from "./components/Layout/Footer";
 import { Home } from "./pages/Home";
@@ -19,6 +20,7 @@ import { ServiceAvailability } from "./pages/Services/ServiceAvailability";
 import { Payment } from "./pages/Payment/Payment";
 import { PaymentSuccess } from "./pages/Payment/PaymentSuccess";
 import { PaymentCancel } from "./pages/Payment/PaymentCancel";
+import { LiveMap } from "./pages/Map/LiveMap";
 
 function AppContent() {
 	const { currentPath } = useRouter();
@@ -42,6 +44,7 @@ function AppContent() {
 				<Route path="/dashboard/prestataire" component={DashboardPrestataire} />
 				<Route path="/profile" component={Profile} />
 				<Route path="/services" component={Services} />
+				<Route path="/carte" component={LiveMap} />
 				<Route path="/create-service" component={CreateService} />
 				<Route path="/edit-service/:id" component={EditService} />
 				<Route path="/payment" component={Payment} />
@@ -61,9 +64,11 @@ function AppContent() {
 function App() {
 	return (
 		<Router>
-			<AuthProvider>
-				<AppContent />
-			</AuthProvider>
+			<LanguageProvider>
+				<AuthProvider>
+					<AppContent />
+				</AuthProvider>
+			</LanguageProvider>
 		</Router>
 	);
 }

@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 module.exports = {
-	NODE_ENV: process.env.NODE_ENV || "prod",
+	NODE_ENV: process.env.NODE_ENV || "production",
 	PORT: process.env.PORT || 3000,
 
 	// Database PostgreSQL (SUPABASE / PROD)
@@ -51,7 +51,7 @@ module.exports = {
 		API_KEY: process.env.PAYTECH_API_KEY || "",
 		API_SECRET: process.env.PAYTECH_API_SECRET || "",
 		BASE_URL: process.env.PAYTECH_BASE_URL || "https://paytech.sn",
-		ENV: process.env.PAYTECH_ENV || "production",
+		ENV: process.env.PAYTECH_ENV || "prod",
 		IPN_URL: process.env.PAYTECH_IPN_URL || "",
 		SUCCESS_URL: process.env.PAYTECH_SUCCESS_URL || "",
 		CANCEL_URL: process.env.PAYTECH_CANCEL_URL || "",
@@ -90,7 +90,7 @@ module.exports = {
 	// URLs PRODUCTION
 	API_URL: process.env.API_URL || "https://agro-boost-ruddy.vercel.app",
 	FRONTEND_URL: process.env.FRONTEND_URL || "https://allotracteur.com",
-	ADMIN_URL: process.env.ADMIN_URL || "https://admin.allotracteur.com/",
+	ADMIN_URL: process.env.ADMIN_URL || "https://allotracteuradmin.vercel.app",
 
 	// Email (PRODUCTION)
 	EMAIL: {

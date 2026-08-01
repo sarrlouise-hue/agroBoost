@@ -1,10 +1,69 @@
 import React, { useState } from "react";
 import { Link } from "../../router";
 import { useAuth } from "../../contexts/AuthContext";
-import { Menu, X, User, LogOut, LayoutDashboard } from "lucide-react";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { LANGUAGES, Language } from "../../i18n/translations";
+import { Menu, X, User, LogOut, LayoutDashboard, Map, Globe, ChevronDown } from "lucide-react";
+
+const LanguageSwitcher: React.FC<{ compact?: boolean }> = ({ compact }) => {
+	const { language, setLanguage } = useLanguage();
+	const [open, setOpen] = useState(false);
+	const current = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
+
+	const handleSelect = (code: Language) => {
+		setLanguage(code);
+		setOpen(false);
+	};
+
+	return (
+		<div className="relative">
+			<button
+				onClick={() => setOpen((prev) => !prev)}
+				className="flex items-center gap-1.5 text-gray-700 hover:text-green-600 transition-colors font-medium px-2 py-1.5 rounded-lg hover:bg-gray-50"
+				aria-haspopup="true"
+				aria-expanded={open}
+			>
+				{compact ? (
+					<Globe className="w-4 h-4" />
+				) : (
+					<span className="text-base leading-none">{current.flag}</span>
+				)}
+				<span className={compact ? "sr-only" : "text-sm"}>{current.label}</span>
+				<ChevronDown className="w-3.5 h-3.5" />
+			</button>
+
+			{open && (
+				<>
+					<div
+						className="fixed inset-0 z-40"
+						onClick={() => setOpen(false)}
+						aria-hidden="true"
+					/>
+					<div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+						{LANGUAGES.map((lang) => (
+							<button
+								key={lang.code}
+								onClick={() => handleSelect(lang.code)}
+								className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-green-50 transition-colors ${
+									lang.code === language
+										? "text-green-700 font-semibold"
+										: "text-gray-700"
+								}`}
+							>
+								<span className="text-base leading-none">{lang.flag}</span>
+								{lang.label}
+							</button>
+						))}
+					</div>
+				</>
+			)}
+		</div>
+	);
+};
 
 export const Header: React.FC = () => {
 	const { user, profile, signOut } = useAuth();
+	const { t } = useLanguage();
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	const handleSignOut = async () => {
@@ -49,13 +108,20 @@ export const Header: React.FC = () => {
 							to="/"
 							className="text-gray-700 hover:text-green-600 transition-colors font-medium"
 						>
-							Accueil
+							{t("nav.home")}
 						</Link>
 						<Link
 							to="/services"
 							className="text-gray-700 hover:text-green-600 transition-colors font-medium"
 						>
-							Services
+							{t("nav.services")}
+						</Link>
+						<Link
+							to="/carte"
+							className="text-gray-700 hover:text-green-600 transition-colors font-medium flex items-center gap-1"
+						>
+							<Map className="w-4 h-4" />
+							{t("nav.map")}
 						</Link>
 
 						{user ? (
@@ -65,7 +131,7 @@ export const Header: React.FC = () => {
 									className="text-gray-700 hover:text-green-600 transition-colors font-medium flex items-center space-x-1"
 								>
 									<LayoutDashboard className="w-4 h-4" />
-									<span>Tableau de bord</span>
+									<span>{t("nav.dashboard")}</span>
 								</Link>
 
 								{profile?.role === "prestataire" && (
@@ -89,7 +155,7 @@ export const Header: React.FC = () => {
 										className="flex items-center space-x-1 text-gray-700 hover:text-red-600 transition-colors"
 									>
 										<LogOut className="w-5 h-5" />
-										<span>Déconnexion</span>
+										<span>{t("nav.logout")}</span>
 									</button>
 								</div>
 							</>
@@ -99,29 +165,36 @@ export const Header: React.FC = () => {
 									to="/login"
 									className="text-gray-700 hover:text-green-600 transition-colors font-medium"
 								>
-									Connexion
+									{t("nav.login")}
 								</Link>
 								<Link
 									to="/register"
 									className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium"
 								>
-									S'inscrire
+									{t("nav.register")}
 								</Link>
 							</>
 						)}
+
+						<div className="border-l border-gray-200 pl-4">
+							<LanguageSwitcher />
+						</div>
 					</div>
 
-					{/* Mobile Menu Button */}
-					<button
-						onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-						className="md:hidden text-gray-700 hover:text-green-600"
-					>
-						{mobileMenuOpen ? (
-							<X className="w-6 h-6" />
-						) : (
-							<Menu className="w-6 h-6" />
-						)}
-					</button>
+					{/* Mobile: language + menu button */}
+					<div className="flex items-center gap-2 md:hidden">
+						<LanguageSwitcher compact />
+						<button
+							onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+							className="text-gray-700 hover:text-green-600"
+						>
+							{mobileMenuOpen ? (
+								<X className="w-6 h-6" />
+							) : (
+								<Menu className="w-6 h-6" />
+							)}
+						</button>
+					</div>
 				</div>
 
 				{/* Mobile Navigation */}
@@ -133,14 +206,22 @@ export const Header: React.FC = () => {
 								className="text-gray-700 hover:text-green-600 transition-colors font-medium"
 								onClick={() => setMobileMenuOpen(false)}
 							>
-								Accueil
+								{t("nav.home")}
 							</Link>
 							<Link
 								to="/services"
 								className="text-gray-700 hover:text-green-600 transition-colors font-medium"
 								onClick={() => setMobileMenuOpen(false)}
 							>
-								Services
+								{t("nav.services")}
+							</Link>
+							<Link
+								to="/carte"
+								className="text-gray-700 hover:text-green-600 transition-colors font-medium flex items-center gap-2"
+								onClick={() => setMobileMenuOpen(false)}
+							>
+								<Map className="w-4 h-4" />
+								{t("nav.map")}
 							</Link>
 
 							{user ? (
@@ -151,7 +232,7 @@ export const Header: React.FC = () => {
 										onClick={() => setMobileMenuOpen(false)}
 									>
 										<LayoutDashboard className="w-4 h-4" />
-										<span>Tableau de bord</span>
+										<span>{t("nav.dashboard")}</span>
 									</Link>
 
 									{profile?.role === "prestataire" && (
@@ -176,7 +257,7 @@ export const Header: React.FC = () => {
 											className="w-full flex items-center justify-center space-x-2 text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors"
 										>
 											<LogOut className="w-5 h-5" />
-											<span>Déconnexion</span>
+											<span>{t("nav.logout")}</span>
 										</button>
 									</div>
 								</>
@@ -187,14 +268,14 @@ export const Header: React.FC = () => {
 										className="text-gray-700 hover:text-green-600 transition-colors font-medium"
 										onClick={() => setMobileMenuOpen(false)}
 									>
-										Connexion
+										{t("nav.login")}
 									</Link>
 									<Link
 										to="/register"
 										className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium text-center"
 										onClick={() => setMobileMenuOpen(false)}
 									>
-										S'inscrire
+										{t("nav.register")}
 									</Link>
 								</>
 							)}
