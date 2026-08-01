@@ -1,34 +1,41 @@
 {
-	"name": "agroboost-monorepo",
-	"version": "1.0.0",
-	"description": "ALLO TRACTEUR - Plateforme de réservation de services agricoles (Backend + Admin Panel)",
-	"private": true,
-	"scripts": {
-		"dev": "concurrently \"npm run dev:backend\" \"npm run dev:admin\" \"npm run dev:frontend\" --names \"BACKEND,ADMIN,FRONTEND\" --prefix-colors \"cyan,magenta,yellow\"",
-		"dev:backend": "cd backend && npm run dev",
-		"dev:admin": "cd admin-agro-boost && npm run dev",
-		"dev:frontend": "cd frontend && npm run dev",
-		"install:all": "npm install && cd backend && npm install && cd ../admin-agro-boost && npm install && cd ../frontend && npm install",
-		"build:admin": "cd admin-agro-boost && npm run build",
-		"start:backend": "cd backend && npm start",
-		"lint:backend": "cd backend && npm run lint",
-		"lint:admin": "cd admin-agro-boost && npm run lint",
-		"test:backend": "cd backend && npm test"
-	},
-	"keywords": [
-		"agriculture",
-		"senegal",
-		"monorepo",
-		"backend",
-		"admin-panel"
-	],
-	"author": "ALLO TRACTEUR",
-	"license": "ISC",
-	"devDependencies": {
-		"concurrently": "^8.2.2"
-	},
-	"engines": {
-		"node": ">=18.0.0",
-		"npm": ">=9.0.0"
-	}
+  "name": "allotracteur-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.344.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "@types/leaflet": "^1.9.21",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.18",
+    "eslint": "^9.9.1",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.11",
+    "globals": "^15.9.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.3.0",
+    "vite": "^7.3.6"
+  },
+  "engines": {
+    "node": ">=18"
+  }
 }

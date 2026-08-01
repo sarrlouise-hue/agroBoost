@@ -1,1 +1,11 @@
+<<<<<<< HEAD
 node_modules
+=======
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+>>>>>>> fdce2e6 (Initial commit)
