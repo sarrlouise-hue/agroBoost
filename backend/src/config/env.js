@@ -51,7 +51,7 @@ module.exports = {
 		API_KEY: process.env.PAYTECH_API_KEY || "",
 		API_SECRET: process.env.PAYTECH_API_SECRET || "",
 		BASE_URL: process.env.PAYTECH_BASE_URL || "https://paytech.sn",
-		ENV: process.env.PAYTECH_ENV || "production",
+		ENV: process.env.PAYTECH_ENV || "prod",
 		IPN_URL: process.env.PAYTECH_IPN_URL || "",
 		SUCCESS_URL: process.env.PAYTECH_SUCCESS_URL || "",
 		CANCEL_URL: process.env.PAYTECH_CANCEL_URL || "",
